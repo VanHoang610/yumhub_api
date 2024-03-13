@@ -45,7 +45,7 @@ import { AdminModule } from './modules/admins/admin.module';
     AdminModule,
 
 
-    MongooseModule.forRoot('mongodb://localhost:27017/API_Merchant'),
+    MongooseModule.forRoot('mongodb://127.0.0.1:27017/API_Merchant'),
   ],
   controllers: [AppController],
   providers: [AppService],

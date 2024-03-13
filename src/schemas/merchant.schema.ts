@@ -2,6 +2,7 @@ import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 
 @Schema()
 export class Merchant {
+    
 
     @Prop({required: true})
     name: string
@@ -23,6 +24,9 @@ export class Merchant {
 
     @Prop({required: false})
     businessLicense?: string
+
+    @Prop({required: false, default: false})
+    deleted?: boolean 
 
 }
 

@@ -1,13 +1,13 @@
-import { IsEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmpty, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 
 export class MerchantDto {
 
-    @IsEmpty()
+    @IsNotEmpty({message:"tên không được để trống"})
     @IsString()
     name: string
     
-    @IsEmpty()
+    @IsNotEmpty({message:"tên không được để trống"})
     @IsString()
     address: string
 
