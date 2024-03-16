@@ -3,15 +3,14 @@ import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 @Schema()
 export class Merchant {
     
-
     @Prop({required: true})
     name: string
     
     @Prop({required: true})
     address: string
 
-    @Prop({required: false})
-    type?: string
+    @Prop({required: false})  //1: chay, 2: mặn
+    type?: number
 
     @Prop({required: false})
     openTime?: string

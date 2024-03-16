@@ -11,8 +11,8 @@ export class UserMerchantDto {
     userID? : User
 
     @IsString()
-    @IsOptional()
-    role?: string
+    @IsOptional() //1: admin, 2: employee
+    role?: number
 
     @IsString()
     @IsOptional()

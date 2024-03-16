@@ -7,19 +7,19 @@ import { Order } from "./order.schema";
 export class Review {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    reviewerID?: User
+    orderID: Order
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    userID?: User
-
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    orderID?: Order
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'}) // người đánh giá
+    reviewerID: User
 
     @Prop({required: false})
     description?: string
 
     @Prop({required: true})
-    rating: string
+    rating: number
+
+    @Prop({required: false})  // 1: customer, 2: merchant, 3: shipper
+    typeOfReview: number
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review)

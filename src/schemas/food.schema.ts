@@ -17,8 +17,8 @@ export class Food {
     @Prop({required: true})
     price: number
 
-    @Prop({required: false})
-    type?: string 
+    @Prop({required: false}) //1: thức ăn, 2: nước uống
+    type?: number  
 }   
 
 export const FoodSchema = SchemaFactory.createForClass(Food)

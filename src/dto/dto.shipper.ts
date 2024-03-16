@@ -11,6 +11,7 @@ export class ShipperDto {
     avatar?: string
 
     @IsString()
+    @IsOptional()
     fullName: string
 
     @IsOptional()
@@ -24,10 +25,6 @@ export class ShipperDto {
     @IsOptional()
     @IsString()
     birthDay?: string
-
-    @IsOptional()
-    @IsString()
-    email?: string
 
     @IsOptional()
     @IsString()

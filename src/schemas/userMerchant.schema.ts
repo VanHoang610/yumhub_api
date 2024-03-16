@@ -12,8 +12,8 @@ export class UserMerchant {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
     userID?: User
     
-    @Prop({required: false})
-    role?: string
+    @Prop({required: false})  //1: admin, 2: employee
+    role?: number
 
     @Prop({required: false})
     fullName?: string

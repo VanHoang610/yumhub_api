@@ -5,12 +5,15 @@ import mongoose, { Document, SchemaTypes } from 'mongoose';
 export class User {
 
     @Prop({required: false, unique: true})
+    email?: string;
+
+    @Prop({required: false, unique: true})
     phoneNumber: string;
 
     @Prop({required: false})
     password: string;
 
-    @Prop({required: false})
+    @Prop({required: false})  // 1: customer, 2: merchant, 3: shipper
     role: number;
 
     @Prop({required: false})

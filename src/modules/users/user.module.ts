@@ -4,6 +4,7 @@ import { User, UserSchema } from "src/schemas/user.schemas";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { Customer, CustomerSchema } from "src/schemas/customer.schemas";
+import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema";
 
 @Module({
     imports: [
@@ -12,6 +13,10 @@ import { Customer, CustomerSchema } from "src/schemas/customer.schemas";
                 name: User.name,
                 schema: UserSchema
             },
+            {
+                name: ResetPassword.name,
+                schema: ResetPasswordSchema
+            }
         ]),
     ],
     controllers: [UserController],

@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
 
 
 export class MerchantDto {
@@ -12,8 +12,8 @@ export class MerchantDto {
     address: string
 
     @IsOptional()
-    @IsString()
-    type?: string
+    @IsNumber()
+    type?: number
 
 
     @IsOptional()

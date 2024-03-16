@@ -18,10 +18,6 @@ export class CustomerDto {
 
     @IsOptional()
     @IsString()
-    email?: string
-
-    @IsOptional()
-    @IsString()
     sex?: string
 
     @IsOptional()
@@ -31,4 +27,8 @@ export class CustomerDto {
     @IsOptional()
     @IsString()
     joinDay?: string
+
+    @IsOptional()
+    @IsString()
+    rating?: string
 };

@@ -2,6 +2,7 @@ import { Controller, Post, Body, ValidationPipe, Get, Param, Patch, HttpExceptio
 import { CustomerDto } from "src/dto/dto.customer";
 import { CustomerServices } from "./customer.service";
 import mongoose from "mongoose";
+import { retry } from "rxjs";
 
 
 @Controller('customers')
@@ -11,7 +12,7 @@ export class CustomerController {
 
 
     // tạo customer
-    @Post()
+    @Post('createCustomer')
     createUser(@Body(new ValidationPipe()) customerDto: CustomerDto){
         console.log(customerDto);
         return this.customerService.createUser(customerDto)
@@ -51,6 +52,12 @@ export class CustomerController {
         return  await this.customerService.updateCustomer(id, updateCustomer);
     
     }
+
+     // lấy dánh sách lịch sử theo id
+     @Get('getHistoryCustomer/:id')
+     getHistoryById(@Param('id') id: string){
+         return this.customerService.getHistoryById(id);
+     }
     
 }
 

@@ -7,7 +7,7 @@ export class Shipper {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' }) // Thêm ref và sửa kiểu dữ liệu
     userID?: User;
     
-    @Prop({required: true})
+    @Prop({required: false})
     fullName: string
 
     @Prop({required: false})
@@ -21,9 +21,6 @@ export class Shipper {
 
     @Prop({required: false})
     birthDay?: string
-
-    @Prop({required: false})
-    email?: string
 
     @Prop({required: false})
     address?: string

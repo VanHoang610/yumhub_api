@@ -1,26 +1,30 @@
 import { Injectable } from "@nestjs/common/decorators/core"
 import { InjectModel } from "@nestjs/mongoose";
-import { get } from "http";
 import { Model } from "mongoose";
 import { CustomerDto } from "src/dto/dto.customer";
 import { Customer } from "src/schemas/customer.schemas";
 import { User } from "src/schemas/user.schemas";
+import * as bcrypt from 'bcrypt';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Order } from "src/schemas/order.schema";
 
 @Injectable()
 export class CustomerServices {
     constructor(@InjectModel(Customer.name) private customers: Model<Customer>,
-        @InjectModel(User.name) private users: Model<User>) { }
+        @InjectModel(User.name) private users: Model<User>,
+        @InjectModel(Order.name) private orderModel: Model<Order>) { }
 
     async createUser({ userID, ...customerDto }: CustomerDto) {
-
         if (userID) {
-            const newUsers = new this.users(userID)
+            const passHash = await bcrypt.hash(userID.password, 10);
+
+            const newUsers = new this.users({...userID, password: passHash});
             const savedUsers = await newUsers.save();
-            const newUser = new this.customers({
+            const newCustomer = new this.customers({
                 ...customerDto,
                 userID: savedUsers._id,
             });
-            return newUser.save();
+            return newCustomer.save();
         }
 
         const newCustomer = new this.customers(customerDto)
@@ -41,7 +45,7 @@ export class CustomerServices {
             const getPhoneNumber = getCustomerById.userID.phoneNumber;
             return { SDT: getPhoneNumber };
         } else {
-            throw new Error("Lấy SDT thất bại")
+            return { SDT: "Lấy số điện thoại thất bại" };
         }
     }
 
@@ -52,9 +56,9 @@ export class CustomerServices {
             const userID = customerById.userID;
             const updateUserID = await this.users.findByIdAndUpdate(userID, {deleted: true}, {new: true})
             if (updateUserID) {
-                return "Xóa thành công Customer"
+                return { Message: "Xóa thành công"}
             } else {
-                throw new Error("Không tìm thấy ID Customer")
+                return { Message: "Xóa thất bại"}
             }
         } catch (error) {
             console.error('Error delete customer:', error);
@@ -69,6 +73,18 @@ export class CustomerServices {
         } catch (error) {
             console.error('Error updating customer:', error);
             throw error;
+        }
+    }
+
+
+    async getHistoryById (id: string) {
+        try {
+            const orders = await this.orderModel.find({customerID: id, status: 1}).sort({dataBook: 1});
+            if(!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
+            return { result: true, history: orders }
+
+        } catch (error) {
+            return { result: false, history: error }
         }
     }
 

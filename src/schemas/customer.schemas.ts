@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Document, SchemaTypes } from 'mongoose';
+import mongoose from 'mongoose';
 import { User } from "./user.schemas";
 
 @Schema()
@@ -15,9 +15,6 @@ export class Customer {
     avatar?: string
 
     @Prop({required: false})
-    email?: string
-
-    @Prop({required: false})
     sex?: string
 
     @Prop({required: false})
@@ -25,6 +22,9 @@ export class Customer {
 
     @Prop({required: false})
     joinDay?: string
+
+    @Prop({required: false})
+    rating?: string
 
 }
 
