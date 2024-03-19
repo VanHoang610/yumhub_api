@@ -26,6 +26,12 @@ export class Merchant {
 
     @Prop({required: false, default: false})
     deleted?: boolean 
+    
+    @Prop({required: true}) //kinh độ
+    longitude: number 
+
+    @Prop({required: true}) // vĩ độ
+    latitude: number
 
 }
 

@@ -50,8 +50,7 @@ export class OrderService {
             return { success: true, order: orders };
             
         } catch (error) {
-            console.error("Create Order Fail", error);
-            return { "Create Order Fail": error };
+            return { success: false, order: error };
         }
     }
 

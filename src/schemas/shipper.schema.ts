@@ -34,6 +34,9 @@ export class Shipper {
     @Prop({required: false})
     idBike?: string
 
+    @Prop({required: false, default: true})
+    active?: boolean
+
 }
 
 export const ShipperSchema = SchemaFactory.createForClass(Shipper)

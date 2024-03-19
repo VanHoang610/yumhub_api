@@ -15,7 +15,7 @@ export class ReviewDto {
     description?: string
 
     @IsString()
-    rating: string
+    rating: number
 
     @IsNumber()
     @IsOptional()

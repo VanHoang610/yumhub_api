@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsOptional, IsString } from "class-validator";
 import { User } from "src/schemas/user.schemas";
 
 export class ShipperDto {
@@ -12,7 +12,7 @@ export class ShipperDto {
 
     @IsString()
     @IsOptional()
-    fullName: string
+    fullName?: string
 
     @IsOptional()
     @IsString()
@@ -41,4 +41,8 @@ export class ShipperDto {
     @IsOptional()
     @IsString()
     idBike?: string
+
+    @IsOptional()
+    @IsBoolean()
+    active?: boolean
 }

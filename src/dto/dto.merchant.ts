@@ -15,7 +15,6 @@ export class MerchantDto {
     @IsNumber()
     type?: number
 
-
     @IsOptional()
     @IsString()
     closeTime?: string
@@ -31,5 +30,11 @@ export class MerchantDto {
     @IsOptional()
     @IsString()
     businessLicense?: string
+
+    @IsNumber()
+    longitude: number
+
+    @IsNumber()
+    latitude: number
 
 }

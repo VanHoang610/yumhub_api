@@ -4,10 +4,10 @@ import { MinLength, IsNotEmpty, IsNumber, IsInt, isString, IsString, IsOptional,
 import { User } from "src/schemas/user.schemas";
 export class CustomerDto {
     
+
     @IsOptional()
     userID?: User;
-  
-    // @MinLength(5, {message: 'Tên phải trên 5 kí tự'})
+
     @IsOptional()
     @IsString({})
     fullName?: string;

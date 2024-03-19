@@ -24,8 +24,14 @@ export class UserService {
     }
 
     //lấy tất cả user
-    getAllUser() {
-        return this.users.find();
+    async getAllUser() {
+        try {
+            const users = await this.users.find();
+            if (!users) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
+            return { result: true, users: users }
+        } catch (error) {
+            return { result: false, users: error }
+        }
     }
 
 
@@ -37,26 +43,24 @@ export class UserService {
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
 
-            return { Message: "Đăng nhập thành công" }
-
+            return { result: true, message: "Đăng nhập thành công" }
         } catch (error) {
-            return { Message: "Đăng nhập thất bại" }
+            return { result: true, message: "Đăng nhập thất bại" }
         }
     }
 
     async register(user: UserDto) {
         try {
             const checkPhone = await this.users.findOne({ phoneNumber: user.phoneNumber });
-            console.log(user.phoneNumber);
 
             if (checkPhone) throw new HttpException("SDT đã được đăng ký", HttpStatus.NOT_FOUND);
 
             const hashedPassword = await bcrypt.hash(user.password, 10);
             const createUser = new this.users({ ...user, password: hashedPassword });
-            createUser.save();
-            return { "Đăng ký thành công": createUser }
+            await createUser.save();
+            return { result: true, register: createUser }
         } catch (error) {
-            return { "Đăng ký thất bại": error };
+            return { result: false, register: error }
         }
     }
 
@@ -78,12 +82,12 @@ export class UserService {
 
             setTimeout(async () => {
                 await this.resetPassModel.deleteOne({ email: email });
-            }, 120000); 
+            }, 120000);
 
-            return { Message: "Hãy kiểm tra Email của bạn!" }
+            return { result: true, message: "Hãy kiểm tra email của bạn!" }
 
         } catch (error) {
-            return { Message: "Gửi OTP thất bại" }
+            return { result: false, message: "Gửi OTP thất bại" }
         }
     }
 
@@ -91,30 +95,30 @@ export class UserService {
         try {
             const user = await this.resetPassModel.findOne({ email: email, otp: otp });
             console.log(user);
-            
+
             if (!user) throw new HttpException('Không tìm thấy OTP', HttpStatus.NOT_FOUND);
 
             await this.resetPassModel.deleteOne({ email: email });
-            return { Message: "Xác nhận OTP thành công" }
-
+            return { result: true, message: "Xác nhận OTP thành công" }
         } catch (error) {
-            return { Message: "OTP thất bại", error }
+            return { result: false, message: "OTP thất bại" }
+
+          
         }
     }
 
     async resetPass(id: string, password: string) {
-        try { 
+        try {
             const user = await this.users.findById(id);
-            if(!user) throw new HttpException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND);
+            if (!user) throw new HttpException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND);
 
             const passwordNew = await bcrypt.hash(password, 10);
 
             user.password = passwordNew
             user.save();
-            
-            return { Message: "Cập nhật mật khẩu thành công" };
+            return { result: true, message: "Cập nhật mật khẩu thành công" }
         } catch (error) {
-            return { Message: "Cập nhật mật khẩu thất bại" };
+            return { result: false, message: "Cập nhật mật khẩu thất bại" }
         }
     }
 
@@ -131,11 +135,11 @@ export class UserService {
 
             existingUser.password = hashPassNew;
             existingUser.save();
-            return { Message: "Đổi mật khẩu thành công" }
+            return { result: true, message: "Đổi mật khẩu thành công" }
         } catch (error) {
-            console.error("Đổi mật khẩu không thành công", error);
-            throw error;
+            return { result: false, message: "Đổi mật khẩu không thành công" }
         }
     }
+    
 
 }

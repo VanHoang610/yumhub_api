@@ -14,25 +14,39 @@ export class CustomerServices {
         @InjectModel(User.name) private users: Model<User>,
         @InjectModel(Order.name) private orderModel: Model<Order>) { }
 
-    async createUser({ userID, ...customerDto }: CustomerDto) {
-        if (userID) {
-            const passHash = await bcrypt.hash(userID.password, 10);
+    async createUser(customerDto: CustomerDto) {
+        try {
+            const phoneNumber = customerDto.userID.phoneNumber;
+            const password = customerDto.userID.password;
+            const balance = customerDto.userID.balance;
+            const email = customerDto.userID.email;
+            const role = customerDto.userID.role;
 
-            const newUsers = new this.users({...userID, password: passHash});
-            const savedUsers = await newUsers.save();
-            const newCustomer = new this.customers({
-                ...customerDto,
-                userID: savedUsers._id,
+            const hashPass = await bcrypt.hash(password, 10)
+
+            const createUser = new this.users({ phoneNumber, password: hashPass, balance, email, role })
+            await createUser.save();
+
+            const createCustomer = new this.customers({
+                userID: createUser._id,
+                fullName: customerDto.fullName,
+                avatar: customerDto.avatar,
+                birthDay: customerDto.birthDay,
+                joinDay: customerDto.joinDay,
+                rating: customerDto.rating,
+                sex: customerDto.sex,
             });
-            return newCustomer.save();
-        }
+            if(!createCustomer) throw new HttpException("Create Fail", HttpStatus.NOT_FOUND)
+            await createCustomer.save();
 
-        const newCustomer = new this.customers(customerDto)
-        return newCustomer.save();
+            return { result: true, customerNew: createCustomer}
+        } catch (error) {
+            return { result: false, customerNew: error}
+        }
     }
 
     getCustomerById(id: string) {
-        return this.customers.findById(id);
+        return this.customers.findById(id).populate('userID');
     }
 
     getCustmer() {
@@ -54,11 +68,11 @@ export class CustomerServices {
         try {
             const customerById = await this.customers.findById(id);
             const userID = customerById.userID;
-            const updateUserID = await this.users.findByIdAndUpdate(userID, {deleted: true}, {new: true})
+            const updateUserID = await this.users.findByIdAndUpdate(userID, { deleted: true }, { new: true })
             if (updateUserID) {
-                return { Message: "Xóa thành công"}
+                return { Message: "Xóa thành công" }
             } else {
-                return { Message: "Xóa thất bại"}
+                return { Message: "Xóa thất bại" }
             }
         } catch (error) {
             console.error('Error delete customer:', error);
@@ -69,24 +83,22 @@ export class CustomerServices {
     async updateCustomer(id: string, updateCustomer: CustomerDto) {
         try {
             const customerNew = await this.customers.findByIdAndUpdate(id, updateCustomer, { new: true });
-            return { CustomerNew: customerNew }
+            if (!customerNew) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
+            return { result: true, customerUpdate: customerNew }
         } catch (error) {
-            console.error('Error updating customer:', error);
-            throw error;
+            return { result: true, customerUpdate: error }
         }
     }
 
 
-    async getHistoryById (id: string) {
+    async getHistoryById(id: string) {
         try {
-            const orders = await this.orderModel.find({customerID: id, status: 1}).sort({dataBook: 1});
-            if(!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
+            const orders = await this.orderModel.find({ customerID: id, status: 1 }).sort({ dataBook: 1 });
+            if (!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
             return { result: true, history: orders }
-
         } catch (error) {
             return { result: false, history: error }
         }
     }
-
 }
 

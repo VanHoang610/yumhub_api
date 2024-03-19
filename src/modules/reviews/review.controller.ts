@@ -20,7 +20,7 @@ export class ReviewController {
 
 
     // lấy tất cả
-    @Get('getAllReview')
+    @Get('getAllReview') // chưa
     getAllReview() {
         try {
             const review = this.reviewService.getAllReview();

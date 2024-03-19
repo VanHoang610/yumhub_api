@@ -14,7 +14,6 @@ export class CustomerController {
     // tạo customer
     @Post('createCustomer')
     createUser(@Body(new ValidationPipe()) customerDto: CustomerDto){
-        console.log(customerDto);
         return this.customerService.createUser(customerDto)
     }
 

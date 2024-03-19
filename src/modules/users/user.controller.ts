@@ -10,13 +10,6 @@ export class UserController {
 
     constructor(private readonly userService: UserService) { }
 
-
-    //tạo user
-    @Post()
-    createUser(@Body(new ValidationPipe()) userDto: UserDto) {
-        return this.userService.createUser(userDto);
-    }
-
     @Get()
     getAllUser() {
         return this.userService.getAllUser();
@@ -63,4 +56,6 @@ export class UserController {
         const { passOld, passNew } = body;
         return this.userService.changePass(id, passOld, passNew);
     }
+
+    
 }
