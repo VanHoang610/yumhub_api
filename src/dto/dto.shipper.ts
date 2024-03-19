@@ -10,6 +10,7 @@ export class ShipperDto {
     @IsString()
     avatar?: string
 
+    
     @IsString()
     fullName: string
 
@@ -41,7 +42,7 @@ export class ShipperDto {
     @IsString()
     modeCode?: string
 
-    @IsOptional()
+    
     @IsString()
-    idBike?: string
+    idBike: string
 }

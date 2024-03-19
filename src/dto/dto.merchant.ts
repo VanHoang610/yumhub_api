@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 
 export class MerchantDto {
@@ -25,8 +25,8 @@ export class MerchantDto {
     openTime?: string
 
     @IsOptional()
-    @IsString()
-    rating?: string
+    @IsNumber()
+    rating?: number
 
     @IsOptional()
     @IsString()

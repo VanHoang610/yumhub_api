@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common'
 import { MerchantService } from './merchant.service';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import mongoose from 'mongoose';
@@ -28,6 +28,7 @@ export class MerchantController {
         const isValid = mongoose.Types.ObjectId.isValid(id);
         if (!isValid) throw new HttpException("Invalid ID", 40);
         return await this.merchantService.updateMerchant(id, updateMerchant);
-
     }
+    
+
 }

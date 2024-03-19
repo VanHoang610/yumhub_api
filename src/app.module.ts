@@ -21,6 +21,8 @@ import { DetailOrderModule } from './modules/detailOrders/detailOrder.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { ImageReviewModule } from './modules/imageReviews/imageReview.module';
 import { AdminModule } from './modules/admins/admin.module';
+import { uploadModule } from './modules/upload/upload.module';
+
 
 @Module({
   imports: [
@@ -43,9 +45,9 @@ import { AdminModule } from './modules/admins/admin.module';
     ReviewModule,
     ImageReviewModule,
     AdminModule,
+    uploadModule,
 
-
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/API_Merchant'),
+    MongooseModule.forRoot('mongodb://127.0.0.1:27017/yumhub'),
   ],
   controllers: [AppController],
   providers: [AppService],

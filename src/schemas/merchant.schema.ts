@@ -20,7 +20,7 @@ export class Merchant {
     closeTime?: string
 
     @Prop({required: false})
-    rating?: string
+    rating?: number
 
     @Prop({required: false})
     businessLicense?: string
