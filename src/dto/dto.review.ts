@@ -1,14 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
+
+import { IsNumber, IsOptional, IsString, IsNotEmpty } from "class-validator";
 import { Order } from "src/schemas/order.schema";
-import { User } from "src/schemas/user.schemas";
 
 export class ReviewDto {
-
+  
     @IsNotEmpty()
-    reviewerID?: User
-
-    @IsNotEmpty()
-    orderID?: Order
+    orderID: Order
 
     @IsString()
     @IsOptional()

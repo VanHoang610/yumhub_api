@@ -5,6 +5,9 @@ import { ShipperController } from "./shipper.controller";
 import { ShipperService } from "./shipper.service";
 import { User, UserSchema } from "src/schemas/user.schemas";
 
+import { Order, OrderSchema } from "src/schemas/order.schema";
+
+
 
 @Module({
     imports:[
@@ -16,6 +19,11 @@ import { User, UserSchema } from "src/schemas/user.schemas";
             {
                 name: User.name,
                 schema: UserSchema
+            },
+            {
+                name: Order.name,
+                schema: OrderSchema
+
             }
         ]),
     ],

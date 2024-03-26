@@ -1,16 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Mongoose } from "mongoose";
-import { User } from "./user.schemas";
+import { Shipper } from "./shipper.schema";
+import { Customer } from "./customer.schemas";
 
 
 @Schema()
-export class PaymentMethod {
+export class PaymentMethodCustomer {
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    userID?: User
-
-    @Prop({required: true})
-    namePaymentMethod: string
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Customer'})
+    customerID: Customer
     
     @Prop({required: true})
     numberCard: string
@@ -25,4 +23,4 @@ export class PaymentMethod {
     cvv: string
 }
 
-export const PaymentMethodSchema = SchemaFactory.createForClass(PaymentMethod)
+export const PaymentMethodCustomerSchema = SchemaFactory.createForClass(PaymentMethodCustomer)

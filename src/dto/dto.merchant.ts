@@ -1,5 +1,4 @@
-import { IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-
+import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
 
 export class MerchantDto {
 
@@ -12,9 +11,8 @@ export class MerchantDto {
     address: string
 
     @IsOptional()
-    @IsString()
-    type?: string
-
+    @IsNumber()
+    type?: number
 
     @IsOptional()
     @IsString()
@@ -31,5 +29,11 @@ export class MerchantDto {
     @IsOptional()
     @IsString()
     businessLicense?: string
+
+    @IsNumber()
+    longitude: number
+
+    @IsNumber()
+    latitude: number
 
 }

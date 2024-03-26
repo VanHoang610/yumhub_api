@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { Shipper } from "./shipper.schema";
+import { DocumentType } from "./documentType.schema";
 
 
 @Schema()
@@ -9,8 +10,8 @@ export class Document {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipper'})
     shipperID?: Shipper
 
-    @Prop({required: true})
-    documentTypeID: number
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType'})
+    documentTypeID: DocumentType
 
     @Prop({required: false})
     description?: string

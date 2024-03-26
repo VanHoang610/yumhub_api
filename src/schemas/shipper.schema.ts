@@ -4,10 +4,7 @@ import { User } from "./user.schemas";
 @Schema()
 export class Shipper {
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]) // Thêm ref và sửa kiểu dữ liệu
-    userID?: User;
-    
-    @Prop({required: true})
+    @Prop({required: false})
     fullName: string
 
     @Prop({required: false})
@@ -23,22 +20,35 @@ export class Shipper {
     birthDay?: string
 
     @Prop({required: false})
-    email?: string
-
-    @Prop({required: false})
     address?: string
     
     @Prop({required: false})
     brandBike?: string
 
-    @Prop({required: false})
+    @Prop({required: false}) //màu
     modeCode?: string
 
-    @Prop({required: true})
-    idBike: string
+    @Prop({required: false}) 
+    idBike?: string
 
-    @Prop({required: false, default: false})
-    deleted?: boolean 
+    @Prop({required: false, default: true}) 
+    active?: boolean
+
+    @Prop({required: false}) //kinh độ
+    longitude: number
+
+    @Prop({required: false}) //vĩ độ
+    latitude: number
+
+    @Prop({required: true}) 
+    phoneNumber: number
+
+    @Prop({required: true})
+    password: string
+
+    @Prop({required: true}) 
+    email: string
+
 }
 
 export const ShipperSchema = SchemaFactory.createForClass(Shipper)

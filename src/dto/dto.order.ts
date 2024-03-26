@@ -2,6 +2,7 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 import { Customer } from "src/schemas/customer.schemas";
 import { Merchant } from "src/schemas/merchant.schema";
 import { Shipper } from "src/schemas/shipper.schema";
+import { Voucher } from "src/schemas/voucher";
 
 export class OrderDto {
 
@@ -13,6 +14,9 @@ export class OrderDto {
 
     @IsOptional()
     shipperID?: Shipper
+
+    @IsOptional()
+    voucherID?: Voucher
 
     @IsString()
     deliveryAddress: string
@@ -41,8 +45,8 @@ export class OrderDto {
     @IsString()
     totalDistance?: string
 
-    @IsString()
-    status: string
+    @IsNumber()
+    status: number
 
     @IsString()
     imageGetFood?: string

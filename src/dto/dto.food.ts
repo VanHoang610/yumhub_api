@@ -19,5 +19,5 @@ export class FoodDto {
 
     @IsString()
     @IsOptional()
-    type?: string
+    type?: number
 }

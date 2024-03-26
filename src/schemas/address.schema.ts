@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 export class Address {
     
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer'})
-    CustomerID?: Customer;
+    customerID?: Customer;
 
     @Prop({required: true})
     city: string;
@@ -23,6 +23,12 @@ export class Address {
 
     @Prop({required: true})
     houseNumber: string;
+    
+    @Prop({required: false}) //kinh độ
+    longitude: number
+
+    @Prop({required: false}) //vĩ độ
+    latitude: number
 
 }
 

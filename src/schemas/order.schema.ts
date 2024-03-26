@@ -3,7 +3,12 @@ import mongoose from "mongoose";
 import { Customer } from "./customer.schemas";
 import { Merchant } from "./merchant.schema";
 import { Shipper } from "./shipper.schema";
+
+import { Voucher } from "./voucher";
+import { OrderStatus } from "./orderStatus.schema";
+
 import { Review } from "./review.schema";
+
 
 
 @Schema()
@@ -21,35 +26,35 @@ export class Order {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Review'})
     reviewID: mongoose.Schema.Types.ObjectId;
 
-    @Prop({required: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Voucher'})
+    voucherID: Voucher
+
+    @Prop({required: true}) 
     deliveryAddress: string
 
-    @Prop({required: true})
+    @Prop({required: true}) 
     priceFood: number
 
-    @Prop({required: true})
+    @Prop({required: true}) 
     deliveryCost: number
 
     @Prop({required: true})
-    totalPaid: number
+    totalPaid: number 
 
-    @Prop({required: false})
-    timeBook?: string
+    @Prop({required: false, default: Date.now})
+    timeBook?: Date
 
-    @Prop({required: false})
-    dateBook?: string
+    @Prop({required: false, default: Date.now})
+    timeGetFood?: Date
 
-    @Prop({required: true})
-    timeGetFood: string
+    @Prop({required: false, default: Date.now})
+    timeGiveFood: Date 
 
-    @Prop({required: true})
-    timeGiveFood: string
-
-    @Prop({required: false})
+    @Prop({required: false}) // quãng đường
     totalDistance?: string
 
-    @Prop({required: true})
-    status: string
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus'})   //1: đã thanh toán, 2:đã hủy, 3: đang giao
+    status: OrderStatus 
 
     @Prop({required: false})
     imageGetFood?: string

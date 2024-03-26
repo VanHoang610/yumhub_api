@@ -1,7 +1,7 @@
 
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { DetailOrder, DetailOrderSchema } from "src/schemas/detailOrder";
+import { DetailOrder, DetailOrderSchema } from "src/schemas/detailOrder.schema";
 
 @Module({
     imports: [
