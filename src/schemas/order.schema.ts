@@ -3,21 +3,28 @@ import mongoose from "mongoose";
 import { Customer } from "./customer.schemas";
 import { Merchant } from "./merchant.schema";
 import { Shipper } from "./shipper.schema";
+
 import { Voucher } from "./voucher";
 import { OrderStatus } from "./orderStatus.schema";
+
+import { Review } from "./review.schema";
+
 
 
 @Schema()
 export class Order {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer'})
-    customerID: Customer
+    customerID: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Merchant'})
-    merchantID: Merchant
+    merchantID: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipper'})
-    shipperID: Shipper
+    shipperID: mongoose.Schema.Types.ObjectId;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Review'})
+    reviewID: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Voucher'})
     voucherID: Voucher

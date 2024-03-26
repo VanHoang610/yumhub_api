@@ -34,8 +34,6 @@ export class MerchantService {
     async deleteMerchant(id: string) {
         try {
             const merchantById = await this.merchants.findById(id);
-
-
             const updateMerchantID = await this.merchants.findByIdAndUpdate(merchantById, { deleted: true }, { new: true })
             if (updateMerchantID) {
                 return "Xóa thành công Merchant"
@@ -67,6 +65,7 @@ export class MerchantService {
             return { result: false, historyShipper: error }
         }
     }
+
 
     async sortLocation(longitude: number, latitude: number) {
         try {

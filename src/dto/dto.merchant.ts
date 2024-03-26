@@ -1,6 +1,5 @@
 import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
 
-
 export class MerchantDto {
 
     @IsNotEmpty({message:"tên không được để trống"})
@@ -24,8 +23,8 @@ export class MerchantDto {
     openTime?: string
 
     @IsOptional()
-    @IsString()
-    rating?: string
+    @IsNumber()
+    rating?: number
 
     @IsOptional()
     @IsString()

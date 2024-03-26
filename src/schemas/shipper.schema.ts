@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { User } from "./user.schemas";
 @Schema()
 export class Shipper {
-    
+
     @Prop({required: false})
     fullName: string
 

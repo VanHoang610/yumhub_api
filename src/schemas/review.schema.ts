@@ -9,17 +9,16 @@ export class Review {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     orderID: Order
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order'}) // người đánh giá
-    reviewerID: Order
-
     @Prop({required: false})
     description?: string
 
     @Prop({required: true})
     rating: number
 
+
     @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfReview'})
     typeOfReview: TypeOfReview
+
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review)

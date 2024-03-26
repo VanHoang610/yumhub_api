@@ -18,6 +18,7 @@ import { DetailOrderModule } from './modules/detailOrders/detailOrder.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { ImageReviewModule } from './modules/imageReviews/imageReview.module';
 import { AdminModule } from './modules/admins/admin.module';
+import { uploadModule } from './modules/upload/upload.module';
 import { VoucherModule } from './modules/vouchers/voucher.module';
 
 @Module({
@@ -38,9 +39,8 @@ import { VoucherModule } from './modules/vouchers/voucher.module';
     ReviewModule,
     ImageReviewModule,
     AdminModule,
+    uploadModule,
     VoucherModule,
-
-
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],
