@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 import { User } from "src/schemas/user.schemas";
 
 export class ShipperDto {
@@ -45,4 +45,10 @@ export class ShipperDto {
     @IsOptional()
     @IsBoolean()
     active?: boolean
+
+    @IsNumber()
+    longitude: number
+
+    @IsNumber()
+    latitude: number
 }

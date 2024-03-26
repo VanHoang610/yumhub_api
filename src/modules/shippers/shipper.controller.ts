@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, HttpException, HttpStatus, Param } from '@nestjs/common'
+import { Body, Controller, Post, Get, HttpException, HttpStatus, Param, Patch } from '@nestjs/common'
 import { ShipperService } from './shipper.service';
 import { ShipperDto } from 'src/dto/dto.shipper';
 
@@ -45,5 +45,17 @@ export class ShipperController {
              return error
          }
      }
+
+      // sửa review
+      @Patch('updateLocation/:id')
+      updateLocation(@Param('id') id: string, @Body() body: {longitude: number, latitude: number}) {
+          try {
+                const { longitude, latitude } = body;
+              const review = this.shipperService.updateLocation(id, longitude, latitude);
+              return review;
+          } catch (error) {
+              console.error("Update location fail", error)
+          }
+      }
 
 }

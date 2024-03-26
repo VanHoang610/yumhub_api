@@ -7,10 +7,10 @@ import { Food } from "./food.schema";
 export class DetailOrder {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order'})
-    orderID?: Order
+    orderID: Order
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Food'})
-    foodID?: Food
+    foodID: Food
 
     @Prop({required: true})
     quantity: number

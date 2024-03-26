@@ -1,12 +1,8 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from 'mongoose';
-import { User } from "./user.schemas";
 
 @Schema()
 export class Customer {
-
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' }) // Thêm ref và sửa kiểu dữ liệu
-    userID?: User;
 
     @Prop({required: false})
     fullName?: string
@@ -20,11 +16,20 @@ export class Customer {
     @Prop({required: false})
     birthDay?: string
 
-    @Prop({required: false})
-    joinDay?: string
+    @Prop({required: false, default: Date.now})
+    joinDay?: Date
 
     @Prop({required: false})
     rating?: string
+
+    @Prop({required: true})
+    phoneNumber: string
+
+    @Prop({required: true})
+    email: string
+
+    @Prop({required: true})
+    password: string
 
 }
 

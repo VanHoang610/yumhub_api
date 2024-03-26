@@ -5,13 +5,15 @@ import { MerchantDto } from 'src/dto/dto.merchant';
 import { Merchant } from 'src/schemas/merchant.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Order } from 'src/schemas/order.schema';
+import { Shipper } from 'src/schemas/shipper.schema';
 
 
 @Injectable()
 export class MerchantService {
 
     constructor(@InjectModel(Merchant.name) private merchants: Model<Merchant>,
-        @InjectModel(Order.name) private orderModel: Model<Order>) { }
+        @InjectModel(Order.name) private orderModel: Model<Order>,
+        @InjectModel(Shipper.name) private shipperModel: Model<Shipper>) { }
 
     async createMerchant(merchant: MerchantDto) {
         const newMerchants = new this.merchants(merchant)
@@ -76,12 +78,33 @@ export class MerchantService {
                 return { ...merchant.toObject(), distance };
             });
 
-            // Sắp xếp các nhà hàng theo khoảng cách tăng dần
+            // sắp xếp
             sortedMerchants.sort((a, b) => a.distance - b.distance);
 
             return { result: true, merchants: sortedMerchants };
         } catch (error) {
             return { result: false, merchants: error };
+        }
+    }
+
+
+    async get5NearestShippers(id: string) {
+        try {
+            const merchant = await this.merchants.findById(id).exec();
+            const shipper = await this.shipperModel.find().exec();
+
+            //tính quãng đường
+            const sortShipper = shipper.map(shipper => {
+                const distance = Math.sqrt(Math.pow(shipper.longitude - merchant.longitude, 2) + Math.pow(shipper.latitude - merchant.latitude, 2));
+                return { ...shipper.toObject(), distance };
+            });
+
+            sortShipper.sort((a, b) => a.distance - b.distance);
+            const nearestShippers = sortShipper.slice(0, 5);
+            return { result: true, get5NearestShippers: nearestShippers }
+           
+        } catch (error) {
+            return { result: false, get5NearestShippers: error }
         }
     }
 }

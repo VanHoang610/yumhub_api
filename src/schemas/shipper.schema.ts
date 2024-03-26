@@ -3,9 +3,6 @@ import mongoose from 'mongoose';
 import { User } from "./user.schemas";
 @Schema()
 export class Shipper {
-
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' }) // Thêm ref và sửa kiểu dữ liệu
-    userID?: User;
     
     @Prop({required: false})
     fullName: string
@@ -28,14 +25,29 @@ export class Shipper {
     @Prop({required: false})
     brandBike?: string
 
-    @Prop({required: false})
+    @Prop({required: false}) //màu
     modeCode?: string
 
-    @Prop({required: false})
+    @Prop({required: false}) 
     idBike?: string
 
-    @Prop({required: false, default: true})
+    @Prop({required: false, default: true}) 
     active?: boolean
+
+    @Prop({required: false}) //kinh độ
+    longitude: number
+
+    @Prop({required: false}) //vĩ độ
+    latitude: number
+
+    @Prop({required: true}) 
+    phoneNumber: number
+
+    @Prop({required: true})
+    password: string
+
+    @Prop({required: true}) 
+    email: string
 
 }
 

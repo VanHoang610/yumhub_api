@@ -10,7 +10,6 @@ export class CustomerController {
 
     constructor(private readonly customerService : CustomerServices) {}
 
-
     // tạo customer
     @Post('createCustomer')
     createUser(@Body(new ValidationPipe()) customerDto: CustomerDto){

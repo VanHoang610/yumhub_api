@@ -14,11 +14,14 @@ export class Food {
     @Prop({required: true})
     nameFood: string
 
-    @Prop({required: true})
+    @Prop({required: true}) // giá niêm yết
     price: number
 
-    @Prop({required: false}) //1: thức ăn, 2: nước uống
-    type?: number  
+    @Prop({required: false}) // giá bán
+    priceForSale?: number
+
+    // @Prop({required: false}) //1: thức ăn, 2: nước uống
+    // type?: number  
 }   
 
 export const FoodSchema = SchemaFactory.createForClass(Food)

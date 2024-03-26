@@ -1,4 +1,6 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import mongoose from "mongoose";
+import { TypeOfMerchant } from "./typeOfMerchant.schema";
 
 @Schema()
 export class Merchant {
@@ -9,8 +11,8 @@ export class Merchant {
     @Prop({required: true})
     address: string
 
-    @Prop({required: false})  //1: chay, 2: mặn
-    type?: number
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TypeOfMerchant'})  //1: chay, 2: mặn
+    type?: TypeOfMerchant
 
     @Prop({required: false})
     openTime?: string
@@ -21,7 +23,7 @@ export class Merchant {
     @Prop({required: false})
     rating?: string
 
-    @Prop({required: false})
+    @Prop({required: false}) //giấy phép
     businessLicense?: string
 
     @Prop({required: false, default: false})

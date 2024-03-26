@@ -17,23 +17,23 @@ export class MerchantController {
 
     // sắp xếp vị trí từ gần đến xa
     @Post('sortLocation')
-    getLocation(@Body() body: {longitude: number, latitude: number}){
+    getLocation(@Body() body: { longitude: number, latitude: number }) {
         const { longitude, latitude } = body;
         try {
             const merchant = this.merchantService.sortLocation(longitude, latitude);
-            if(!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
             return merchant;
         } catch (error) {
             return error
         }
     }
-    
+
     @Get(':id')
     getMerchantByID(@Param('id') id: string) {
         return this.merchantService.getMerchantById(id);
     }
 
-     
+
 
     // sắp xếp theo vị trí từ thấp đến cao
     @Get()
@@ -55,16 +55,29 @@ export class MerchantController {
 
     //lấy lịch sử merchant
     @Get('getHistoryOrder/:id')
-    getHistoryShipper(@Param('id') id: string){
+    getHistoryShipper(@Param('id') id: string) {
         try {
             const merchant = this.merchantService.getHistory(id);
-            if(!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
             return merchant;
         } catch (error) {
             return error
         }
     }
 
-   
-   
+    //lấy 5 shipper gần cửa hàng nhất
+    @Post('get5NearestShippers/:id')
+    get5NearestShippers(@Param('id') id: string) {
+        try {
+            const merchant = this.merchantService.get5NearestShippers(id);
+            if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            return merchant;
+        } catch (error) {
+            return error
+        }
+
+    }
+
+
+
 }

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { User } from "./user.schemas";
 import { Order } from "./order.schema";
+import { TypeOfReview } from "./typeOfReview.shema";
 
 @Schema()
 export class Review {
@@ -9,8 +9,8 @@ export class Review {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     orderID: Order
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'}) // người đánh giá
-    reviewerID: User
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order'}) // người đánh giá
+    reviewerID: Order
 
     @Prop({required: false})
     description?: string
@@ -18,8 +18,8 @@ export class Review {
     @Prop({required: true})
     rating: number
 
-    @Prop({required: false})  // 1: customer, 2: merchant, 3: shipper
-    typeOfReview: number
+    @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfReview'})
+    typeOfReview: TypeOfReview
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review)

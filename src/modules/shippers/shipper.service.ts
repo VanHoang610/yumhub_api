@@ -38,6 +38,8 @@ export class ShipperService {
                 modeCode: shipperDto.modeCode,
                 rating: shipperDto.rating,
                 sex: shipperDto.sex,
+                longitude: shipperDto.longitude,
+                latitude: shipperDto.latitude,
                 userID: newUser._id
             });
             if (!newShipper) throw new HttpException("Create Fail", HttpStatus.NOT_FOUND);
@@ -68,6 +70,20 @@ export class ShipperService {
             return { result: true, historyShipper: orders }
         } catch (error) {
             return { result: false, historyShipper: error }
+        }
+    }
+
+    async updateLocation(id: string, longitude: number, latitude: number) {
+        try {
+            const shipper = await this.shipperModel.findByIdAndUpdate(id,
+                {longitude: longitude, latitude: latitude},
+                {new: true});
+            if(!shipper) throw new HttpException("Update fail location", HttpStatus.NOT_FOUND);
+            await shipper.save();
+            return { result: true, newLocation: shipper }
+            
+        } catch (error) {
+            return { result: false, newLocation: error }
         }
     }
 

@@ -1,16 +1,12 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from 'mongoose';
 import { Merchant } from "./merchant.schema";
-import { User } from "./user.schemas";
 
 @Schema()
 export class UserMerchant {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Merchant' }) // Thêm ref và sửa kiểu dữ liệu
     merchantID?: Merchant;
-
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-    userID?: User
     
     @Prop({required: false})  //1: admin, 2: employee
     role?: number
@@ -21,6 +17,17 @@ export class UserMerchant {
     @Prop({required: false})
     sex?: string
 
+    @Prop({required: false})
+    avatar?: string
+
+    @Prop({required: true})
+    phoneNumber: string
+
+    @Prop({required: true})
+    password: string
+
+    @Prop({required: true})
+    email: string
 }
 
 export const UserMerchantSchema = SchemaFactory.createForClass(UserMerchant)
