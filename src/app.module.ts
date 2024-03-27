@@ -20,6 +20,14 @@ import { ImageReviewModule } from './modules/imageReviews/imageReview.module';
 import { AdminModule } from './modules/admins/admin.module';
 import { uploadModule } from './modules/upload/upload.module';
 import { VoucherModule } from './modules/vouchers/voucher.module';
+import { HistoryWalletMerchantModule } from './modules/historyWalletMerchant/walletMerchant.module';
+import { HistoryWalletShipperModule } from './modules/historyWalletShipper/history.module';
+import { OrderStatusModule } from './modules/orderStatus/orderStatus.module';
+import { TransactionTypeMerchantModule } from './modules/transactionTypeMerchant/typeMerchant.module';
+import { TransactionTypeShipperModule } from './modules/transactionTypeShipper/transactionTypeShipper.module';
+import { TypeOfMerchantModule } from './modules/typeOfMerchant/typeOfMerchant.module';
+import { TypeOfReviewModule } from './modules/typeOfReview/typeOfReview.module';
+import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.module';
 
 @Module({
   imports: [
@@ -41,6 +49,17 @@ import { VoucherModule } from './modules/vouchers/voucher.module';
     AdminModule,
     uploadModule,
     VoucherModule,
+
+    //new
+    HistoryWalletMerchantModule,
+    HistoryWalletShipperModule,
+    OrderStatusModule,
+    TransactionTypeMerchantModule,
+    TransactionTypeShipperModule,
+    TypeOfMerchantModule,
+    TypeOfReviewModule,
+    TypeOfVoucherModule,
+    
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],
