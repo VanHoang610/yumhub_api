@@ -16,6 +16,6 @@ export class ReviewDto {
     rating: number
 
     @IsNotEmpty()
-    typeOfReview: number
+    typeOfReview: string 
 
 }

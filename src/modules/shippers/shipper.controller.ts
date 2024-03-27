@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as path from "path";
-import { storageConfig } from 'src/helpers/config';
+import { storageConfig } from 'src/helper/config';
 import { extname } from 'path';
 
 
@@ -15,16 +15,16 @@ export class ShipperController {
     constructor(private readonly shipperService: ShipperService) {}
     
      // tạo shipper
-     @Post('createShipper')
-     createOrder(@Body() shipperService: ShipperDto) 
-     {
-         try {
-             const shipper = this.shipperService.createShipper(shipperService);
-             return shipper;
-         } catch (error) {
-             console.error("Create Shipper Fail", error)
-         }
-     }
+    //  @Post('createShipper')
+    //  createOrder(@Body() shipperService: ShipperDto) 
+    //  {
+    //      try {
+    //          const shipper = this.shipperService.createShipper(shipperService);
+    //          return shipper;
+    //      } catch (error) {
+    //          console.error("Create Shipper Fail", error)
+    //      }
+    //  }
  
      //lấy tất cả shipper
      @Get('getAllShipper')
@@ -63,10 +63,10 @@ export class ShipperController {
           }
       }
 
-    @Post()
-    createShipper(@Body(new ValidationPipe()) shipperDto: ShipperDto) {
-        return this.shipperService.createShipper(shipperDto);
-    }
+    // @Post()
+    // createShipper(@Body(new ValidationPipe()) shipperDto: ShipperDto) {
+    //     return this.shipperService.createShipper(shipperDto);
+    // }
     @Get(':id')
     getShipperByID(@Param('id') id: string){
         return this.shipperService.getShipperById(id).populate('userID');
@@ -94,26 +94,10 @@ export class ShipperController {
     
     }
 
-    // @Post("/uploadImage")
-    // @UseInterceptors(FileInterceptor('image', {
-    //     storage: diskStorage({
-    //         destination:"",
-    //         filename: (req, file, callBack) => {
-    //             const fileName = path.parse(file.originalname).name.replace(/\s/g,'')+Date.now();
-    //             const extension = path.parse(file.originalname).ext;
-    //             callBack(null, '${fileName}${extension}');
-    //         }
-    //     })
-    // }))
-    // uploadFile(@Res() res, @UploadedFile() file){
-    //     return res.status(HttpStatus.OK).json({
-    //         Success: true,
-    //         date: file.path
-    //     })
-    // }
+   
     @Post("upload-avatar/:id") // Thêm :id vào đường dẫn URL để nhận id từ đường dẫn
-    @UseInterceptors(FileInterceptor('avatar',{
-        storage: storageConfig("avatarShipper"),
+    @UseInterceptors(FileInterceptor('File',{
+        storage: storageConfig("Image"),
         fileFilter: (req, file, cb) => {
             const ext = extname(file.originalname);
             const allowedExArr =["jpg", "png", "jpeg"];
