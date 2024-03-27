@@ -5,7 +5,6 @@ import { Review, ReviewSchema } from 'src/schemas/review.schema';
 import { ReviewService } from './review.service';
 import { ReviewController } from './review.controller';
 import { Order, OrderSchema } from 'src/schemas/order.schema';
-import { User, UserSchema } from 'src/schemas/user.schemas';
 
 
 @Module({
@@ -19,21 +18,11 @@ import { User, UserSchema } from 'src/schemas/user.schemas';
                 name: Order.name,
                 schema: OrderSchema,
 
-            },
-            {
-                name: User.name,
-                schema: UserSchema,
             }
         ])
     ],
     providers: [ReviewService],
     controllers: [ReviewController]
-            }
-        ])
-    ],
-    controllers: [ReviewController],
-    providers: [ReviewService],
-
 })
 
 export class ReviewModule { };

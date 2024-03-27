@@ -6,7 +6,6 @@ import { Model } from 'mongoose';
 import { ReviewDto } from 'src/dto/dto.review';
 import { Order } from 'src/schemas/order.schema';
 import { Review } from 'src/schemas/review.schema';
-import { User } from 'src/schemas/user.schemas';
 
 
 
@@ -14,35 +13,34 @@ import { User } from 'src/schemas/user.schemas';
 export class ReviewService { 
 
     constructor(@InjectModel(Review.name) private reviewModel: Model<Review>,
-    @InjectModel(Order.name) private orderModel: Model<Order>,
-    @InjectModel(User.name) private userModel: Model<User>) {}
+    @InjectModel(Order.name) private orderModel: Model<Order>) {}
 
-    async createReivew(createReview: ReviewDto) {
-        try {
-            const order = createReview.orderID;
-            const orderID = await this.orderModel.findById(order);
-            if(!orderID) throw new HttpException("Not Found OrderID", HttpStatus.NOT_FOUND)
+    // async createReivew(createReview: ReviewDto) {
+    //     try {
+    //         const order = createReview.orderID;
+    //         const orderID = await this.orderModel.findById(order);
+    //         if(!orderID) throw new HttpException("Not Found OrderID", HttpStatus.NOT_FOUND)
 
-            const reviewer = createReview.reviewerID;
-            const reviewerID = await this.userModel.findById(reviewer);
-            if(!reviewerID) throw new HttpException("Not Found UserID", HttpStatus.NOT_FOUND)
+    //         const reviewer = createReview.reviewerID;
+    //         const reviewerID = await this.userModel.findById(reviewer);
+    //         if(!reviewerID) throw new HttpException("Not Found UserID", HttpStatus.NOT_FOUND)
 
-            const review = new this.reviewModel({
-                ...createReview,
-                orderID: orderID._id,
-                reviewerID: reviewerID._id,
-            });
+    //         const review = new this.reviewModel({
+    //             ...createReview,
+    //             orderID: orderID._id,
+    //             reviewerID: reviewerID._id,
+    //         });
             
-            const saveReview = await review.save();
-            return {result: true, review: saveReview}
-        } catch (error) {
-            return {result: false, review: error}
-        }
-    }
+    //         const saveReview = await review.save();
+    //         return {result: true, review: saveReview}
+    //     } catch (error) {
+    //         return {result: false, review: error}
+    //     }
+    // }
 
     async getAllReview() {
         try {
-            const reviews =  await this.reviewModel.find().populate('orderID').populate('reviewerID')
+            const reviews =  await this.reviewModel.find();
             return {result: true, reviews: reviews}
         } catch (error) {
             return {result: true, reviews: error}
@@ -54,64 +52,62 @@ export class ReviewService {
             const updateReview = await this.reviewModel.findByIdAndUpdate(id, createReivew, {new: true});
             if(!updateReview) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
 
-            return { result: true, UpdateReview: updateReview }
+            return { result: true, updateReview: updateReview }
         } catch (error) {
-            return { result: false, UpdateReview: error }
+            return { result: false, updateReview: error }
         }
     }
-
-    
 }
 
-    @InjectModel(Order.name) private orders: Model<Order>) { }
+//     @InjectModel(Order.name) private orders: Model<Order>) { }
    
-    async findUserId(reviewID: string) {
-        const review = (await this.reviewModel.findById(reviewID));
-        const order = (await this.reviewModel.findById(reviewID)).orderID;
+//     async findUserId(reviewID: string) {
+//         const review = (await this.reviewModel.findById(reviewID));
+//         const order = (await this.reviewModel.findById(reviewID)).orderID;
        
         
-        // if (!review) {
-        //     throw new Error('Review not found');
-        // }
+//         // if (!review) {
+//         //     throw new Error('Review not found');
+//         // }
         
-        var user : Object;
+//         var user : Object;
         
         
-        if (review.typeOfReview === 1) { // 1 là customer
-            user = (await this.orders.findById(order)).customerID;
-        } else if (review.typeOfReview === 2) { // 2 là merchant
-            user = (await this.orders.findById(order)).merchantID;
-        } else { // 3 là shipper
-            user = (await this.orders.findById(order)).shipperID;
-        }
+//         if (review.typeOfReview === 1) { // 1 là customer
+//             user = (await this.orders.findById(order)).customerID;
+//         } else if (review.typeOfReview === 2) { // 2 là merchant
+//             user = (await this.orders.findById(order)).merchantID;
+//         } else { // 3 là shipper
+//             user = (await this.orders.findById(order)).shipperID;
+//         }
     
-        return user;
-    }
-    async calculateAverageRating(userId: string): Promise<number> {
-        let totalRating = 0;
-        let totalReviews = 0;
+//         return user;
+//     }
+//     async calculateAverageRating(userId: string): Promise<number> {
+//         let totalRating = 0;
+//         let totalReviews = 0;
     
-        // Tìm tất cả các đánh giá liên quan đến người dùng từ bảng Review
-        const reviews = await  this.reviewModel.find().exec();
+//         // Tìm tất cả các đánh giá liên quan đến người dùng từ bảng Review
+//         const reviews = await  this.reviewModel.find().exec();
     
-        // Duyệt qua từng đánh giá
-        for (const review of reviews) {
-            const user = (await this.findUserId(review._id.toString())).toString();
-            if (user === userId) {
-                totalRating += review.rating; // Tổng điểm đánh giá
-                console.log(totalRating);
-                totalReviews++; // Tổng số lượng đánh giá
-                console.log(totalReviews);
-            }else{
-                continue;
-            }
-        }
+//         // Duyệt qua từng đánh giá
+//         for (const review of reviews) {
+//             const user = (await this.findUserId(review._id.toString())).toString();
+//             if (user === userId) {
+//                 totalRating += review.rating; // Tổng điểm đánh giá
+//                 console.log(totalRating);
+//                 totalReviews++; // Tổng số lượng đánh giá
+//                 console.log(totalReviews);
+//             }else{
+//                 continue;
+//             }
+//         }
     
-        // Tính điểm trung bình
-        const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;
+//         // Tính điểm trung bình
+//         const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;
     
-        return averageRating;
-    }
+//         return averageRating;
+//     }
     
-}
+// }
 

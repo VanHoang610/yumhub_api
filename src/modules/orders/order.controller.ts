@@ -10,7 +10,7 @@ export class OrderController {
     // tạo order
     @Post('createOrder')
     async createOrder(@Body() orderDto: OrderDto) {
-        return this.orderServices.createOrder(orderDto);
+        return await this.orderServices.createOrder(orderDto);
     }
 
 

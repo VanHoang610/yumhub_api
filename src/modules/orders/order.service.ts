@@ -42,11 +42,10 @@ export class OrderService {
                 merchantID: merchants._id,
                 shipperID: shippers._id,
                 voucherID: vouchers._id,
-                dateBook: Date.now(),
+                timeBook: Date.now(),
                 ...orderDto
             });
             await orders.save();
-
             return { success: true, order: orders };
             
         } catch (error) {
@@ -67,7 +66,7 @@ export class OrderService {
 
     async sortHistory () {
         try {
-            const orderSort = await this.orderModel.find({status: 1}).sort({dateBook: 1}).exec();
+            const orderSort = await this.orderModel.find({}).sort({timeBook: 1}).exec();
             return {result: true, orderSort: orderSort}
         } catch (error) {
             return {result: false, orderSort: error}

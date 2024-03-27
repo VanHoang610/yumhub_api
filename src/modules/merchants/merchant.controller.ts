@@ -9,15 +9,16 @@ import mongoose from 'mongoose';
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
 
-    @Post()
-    @UsePipes(new ValidationPipe())
-    createMerchant(@Body() merchantDto: MerchantDto) {
-        console.log(merchantDto);
+    // @Post()
+    // @UsePipes(new ValidationPipe())
+    // createMerchant(@Body() merchantDto: MerchantDto) {
+    //     console.log(merchantDto);
 
-        return this.merchantService.createMerchant(merchantDto);
-    }
+    //     return this.merchantService.createMerchant(merchantDto);
+    // }
 
-    // sắp xếp vị trí từ gần đến xa
+
+    // sắp xếp vị trí người dùng với cửa hàng từ gần đến xa
     @Post('sortLocation')
     getLocation(@Body() body: { longitude: number, latitude: number }) {
         const { longitude, latitude } = body;
@@ -30,28 +31,28 @@ export class MerchantController {
         }
     }
 
-    @Get(':id')
-    getMerchantByID(@Param('id') id: string) {
-        return this.merchantService.getMerchantById(id);
-    }
+    // @Get(':id')
+    // getMerchantByID(@Param('id') id: string) {
+    //     return this.merchantService.getMerchantById(id);
+    // }
 
 
 
-    // sắp xếp theo vị trí từ thấp đến cao
-    @Get()
-    getMerchant() {
-        return this.merchantService.getMerchant();
-    }
-    @Post('deleteMerchant/:id')
-    deleteCustomer(@Param('id') id: string) {
-        return this.merchantService.deleteMerchant(id);
-    }
-    @Patch('updateMerchant/:id')
-    async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateMerchant: MerchantDto) {
-        const isValid = mongoose.Types.ObjectId.isValid(id);
-        if (!isValid) throw new HttpException("Invalid ID", 40);
-        return await this.merchantService.updateMerchant(id, updateMerchant);
-    }
+    // // sắp xếp theo vị trí từ thấp đến cao
+    // @Get()
+    // getMerchant() {
+    //     return this.merchantService.getMerchant();
+    // }
+    // @Post('deleteMerchant/:id')
+    // deleteCustomer(@Param('id') id: string) {
+    //     return this.merchantService.deleteMerchant(id);
+    // }
+    // @Patch('updateMerchant/:id')
+    // async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateMerchant: MerchantDto) {
+    //     const isValid = mongoose.Types.ObjectId.isValid(id);
+    //     if (!isValid) throw new HttpException("Invalid ID", 40);
+    //     return await this.merchantService.updateMerchant(id, updateMerchant);
+    // }
 
     //lấy lịch sử merchant
     @Get('getHistoryOrder/:id')
@@ -66,7 +67,7 @@ export class MerchantController {
     }
 
     //lấy 5 shipper gần cửa hàng nhất
-    @Post('get5NearestShippers/:id')
+    @Get('get5NearestShippers/:id')
     get5NearestShippers(@Param('id') id: string) {
         try {
             const merchant = this.merchantService.get5NearestShippers(id);

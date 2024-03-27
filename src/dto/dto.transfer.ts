@@ -1,14 +1,13 @@
 import { IsNumber, IsOptional, IsString } from "class-validator"
-import { User } from "src/schemas/user.schemas"
 
 
 export class TransferDto {
 
-    @IsOptional()
-    fromUserID?: User
+    // @IsOptional()
+    // fromUserID?: User
 
-    @IsOptional()
-    toUserID?: User
+    // @IsOptional()
+    // toUserID?: User
 
     @IsOptional()
     @IsString()

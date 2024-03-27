@@ -13,22 +13,22 @@ export class UploadController {
   // async uploadFile(@UploadedFile() file: Express.Multer.File) {
   //   return this.uploadService.uploadImage(file);
   // }
-  @Post('file')
-uploadFileAndPassValidation(
-  @Body() body: imageDto,
-  @UploadedFile(
-    new ParseFilePipe({
-      validators: [
-        new MaxFileSizeValidator({ maxSize: 1000 }),
-        new FileTypeValidator({ fileType: 'image/png' }),
-      ]
-    })
-  )
-  file: Express.Multer.File,
-) {
-  return {
-    body,
-    file: file.buffer.toString(),
-  };
-}
+//   @Post('file')
+// uploadFileAndPassValidation(
+//   @Body() body: imageDto,
+//   @UploadedFile(
+//     new ParseFilePipe({
+//       validators: [
+//         new MaxFileSizeValidator({ maxSize: 1000 }),
+//         new FileTypeValidator({ fileType: 'image/png' }),
+//       ]
+//     })
+//   )
+//   file: Express.Multer.File,
+// ) {
+//   return {
+//     body,
+//     file: file.buffer.toString(),
+//   };
+// }
 }

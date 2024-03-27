@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from './modules/users/user.module';
+// import { UserModule } from './modules/users/user.module';
 import { CustomerModule } from './modules/customers/customer.module';
 import { MerchantModule } from './modules/merchants/merchant.module';
 import { ShipperModule } from './modules/shippers/shipper.module';
@@ -10,7 +10,7 @@ import { PaymentMethodModule } from './modules/paymentMethods/paymentMethod.modu
 import { AddressModule } from './modules/address/address.module';
 import { DocumentModule } from './modules/documents/document.module';
 import { OrderModule } from './modules/orders/order.module';
-import { TransferModule } from './modules/transfers/transfer.module';
+// import { TransferModule } from './modules/transfers/transfer.module';
 import { UserMerchantModule } from './modules/userMerchant/merchant.module';
 import { DocumentTypeModule } from './modules/documentTypes/document.module';
 import { FoodModule } from './modules/foods/food.module';
@@ -23,12 +23,12 @@ import { VoucherModule } from './modules/vouchers/voucher.module';
 
 @Module({
   imports: [
-    UserModule,
+    // UserModule,
     CustomerModule,
     MerchantModule,
     ShipperModule,
     UserMerchantModule,
-    TransferModule,
+    // TransferModule,
     PaymentMethodModule,
     AddressModule,
     OrderModule,
