@@ -19,4 +19,5 @@ export class ReviewDto {
     @IsNotEmpty()
     typeOfReview: TypeOfReview
 
+
 }

@@ -6,6 +6,10 @@ import { ReviewService } from './review.service';
 import { ReviewController } from './review.controller';
 import { Order, OrderSchema } from 'src/schemas/order.schema';
 
+import { TypeOfReview, TypeOfReviewSchema } from 'src/schemas/typeOfReview.shema';
+
+
+
 
 @Module({
     imports: [
@@ -17,7 +21,10 @@ import { Order, OrderSchema } from 'src/schemas/order.schema';
             {
                 name: Order.name,
                 schema: OrderSchema,
-
+            },
+            {
+                name: TypeOfReview.name,
+                schema: TypeOfReviewSchema,
             }
         ])
     ],
