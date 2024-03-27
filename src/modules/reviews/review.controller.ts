@@ -42,19 +42,19 @@ export class ReviewController {
     //     }
     // }
   
-    // tính trung bình
-    @Get('average-rating/:userId')
-    async getAverageRating(@Param('userId') userId: string): Promise<number> {
-        // Gọi phương thức calculateAverageRating từ ReviewService và trả về kết quả
-        const averageRating = await this.reviewService.calculateAverageRating(userId);
-        return averageRating;
-    }
+    // // tính trung bình
+    // @Get('average-rating/:userId')
+    // async getAverageRating(@Param('userId') userId: string): Promise<number> {
+    //     // Gọi phương thức calculateAverageRating từ ReviewService và trả về kết quả
+    //     const averageRating = await this.reviewService.calculateAverageRating(userId);
+    //     return averageRating;
+    // }
   
-    // lấy trung bình dựa theo id
-    @Get("getRatting/:id")
-    async getReview(@Param('id') id: string) {
-        return await this.reviewService.findUserId(id);
-    }
+    // // lấy trung bình dựa theo id
+    // @Get("getRatting/:id")
+    // async getReview(@Param('id') id: string) {
+    //     return await this.reviewService.findUserId(id);
+    // }
 
 
 

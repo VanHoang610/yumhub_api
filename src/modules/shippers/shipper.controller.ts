@@ -14,17 +14,17 @@ export class ShipperController {
 
     constructor(private readonly shipperService: ShipperService) {}
     
-     // tạo shipper
-    //  @Post('createShipper')
-    //  createOrder(@Body() shipperService: ShipperDto) 
-    //  {
-    //      try {
-    //          const shipper = this.shipperService.createShipper(shipperService);
-    //          return shipper;
-    //      } catch (error) {
-    //          console.error("Create Shipper Fail", error)
-    //      }
-    //  }
+     tạo shipper
+     @Post('createShipper')
+     createOrder(@Body() shipperService: ShipperDto) 
+     {
+         try {
+             const shipper = this.shipperService.createShipper(shipperService);
+             return shipper;
+         } catch (error) {
+             console.error("Create Shipper Fail", error)
+         }
+     }
  
      //lấy tất cả shipper
      @Get('getAllShipper')
@@ -51,7 +51,7 @@ export class ShipperController {
          }
      }
 
-      // sửa review
+      // sửa location của shipper
       @Patch('updateLocation/:id')
       updateLocation(@Param('id') id: string, @Body() body: {longitude: number, latitude: number}) {
           try {
@@ -62,25 +62,12 @@ export class ShipperController {
               console.error("Update location fail", error)
           }
       }
-
-    // @Post()
-    // createShipper(@Body(new ValidationPipe()) shipperDto: ShipperDto) {
-    //     return this.shipperService.createShipper(shipperDto);
-    // }
-    @Get(':id')
-    getShipperByID(@Param('id') id: string){
-        return this.shipperService.getShipperById(id).populate('userID');
+  
+    @Get('getPhoneNumberShipper/:id')
+    getPhoneNumberShipper(@Param('id') id: string){
+        return this.shipperService.getPhoneNumberShipper(id);
     }
-    @Get()
-    getShipper(){
-        return this.shipperService.getShipper();
-    }
-
-    // @Get('getPhoneNumberShipper/:id')
-    // getPhoneNumberShipper(@Param('id') id: string){
-    //     return this.shipperService.getPhoneNumberShipper(id);
-    // }
-
+    
     @Post('deleteShipper/:id')
     deleteShipper(@Param('id') id: string){
         return this.shipperService.deleteShipper(id);
@@ -91,10 +78,8 @@ export class ShipperController {
         const isValid = mongoose.Types.ObjectId.isValid(id);
         if(!isValid) throw new HttpException("Invalid ID", 40);
         return  await this.shipperService.updateShipper(id, updateShipper);
-    
     }
 
-   
     @Post("upload-avatar/:id") // Thêm :id vào đường dẫn URL để nhận id từ đường dẫn
     @UseInterceptors(FileInterceptor('File',{
         storage: storageConfig("Image"),
@@ -118,8 +103,6 @@ export class ShipperController {
     uploadAvatar(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): void{
         console.log("upload avatar");
         console.log(file);
-
-        
         this.shipperService.updateAvatar(id, file.destination+'/'+file.filename); // Sử dụng id lấy từ đường dẫn URL
     }
 

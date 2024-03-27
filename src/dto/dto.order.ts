@@ -34,9 +34,6 @@ export class OrderDto {
     timeBook?: string
 
     @IsString()
-    dateBook?: string
-
-    @IsString()
     timeGetFood: string
 
     @IsString()

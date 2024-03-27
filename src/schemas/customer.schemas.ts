@@ -31,6 +31,9 @@ export class Customer {
     @Prop({required: true})
     password: string
 
+    @Prop({required: false, default: false})
+    deleted: boolean
+
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer)

@@ -1,7 +1,7 @@
 //lấy dữ liệu client
 
 import { MinLength, IsNotEmpty, IsNumber, IsInt, isString, IsString, IsOptional, IsEmpty } from "class-validator"; // kiểm tra validate
-export class CustomerDto {
+export class UpdateCustomerDto {
 
     @IsOptional()
     @IsString({})
@@ -27,15 +27,11 @@ export class CustomerDto {
     @IsString()
     rating?: string
 
-    @IsEmpty()
+    @IsOptional()
     @IsString()
-    phoneNumber: string
+    phoneNumber?: string
 
-    @IsEmpty()
+    @IsOptional()
     @IsString()
-    password: string
-
-    @IsEmpty()
-    @IsString()
-    email: string
+    email?: string
 };

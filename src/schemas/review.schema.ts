@@ -14,8 +14,7 @@ export class Review {
 
     @Prop({required: true})
     rating: number
-
-
+    
     @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfReview'})
     typeOfReview: TypeOfReview
 

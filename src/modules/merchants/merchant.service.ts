@@ -58,8 +58,8 @@ export class MerchantService {
 
     async getHistory(id: string) {
         try {
-            const orders = await this.orderModel.find({ "merchantID": id });
-            if (!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
+            const orders = await this.orderModel.find({"merchantID": id});
+            if (orders.length === 0) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
             return { result: true, historyShipper: orders }
         } catch (error) {
             return { result: false, historyShipper: error }
@@ -71,7 +71,6 @@ export class MerchantService {
         try {
             const merchants = await this.merchants.find().exec();
 
-            //tính quãng đường
             const sortedMerchants = merchants.map(merchant => {
                 const distance = Math.sqrt(Math.pow(merchant.longitude - longitude, 2) + Math.pow(merchant.latitude - latitude, 2));
                 return { ...merchant.toObject(), distance };

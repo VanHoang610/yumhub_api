@@ -3,7 +3,6 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { Shipper, ShipperSchema } from "src/schemas/shipper.schema";
 import { ShipperController } from "./shipper.controller";
 import { ShipperService } from "./shipper.service";
-import { User, UserSchema } from "src/schemas/user.schemas";
 
 import { Order, OrderSchema } from "src/schemas/order.schema";
 
@@ -15,10 +14,6 @@ import { Order, OrderSchema } from "src/schemas/order.schema";
             {
                 name: Shipper.name,
                 schema: ShipperSchema
-            },
-            {
-                name: User.name,
-                schema: UserSchema
             },
             {
                 name: Order.name,

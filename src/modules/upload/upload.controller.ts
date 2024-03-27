@@ -15,6 +15,7 @@ export class UploadController {
   // async uploadFile(@UploadedFile() file: Express.Multer.File) {
   //   return this.uploadService.uploadImage(file);
   // }
+
   // @Post('/file')
   // @UseInterceptors(FileInterceptor("file"))
   // handleUpload(@UploadedFile()file: Express.Multer.File){
@@ -41,6 +42,4 @@ export class UploadController {
 //     // file: file.buffer.toString(),
 //   ;
 // }
-
-
 }

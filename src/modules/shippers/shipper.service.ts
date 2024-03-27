@@ -4,9 +4,8 @@ import { promises } from 'dns';
 import { Model } from 'mongoose';
 import { ShipperDto } from 'src/dto/dto.shipper';
 import { Shipper } from 'src/schemas/shipper.schema';
-
 import { HttpException, HttpStatus } from '@nestjs/common';
-
+import * as bcrypt from 'bcrypt';
 import { Order } from 'src/schemas/order.schema';
 
 
@@ -16,47 +15,59 @@ export class ShipperService {
     constructor(@InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
         @InjectModel(Order.name) private orderModel: Model<Order>) { }
 
-    // async createShipper(shipperDto: ShipperDto) {
-    //     try {
-    //         const phoneNumber = shipperDto.userID.phoneNumber;
-    //         const password = shipperDto.userID.password;
-    //         const balance = shipperDto.userID.balance;
-    //         const email = shipperDto.userID.email;
-    //         const role = shipperDto.userID.role;
-    //         const hashPass = await bcrypt.hash(password, 10);
 
-    //         const newUser = new this.userModel({ phoneNumber, password: hashPass, balance, email, role });
-    //         if (!newUser) throw new HttpException("Create Fail", HttpStatus.NOT_FOUND);
-    //         await newUser.save();
+    async createShipper(shipperDto: ShipperDto) {
+        try {
 
-    //         const newShipper = new this.shipperModel({
-    //             address: shipperDto.address,
-    //             avatar: shipperDto.avatar,
-    //             birthDay: shipperDto.birthDay,
-    //             brandBike: shipperDto.brandBike,
-    //             fullName: shipperDto.fullName,
-    //             idBike: shipperDto.idBike,
-    //             modeCode: shipperDto.modeCode,
-    //             rating: shipperDto.rating,
-    //             sex: shipperDto.sex,
-    //             longitude: shipperDto.longitude,
-    //             latitude: shipperDto.latitude,
-    //             userID: newUser._id
-    //         });
-    //         if (!newShipper) throw new HttpException("Create Fail", HttpStatus.NOT_FOUND);
-    //         await newShipper.save();
+            const phoneNumber = shipperDto.phoneNumber;
+            const email = shipperDto.email;
+            const password = shipperDto.password;
+            const avatar = shipperDto.avatar;
+            const fullName = shipperDto.fullName;
+            const rating = shipperDto.rating;
+            const sex = shipperDto.sex;
+            const birthDay = shipperDto.birthDay;
+            const address = shipperDto.address;
+            const brandBike = shipperDto.brandBike;
+            const modeCode =  shipperDto.modeCode;
+            const idBike = shipperDto.idBike;
+            const active = shipperDto.active;
+            const longitude = shipperDto.longitude;
+            const latitude = shipperDto.latitude;
 
-    //         return { result: true, createShipper: newShipper }
+            const hashPass = await bcrypt.hash(password, 10)
 
-    //     } catch (error) {
-    //         return { result: false, createShipper: error }
-    //     }
-    // }
+            const newShipper = new this.shipperModel({
+                phoneNumber: phoneNumber,
+                email: email,
+                password: hashPass,
+                avatar: avatar,
+                fullName: fullName,
+                rating: rating,
+                sex: sex,
+                birthDay: birthDay,
+                address: address,
+                brandBike: brandBike,
+                modeCode: modeCode,
+                idBike: idBike,
+                active: active,
+                longitude: longitude,
+                latitude: latitude
+            });
+            if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
+            await newShipper.save();
+
+            return { result: true, createShipper: newShipper }
+
+        } catch (error) {
+            return { result: false, createShipper: error }
+        }
+    }
 
 
     async getAllShipper() {
         try {
-            const shippers = await this.shipperModel.find().populate('userID');
+            const shippers = await this.shipperModel.find();
             if (!shippers) return { Message: "Not found Order" }
             return { result: true, AllShipper: shippers }
         } catch (error) {
@@ -86,26 +97,10 @@ export class ShipperService {
         } catch (error) {
             return { result: false, newLocation: error }
         }
-    }
-  
-    
+    }    
     getShipperById(id: string) {
         return this.shipperModel.findById(id);
     }
-
-    getShipper() {
-        return this.shipperModel.find().populate('userID');
-    }
-
-    // async getPhoneNumberShipper(id: string) {
-    //     const getShipperById = await this.shippers.findById(id).populate('userID');
-    //     if (getShipperById) {
-    //         const getPhoneNumber = getShipperById.userID.phoneNumber;
-    //         return { SDT: getPhoneNumber };
-    //     } else {
-    //         throw new Error("Lấy SDT thất bại")
-    //     }
-    // }
 
 
     async deleteShipper(id: string) {

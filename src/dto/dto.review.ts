@@ -1,6 +1,7 @@
 
 import { IsNumber, IsOptional, IsString, IsNotEmpty } from "class-validator";
 import { Order } from "src/schemas/order.schema";
+import { TypeOfReview } from "src/schemas/typeOfReview.shema";
 
 export class ReviewDto {
   
@@ -16,6 +17,7 @@ export class ReviewDto {
     rating: number
 
     @IsNotEmpty()
-    typeOfReview: string 
+    typeOfReview: TypeOfReview
+
 
 }

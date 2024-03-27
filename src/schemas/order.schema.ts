@@ -23,9 +23,6 @@ export class Order {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipper'})
     shipperID: mongoose.Schema.Types.ObjectId;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Review'})
-    reviewID: mongoose.Schema.Types.ObjectId;
-
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Voucher'})
     voucherID: Voucher
 
@@ -41,13 +38,13 @@ export class Order {
     @Prop({required: true})
     totalPaid: number 
 
-    @Prop({required: false, default: Date.now})
+    @Prop({required: false})
     timeBook?: Date
 
-    @Prop({required: false, default: Date.now})
+    @Prop({required: false})
     timeGetFood?: Date
 
-    @Prop({required: false, default: Date.now})
+    @Prop({required: false})
     timeGiveFood: Date 
 
     @Prop({required: false}) // quãng đường

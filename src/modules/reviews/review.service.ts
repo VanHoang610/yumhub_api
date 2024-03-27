@@ -15,8 +15,9 @@ import { TypeOfReview } from 'src/schemas/typeOfReview.shema';
 export class ReviewService { 
 
     constructor(@InjectModel(Review.name) private reviewModel: Model<Review>,
-    @InjectModel(Order.name) private orderModel: Model<Order>,
+   @InjectModel(Order.name) private orderModel: Model<Order>,
     @InjectModel(TypeOfReview.name) private reviewType: Model<TypeOfReview>,) {}
+
 
     // async createReivew(createReview: ReviewDto) {
     //     try {
@@ -41,48 +42,43 @@ export class ReviewService {
     //     }
     // }
 
-    // async getAllReview() {
-    //     try {
-    //         const reviews =  await this.reviewModel.find().populate('orderID').populate('reviewerID')
-    //         return {result: true, reviews: reviews}
-    //     } catch (error) {
-    //         return {result: true, reviews: error}
-    //     }
-    // }
 
-    // async updateReview(id: string, createReivew: ReviewDto) {
-    //     try {
-    //         const updateReview = await this.reviewModel.findByIdAndUpdate(id, createReivew, {new: true});
-    //         if(!updateReview) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
+    async getAllReview() {
+        try {
+            const reviews =  await this.reviewModel.find();
+            return {result: true, reviews: reviews}
+        } catch (error) {
+            return {result: true, reviews: error}
+        }
+    }
 
-    //         return { result: true, UpdateReview: updateReview }
-    //     } catch (error) {
-    //         return { result: false, UpdateReview: error }
-    //     }
-    // }
 
- 
+
+         async updateReview(id: string, createReivew: ReviewDto) {
+        try {
+            const updateReview = await this.reviewModel.findByIdAndUpdate(id, createReivew, {new: true});
+            if(!updateReview) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
+
+            return { result: true, updateReview: updateReview }
+        } catch (error) {
+            return { result: false, updateReview: error }
+        }
+    }
+
+
+
    
     async findUserId(reviewID: string) {
         const review = (await this.reviewModel.findById(reviewID));
         const order = (await this.reviewModel.findById(reviewID)).orderID;
-       
-        
-        // if (!review) {
-        //     throw new Error('Review not found');
-        // }
-        
         var user : Object;
-        
-        
-        if (review.typeOfReview.name=== "shipperToCustomer") { // người bị review là customer
+      if (review.typeOfReview.name=== "shipperToCustomer") { // người bị review là customer
             user = (await this.orderModel.findById(order)).customerID;
         } else if (review.typeOfReview.name === "cutomerToMerchant") { // 2 là merchant
             user = (await this.orderModel.findById(order)).merchantID;
         } else { // 3 là shipper
             user = (await this.orderModel.findById(order)).shipperID;
         }
-    
         return user;
     }
     async calculateAverageRating(userId: string): Promise<number> {
