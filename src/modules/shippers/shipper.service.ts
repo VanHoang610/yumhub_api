@@ -106,9 +106,6 @@ export class ShipperService {
     async deleteShipper(id: string) {
         try {
             const ShipperById = await this.shipperModel.findById(id);
-            
-            // const UserID = ShipperById.userID;
-            // console.log(UserID);
             const updateUserID = await this.shipperModel.findByIdAndUpdate(ShipperById, {deleted: true}, {new: true})
             if (updateUserID) {
                 return "Xóa thành công Shipper"

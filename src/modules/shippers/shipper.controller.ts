@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as path from "path";
-import { storageConfig } from 'src/helper/config';
 import { extname } from 'path';
 
 
@@ -14,7 +13,7 @@ export class ShipperController {
 
     constructor(private readonly shipperService: ShipperService) {}
     
-     tạo shipper
+    //  tạo shipper
      @Post('createShipper')
      createOrder(@Body() shipperService: ShipperDto) 
      {
@@ -63,10 +62,10 @@ export class ShipperController {
           }
       }
   
-    @Get('getPhoneNumberShipper/:id')
-    getPhoneNumberShipper(@Param('id') id: string){
-        return this.shipperService.getPhoneNumberShipper(id);
-    }
+    // @Get('getPhoneNumberShipper/:id')
+    // getPhoneNumberShipper(@Param('id') id: string){
+    //     return this.shipperService.getPhoneNumberShipper(id);
+    // }
     
     @Post('deleteShipper/:id')
     deleteShipper(@Param('id') id: string){
@@ -79,33 +78,4 @@ export class ShipperController {
         if(!isValid) throw new HttpException("Invalid ID", 40);
         return  await this.shipperService.updateShipper(id, updateShipper);
     }
-
-    @Post("upload-avatar/:id") // Thêm :id vào đường dẫn URL để nhận id từ đường dẫn
-    @UseInterceptors(FileInterceptor('File',{
-        storage: storageConfig("Image"),
-        fileFilter: (req, file, cb) => {
-            const ext = extname(file.originalname);
-            const allowedExArr =["jpg", "png", "jpeg"];
-            if(!allowedExArr.includes(ext)){
-                req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExArr.toString()}`;
-                cb(null, false);
-            }else{
-                const fileSize = parseInt(req.headers['content-length']);
-                if(fileSize > 1024 * 1024 * 5){
-                    req.fileValidationError =`file size is too large. Accepted file size is less 5 MB`;
-                    cb(null, false);
-                }else{
-                    cb(null, true);
-                }
-            }
-        }
-    }))
-    uploadAvatar(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): void{
-        console.log("upload avatar");
-        console.log(file);
-        this.shipperService.updateAvatar(id, file.destination+'/'+file.filename); // Sử dụng id lấy từ đường dẫn URL
-    }
-
-
-
 }
