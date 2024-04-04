@@ -14,7 +14,19 @@ export class ShipperController {
 
     constructor(private readonly shipperService: ShipperService) {}
     
-     tạo shipper
+    // add Data
+    @Get('addData')
+    addData() 
+    {
+        try {
+            const shipper = this.shipperService.addData();
+            return shipper;
+        } catch (error) {
+            console.error("Create Shipper Fail", error)
+        }
+    }
+
+     // tạo shipper
      @Post('createShipper')
      createOrder(@Body() shipperService: ShipperDto) 
      {
@@ -63,10 +75,10 @@ export class ShipperController {
           }
       }
   
-    @Get('getPhoneNumberShipper/:id')
-    getPhoneNumberShipper(@Param('id') id: string){
-        return this.shipperService.getPhoneNumberShipper(id);
-    }
+    // @Get('getPhoneNumberShipper/:id')
+    // getPhoneNumberShipper(@Param('id') id: string){
+    //     return this.shipperService.getPhoneNumberShipper(id);
+    // }
     
     @Post('deleteShipper/:id')
     deleteShipper(@Param('id') id: string){

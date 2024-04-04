@@ -9,6 +9,17 @@ import mongoose from 'mongoose';
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
 
+    @Get('addData')
+    addData() 
+    {
+        try {
+            const shipper = this.merchantService.addData();
+            return shipper;
+        } catch (error) {
+            console.error("Create Shipper Fail", error)
+        }
+    }
+
     // @Post()
     // @UsePipes(new ValidationPipe())
     // createMerchant(@Body() merchantDto: MerchantDto) {

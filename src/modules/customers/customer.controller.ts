@@ -14,6 +14,13 @@ export class CustomerController {
 
     constructor(private readonly customerService: CustomerServices) { }
 
+    //addData
+    @Get('addData') 
+        addData() {
+            return this.customerService.addData();
+        }
+
+
     // tạo customer
     @Post('createCustomer')
     createUser(@Body(new ValidationPipe()) registerDto: RegisterCustomerDto) {
@@ -52,11 +59,11 @@ export class CustomerController {
         return await this.customerService.updateCustomer(id, updateCustomer);
     }
 
-    //  // lấy dánh sách lịch sử theo id
-    //  @Get('getHistoryCustomer/:id')
-    //  getHistoryById(@Param('id') id: string){
-    //      return this.customerService.getHistoryById(id);
-    //  }
+     // lấy dánh sách lịch sử theo id
+     @Get('getHistoryCustomer/:id')
+     getHistoryById(@Param('id') id: string){
+         return this.customerService.getHistoryById(id);
+     }
 
      //login
      @Post('login')
