@@ -68,7 +68,7 @@ export class ShipperService {
     async getAllShipper() {
         try {
             const shippers = await this.shipperModel.find();
-            if (!shippers) return { Message: "Not found Order" }
+            if (!shippers) return { Message: "Not found shipper" }
             return { result: true, AllShipper: shippers }
         } catch (error) {
             return { result: false, AllShipper: error }
@@ -108,7 +108,7 @@ export class ShipperService {
             const ShipperById = await this.shipperModel.findById(id);
             const updateUserID = await this.shipperModel.findByIdAndUpdate(ShipperById, {deleted: true}, {new: true})
             if (updateUserID) {
-                return "Xóa thành công Shipper"
+                return {result: true, isDelete:"Xóa thành công Shipper"}
             } else {
                 throw new Error("Không tìm thấy ID Shipper")
             }

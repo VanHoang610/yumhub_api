@@ -6,10 +6,10 @@ import { TypeOfVoucher } from "./typeOfVoucher.schema";
 export class Voucher {
 
     @Prop({required: true})
-    startDate: string
+    startDate: Date
 
     @Prop({required: true})
-    endDate: string
+    endDate: Date
 
     @Prop({required: true})
     nameVoucher: string
@@ -22,9 +22,6 @@ export class Voucher {
 
     @Prop({required: true})
     code: string
-
-    @Prop({required: false, default: false}) //hạn sử dụng
-    expiry: boolean
 
     @Prop({required: false}) //điều kiện áp dụng
     conditionsApply?: number

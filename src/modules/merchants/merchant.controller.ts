@@ -9,13 +9,13 @@ import mongoose from 'mongoose';
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
 
-    // @Post()
-    // @UsePipes(new ValidationPipe())
-    // createMerchant(@Body() merchantDto: MerchantDto) {
-    //     console.log(merchantDto);
+    @Post()
+    @UsePipes(new ValidationPipe())
+    createMerchant(@Body() merchantDto: MerchantDto) {
+        console.log(merchantDto);
 
-    //     return this.merchantService.createMerchant(merchantDto);
-    // }
+        return this.merchantService.createMerchant(merchantDto);
+    }
 
 
     // sắp xếp vị trí người dùng với cửa hàng từ gần đến xa
@@ -39,14 +39,14 @@ export class MerchantController {
 
 
     // // sắp xếp theo vị trí từ thấp đến cao
-    // @Get()
-    // getMerchant() {
-    //     return this.merchantService.getMerchant();
-    // }
-    // @Post('deleteMerchant/:id')
-    // deleteCustomer(@Param('id') id: string) {
-    //     return this.merchantService.deleteMerchant(id);
-    // }
+    @Get()
+    getMerchant() {
+        return this.merchantService.getMerchant();
+    }
+    @Post('deleteMerchant/:id')
+    deleteCustomer(@Param('id') id: string) {
+        return this.merchantService.deleteMerchant(id);
+    }
     // @Patch('updateMerchant/:id')
     // async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateMerchant: MerchantDto) {
     //     const isValid = mongoose.Types.ObjectId.isValid(id);

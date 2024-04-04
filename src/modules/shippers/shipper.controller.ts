@@ -27,7 +27,7 @@ export class ShipperController {
  
      //lấy tất cả shipper
      @Get('getAllShipper')
-     getAllOrder(){
+     getAllShipper(){
          try {
              const shipper = this.shipperService.getAllShipper();
              if(!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -44,9 +44,9 @@ export class ShipperController {
          try {
              const shipper = this.shipperService.getHistory(id);
              if(!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return shipper;
+             return {result: true,  history: shipper};
          } catch (error) {
-             return error
+             return {result:false,error} 
          }
      }
 

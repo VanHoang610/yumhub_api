@@ -20,8 +20,11 @@ export class Food {
     @Prop({required: false}) // giá bán
     priceForSale?: number
 
-    // @Prop({required: false}) //1: thức ăn, 2: nước uống
-    // type?: number  
+    @Prop({required: false}) //1: thức ăn, 2: nước uống
+    typeOfFood?: number 
+    
+    @Prop({required: false, default: false}) 
+    deleted?: boolean
 }   
 
 export const FoodSchema = SchemaFactory.createForClass(Food)

@@ -15,7 +15,7 @@ export class DetailOrder {
     @Prop({required: true})
     quantity: number
 
-    @Prop({required: true})
+    @Prop({required: false})
     price: number
 
     @Prop({required:false})

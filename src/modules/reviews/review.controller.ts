@@ -43,8 +43,8 @@ export class ReviewController {
     }
   
     // tính trung bình
-    @Get('average-rating/:id')
-    async getAverageRating(@Param('id') id: string): Promise<number> {
+    @Get('averagerating/:id')
+    async getAverageRating(@Param('id') id: string) {
         // Gọi phương thức calculateAverageRating từ ReviewService và trả về kết quả
         const averageRating = await this.reviewService.calculateAverageRating(id);
         return averageRating;
@@ -55,9 +55,14 @@ export class ReviewController {
     async getReview(@Param('id') id: string) {
         return await this.reviewService.findUserId(id);
     }
-
-
-
-
-
+    // lịch sử review ngta
+    @Get("gethistoryreview/:id")
+    async getHistoryReview(@Param('id') id: string) {
+        return await this.reviewService.getAllHistoryReview(id);
+    }
+    // lịch sử ngta review mình
+    @Get("gethistorybereview/:id")
+    async getAllHistoryBeReview(@Param('id') id: string) {
+        return await this.reviewService.getAllHistoryBeReview(id);
+    }
 }

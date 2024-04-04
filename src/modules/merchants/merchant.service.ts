@@ -26,7 +26,7 @@ export class MerchantService {
     }
 
     getMerchant() {
-        return this.merchants.find();
+            return { result: true, merchants: this.merchants.find() }
     }
 
 
@@ -58,7 +58,7 @@ export class MerchantService {
 
     async getHistory(id: string) {
         try {
-            const orders = await this.orderModel.find({"merchantID": id});
+            const orders = await this.orderModel.find({ "merchantID": id });
             if (orders.length === 0) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
             return { result: true, historyShipper: orders }
         } catch (error) {
@@ -100,7 +100,7 @@ export class MerchantService {
             sortShipper.sort((a, b) => a.distance - b.distance);
             const nearestShippers = sortShipper.slice(0, 5);
             return { result: true, get5NearestShippers: nearestShippers }
-           
+
         } catch (error) {
             return { result: false, get5NearestShippers: error }
         }

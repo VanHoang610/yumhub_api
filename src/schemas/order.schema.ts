@@ -4,7 +4,7 @@ import { Customer } from "./customer.schemas";
 import { Merchant } from "./merchant.schema";
 import { Shipper } from "./shipper.schema";
 
-import { Voucher } from "./voucher";
+import { Voucher } from "./voucher.schema";
 import { OrderStatus } from "./orderStatus.schema";
 
 import { Review } from "./review.schema";
@@ -50,7 +50,8 @@ export class Order {
     @Prop({required: false}) // quãng đường
     totalDistance?: string
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus'})   //1: đã thanh toán, 2:đã hủy, 3: đang giao
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus'})  
+     //1: pending, 2:Processing, 3: Shipped, 4: Delivered, 5: Cancel , 6: OnHold, 7: Backordered
     status: OrderStatus 
 
     @Prop({required: false})

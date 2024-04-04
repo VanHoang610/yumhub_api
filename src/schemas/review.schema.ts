@@ -6,7 +6,7 @@ import { TypeOfReview } from "./typeOfReview.shema";
 @Schema()
 export class Review {
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'order'})
     orderID: Order
 
     @Prop({required: false})

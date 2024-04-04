@@ -28,6 +28,7 @@ import { TransactionTypeShipperModule } from './modules/transactionTypeShipper/t
 import { TypeOfMerchantModule } from './modules/typeOfMerchant/typeOfMerchant.module';
 import { TypeOfReviewModule } from './modules/typeOfReview/typeOfReview.module';
 import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.module';
+import { TypeOfFood } from './schemas/typeOfFood.schema';
 
 @Module({
   imports: [
@@ -59,7 +60,7 @@ import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.modul
     TypeOfMerchantModule,
     TypeOfReviewModule,
     TypeOfVoucherModule,
-    
+    TypeOfFood,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],

@@ -2,7 +2,7 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 import { Customer } from "src/schemas/customer.schemas";
 import { Merchant } from "src/schemas/merchant.schema";
 import { Shipper } from "src/schemas/shipper.schema";
-import { Voucher } from "src/schemas/voucher";
+import { Voucher } from "src/schemas/voucher.schema";
 
 export class OrderDto {
 

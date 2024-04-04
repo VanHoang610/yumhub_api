@@ -1,4 +1,5 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
+import { TypeOfVoucher } from "src/schemas/typeOfVoucher.schema";
 
 export class CreateVoucherDto {
 
@@ -14,13 +15,13 @@ export class CreateVoucherDto {
     @IsString()
     discountAmount: string
 
-    @IsNumber()
-    typeOfVoucher: number
+    @IsOptional()
+    typeOfVoucher?: TypeOfVoucher
 
     @IsString()
     code: string
 
     @IsNumber()
-    status: number
+    conditionsApply: number
 
 }

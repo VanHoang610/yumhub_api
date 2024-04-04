@@ -13,6 +13,33 @@ export class OrderController {
         return await this.orderServices.createOrder(orderDto);
     }
 
+    @Post('statusprocessing/:id')
+    async setStatusProcessing(@Param('id') orderId: string) {
+        return await this.orderServices.setStatusProcessing(orderId);
+    }
+    @Post('statusshipped/:id')
+    async setStatusShipped(@Param('id') orderId: string) {
+        return await this.orderServices.setStatusShipped(orderId);
+    }
+    @Post('statusdelivered/:id')
+    async setStatusDelivered(@Param('id') orderId: string) {
+        return await this.orderServices.setStatusDelivered(orderId);
+    }
+    @Post('statuscancel/:id')
+    async setStatusCancel(@Param('id') orderId: string) {
+        return await this.orderServices.setStatusCancel(orderId);
+    }
+    @Post('statusonhold/:id')
+    async setStatusOnHold(@Param('id') orderId: string) {
+        return await this.orderServices.setStatusOnHold(orderId);
+    }
+
+    @Post('statusbackordered/:id')
+    async setStatusBackordered(@Param('id') orderId: string) {
+        return await this.orderServices.setStatusBackordered(orderId);
+    }
+
+
 
 
     //lấy tất cả order
