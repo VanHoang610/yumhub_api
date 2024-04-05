@@ -1,27 +1,37 @@
 
-import { Controller, Post, Body, Get, Param, Patch, NotFoundException } from '@nestjs/common' 
+import { Controller, Post, Body, Get, Param, Patch, NotFoundException } from '@nestjs/common'
 import { ReviewService } from './review.service';
 import { ReviewDto } from 'src/dto/dto.review';
-import { get } from 'mongoose';
+import { RegisterReviewDto } from 'src/dto/dto.registerReview';
 @Controller('reviews')
 export class ReviewController {
 
-    constructor(private readonly reviewService: ReviewService) {}
 
-    //Tạo review
-    // @Post('createReview')
-    // createReview(@Body() createReview: ReviewDto) {
-    //     try {
-    //         const review = this.reviewService.createReivew(createReview);
-    //         return review;
-    //     } catch (error) {
-    //         console.error(error)
-    //     }
-    // }
+    constructor(private readonly reviewService: ReviewService) { }
+    // Tạo data
+    @Get('addData')
+    addData() {
+        try {
+            const review = this.reviewService.addData();
+            return review;
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    // Tạo review
+    @Post('createReview')
+    createReview(@Body() createReview: RegisterReviewDto) {
+        try {
+            const review = this.reviewService.createReivew(createReview);
+            return review;
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
 
     // lấy tất cả
-    @Get('getAllReview') // chưa
+    @Get('getAllReview')
     getAllReview() {
         try {
             const review = this.reviewService.getAllReview();
@@ -30,6 +40,7 @@ export class ReviewController {
             console.error(error)
         }
     }
+
 
     // sửa review
     @Patch('updateReview/:id')
@@ -41,7 +52,7 @@ export class ReviewController {
             console.error("Update review fail", error)
         }
     }
-  
+
     // tính trung bình
     @Get('averagerating/:id')
     async getAverageRating(@Param('id') id: string) {

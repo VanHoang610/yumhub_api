@@ -7,6 +7,12 @@ export class OrderController {
 
     constructor(private readonly orderServices: OrderService) { }
 
+    // addData
+    @Get('addData')
+    async addData() {
+        return await this.orderServices.addData();
+    }
+
     // tạo order
     @Post('createOrder')
     async createOrder(@Body() orderDto: OrderDto) {

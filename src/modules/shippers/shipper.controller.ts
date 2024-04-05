@@ -13,7 +13,20 @@ export class ShipperController {
 
     constructor(private readonly shipperService: ShipperService) {}
     
-    //  tạo shipper
+
+    // add Data
+    @Get('addData')
+    addData() 
+    {
+        try {
+            const shipper = this.shipperService.addData();
+            return shipper;
+        } catch (error) {
+            console.error("Create Shipper Fail", error)
+        }
+    }
+
+     // tạo shipper
      @Post('createShipper')
      createOrder(@Body() shipperService: ShipperDto) 
      {

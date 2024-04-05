@@ -9,10 +9,24 @@ import mongoose from 'mongoose';
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
 
+
+    @Get('addData')
+    addData() 
+    {
+        try {
+            const shipper = this.merchantService.addData();
+            return shipper;
+        } catch (error) {
+            console.error("Create Shipper Fail", error)
+        }
+    }
+
+
     @Post()
     @UsePipes(new ValidationPipe())
     createMerchant(@Body() merchantDto: MerchantDto) {
         console.log(merchantDto);
+
 
         return this.merchantService.createMerchant(merchantDto);
     }
@@ -31,10 +45,10 @@ export class MerchantController {
         }
     }
 
-    // @Get(':id')
-    // getMerchantByID(@Param('id') id: string) {
-    //     return this.merchantService.getMerchantById(id);
-    // }
+    @Get(':id')
+    getMerchantByID(@Param('id') id: string) {
+        return this.merchantService.getMerchantById(id);
+    }
 
 
 
@@ -47,12 +61,12 @@ export class MerchantController {
     deleteCustomer(@Param('id') id: string) {
         return this.merchantService.deleteMerchant(id);
     }
-    // @Patch('updateMerchant/:id')
-    // async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateMerchant: MerchantDto) {
-    //     const isValid = mongoose.Types.ObjectId.isValid(id);
-    //     if (!isValid) throw new HttpException("Invalid ID", 40);
-    //     return await this.merchantService.updateMerchant(id, updateMerchant);
-    // }
+    @Patch('updateMerchant/:id')
+    async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateMerchant: MerchantDto) {
+        const isValid = mongoose.Types.ObjectId.isValid(id);
+        if (!isValid) throw new HttpException("Invalid ID", 40);
+        return await this.merchantService.updateMerchant(id, updateMerchant);
+    }
 
     //lấy lịch sử merchant
     @Get('getHistoryOrder/:id')

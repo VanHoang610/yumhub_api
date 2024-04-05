@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose';
 import { create } from 'domain';
+import { RegisterCustomerDto } from 'src/dto/dto.registerCustomer';
+import { RegisterReviewDto } from 'src/dto/dto.registerReview';
 import { Model, ObjectId } from 'mongoose';
 import { ReviewDto } from 'src/dto/dto.review';
 import { Order } from 'src/schemas/order.schema';
@@ -19,7 +21,7 @@ export class ReviewService {
         @InjectModel(TypeOfReview.name) private reviewType: Model<TypeOfReview>,) { }
 
 
-    async createReivew(createReview: ReviewDto) {
+    async createReview(createReview: ReviewDto) {
         try {
             const order = createReview.orderID;
             const orderID = await this.orderModel.findById(order);
@@ -41,28 +43,117 @@ export class ReviewService {
     }
 
 
-    async getAllReview() {
+
+    async addData() {
         try {
-            const reviews = await this.reviewModel.find();
+            const reviews = await this.reviewModel.create({
+                _id: "660c9e6cfc13ae76f950fb0f",
+                orderID: "660c9dc319f26b917ea15835",
+                description: "Lilllie",
+                rating: 4,
+                typeOfReview: "6604e5a181084710d45efe9e",
+            }, {
+                _id: "660c9e6cfc13ae76f950fb10",
+                orderID: "660c9dc319f26b917ea15834",
+                description: "Lilllie",
+                rating: 4,
+                typeOfReview: "6604e5a181084710d45efe9e",
+            }, {
+                _id: "660c9e6cfc13ae76f950fb11",
+                orderID: "660c9dc319f26b917ea15834",
+                description: "Lilllie",
+                rating: 4,
+                typeOfReview: "6604e5a181084710d45efe9d",
+            }, {
+                _id: "660c9e6cfc13ae76f950fb12",
+                orderID: "6604de8e26f9a8b37aeb30cf",
+                description: "Lilllie",
+                rating: 4,
+                typeOfReview: "6604e5a181084710d45efe9c",
+            }, {
+                _id: "660c9e6cfc13ae76f950fb13",
+                orderID: "660c9dc319f26b917ea15833",
+                description: "Lilllie",
+                rating: 4,
+                typeOfReview: "6604e5a181084710d45efe9e",
+            }, 
+            )
+
             return { result: true, reviews: reviews }
         } catch (error) {
             return { result: true, reviews: error }
         }
     }
 
+    async createReivew(createReview: RegisterReviewDto) {
+        try {
+            const { orderID, description, rating, typeOfReviewID } = createReview;
+            const customerToMerchant = '6604e5a181084710d45efe9c';
+            const customerToShipper = '6604e5a181084710d45efe9d';
+            const shipperToCustomer = '6604e5a181084710d45efe9e';
 
+            if (typeOfReviewID == 1) {
+                const reviewNew = new this.reviewModel({
+                    orderID: orderID,
+                    description: description,
+                    rating: rating,
+                    typeOfReview: customerToMerchant
+                })
+                await reviewNew.save();
+                return { result: true, newReview: reviewNew }
+            } else if (typeOfReviewID == 2) {
+                const reviewNew = new this.reviewModel({
+                    orderID: orderID,
+                    description: description,
+                    rating: rating,
+                    typeOfReview: customerToShipper
+                })
+                await reviewNew.save();
+                return { result: true, newReview: reviewNew }
+            } else {
+                const reviewNew = new this.reviewModel({
+                    orderID: orderID,
+                    description: description,
+                    rating: rating,
+                    typeOfReview: shipperToCustomer
+                })
+                await reviewNew.save();
+                return { result: true, newReview: reviewNew }
+            }
+        } catch (error) {
+            return { result: false, review: error }
+        }
+    }
+
+    async getAllReview() {
+        try {
+            const reviews = await this.reviewModel.find().populate('typeOfReview');
+            return { result: true, reviews: reviews }
+        } catch (error) {
+            return { result: true, reviews: error }
+        }
+    }
 
     async updateReview(id: string, createReivew: ReviewDto) {
         try {
             const updateReview = await this.reviewModel.findByIdAndUpdate(id, createReivew, { new: true });
             if (!updateReview) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
-
             return { result: true, updateReview: updateReview }
         } catch (error) {
             return { result: false, updateReview: error }
         }
     }
 
+    async getAllFeedback(merchantID: string) {
+        try {
+            const reviews = await this.reviewModel.find({typeOfReview: '6604e5a181084710d45efe9e', 'orderID.merchantID': merchantID});
+
+            if (!reviews) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
+            return reviews
+        } catch (error) {
+            return { result: false, updateReview: error }
+        }
+    }
 
 
     // tìm id user bị review
@@ -70,7 +161,6 @@ export class ReviewService {
         const review = (await this.reviewModel.findById(reviewID));
         const order = (await this.reviewModel.findById(reviewID)).orderID;
         var user: Object;
-
         const reviewType = await this.reviewType.findById(review.typeOfReview).exec();
         var nameType = reviewType.name
         if (nameType == "shipperToCustomer") { // người bị review là customer
@@ -99,6 +189,7 @@ export class ReviewService {
         }
         return user;
     }
+
     async calculateAverageRating(userId: string) {
         try {
             let totalRating = 0;
@@ -165,6 +256,7 @@ export class ReviewService {
         } catch (error) {
             return { result: false, history: error }
         }
+
 
     }
 
