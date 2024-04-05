@@ -48,6 +48,8 @@ export class Shipper {
     @Prop({required: true}) 
     email: string
 
+    @Prop({required: false, default: false}) 
+    deleted?: boolean
 }
 
 export const ShipperSchema = SchemaFactory.createForClass(Shipper)

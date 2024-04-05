@@ -6,7 +6,9 @@ import { OrderController } from './order.controller';
 import { Customer, CustomerSchema } from 'src/schemas/customer.schemas';
 import { Merchant, MerchantSchema } from 'src/schemas/merchant.schema';
 import { Shipper, ShipperSchema } from 'src/schemas/shipper.schema';
-import { Voucher, VoucherSchema } from 'src/schemas/voucher';
+import { Voucher, VoucherSchema } from 'src/schemas/voucher.schema';
+import { OrderStatus, OrderStatusSchemas } from 'src/schemas/orderStatus.schema';
+import { DetailOrder, DetailOrderSchema } from 'src/schemas/detailOrder.schema';
 
 @Module({
     imports:[
@@ -31,6 +33,10 @@ import { Voucher, VoucherSchema } from 'src/schemas/voucher';
                 name: Voucher.name,
                 schema: VoucherSchema
             },
+            {
+                name: OrderStatus.name,
+                schema: OrderStatusSchemas
+            }
         ])
     ],
     providers: [OrderService],

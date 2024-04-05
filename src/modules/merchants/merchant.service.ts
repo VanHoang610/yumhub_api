@@ -97,7 +97,7 @@ export class MerchantService {
     }
 
     getMerchant() {
-        return this.merchants.find();
+            return { result: true, merchants: this.merchants.find() }
     }
 
 
@@ -129,9 +129,11 @@ export class MerchantService {
 
     async getHistory(id: string) {
         try {
+
             const orders = await this.orderModel.find({ merchantID: id }).sort({ timeBook: 1 });
             if (!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
             return { result: true, history: orders }
+
         } catch (error) {
             return { result: false, historyShipper: error }
         }
