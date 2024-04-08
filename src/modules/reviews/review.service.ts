@@ -228,8 +228,9 @@ export class ReviewService {
 
             for (const review of reviews) {
                 const userIdFromReview = (await this.findUserIdReview(review._id.toString())).toString(); // Lấy userId từ reviewId
+                const userIdReview = (await this.findUserId(review._id.toString())).toString();// lấy người mình review
                 if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
-                    history.push(review); // Nếu trùng khớp, thêm review vào mảng history
+                    history.push({key:userIdReview, value: review}); // Nếu trùng khớp, thêm review vào mảng history
                 }
             }
             return { result: true, history: history }; // Trả về mảng lịch sử đánh giá
@@ -247,9 +248,9 @@ export class ReviewService {
 
             for (const review of reviews) {
                 const userIdFromReview = (await this.findUserId(review._id.toString())).toString(); // Lấy userId từ reviewId
-                
+                const userIdReview = (await this.findUserIdReview(review._id.toString())).toString();// lấy người review mình
                 if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
-                    history.push(review); // Nếu trùng khớp, thêm review vào mảng history
+                    history.push({key:userIdReview, value: review}); // Nếu trùng khớp, thêm review vào mảng history
                 }
             }
             return { result: true, history: history }; // Trả về mảng lịch sử đánh giá

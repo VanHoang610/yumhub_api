@@ -44,7 +44,10 @@ export class OrderController {
     async setStatusBackordered(@Param('id') orderId: string) {
         return await this.orderServices.setStatusBackordered(orderId);
     }
-
+        @Post('statusOrder/:id/:status')
+        async setStatus(@Param('id') orderId: string,@Param('status') status: number) {
+            return await this.orderServices.setStatus(orderId,status);
+        }
 
 
 
