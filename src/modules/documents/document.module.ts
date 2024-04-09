@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose';
-import { Document, DocumentSchema } from 'src/schemas/documentShipper.schema';
+import { Document, DocumentSchema } from 'src/schemas/document.schemaShipper';
 import { DocumentController } from './document.controller';
 import { DocumentService } from './document.service';
 
