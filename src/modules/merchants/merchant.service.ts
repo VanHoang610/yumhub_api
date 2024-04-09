@@ -6,6 +6,7 @@ import { Merchant } from 'src/schemas/merchant.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Order } from 'src/schemas/order.schema';
 import { Shipper } from 'src/schemas/shipper.schema';
+import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
 
 
 @Injectable()
@@ -67,8 +68,7 @@ export class MerchantService {
                     longitude: 17.5275042,
                     latitude: 43.9760578,
                 }, {
-                    _id: "660c99c2fc13ae788b50fbdd",
-                    name: "TRAMADOL HYDROCHLORIDE",
+                    _id: "660c99c2fc13ae788b50fbdd",name: "TRAMADOL HYDROCHLORIDE",
                     type: "6604e35881084710d45efe8e",
                     openTime: "1/1/2024",
                     closeTime: "9/22/2023",
@@ -86,8 +86,9 @@ export class MerchantService {
     }
 
 
-    async createMerchant(merchant: MerchantDto) {
-        const newMerchants = new this.merchants(merchant)
+    async createMerchant(merchant: RegisterMerchatDto) {
+        const newMerchants = new this.merchants(merchant);
+        if(!newMerchants) throw new HttpException('Not Create Merchant', HttpStatus.NOT_FOUND);
         await newMerchants.save()
         return { result: true, newMerchant: newMerchants }
     }
@@ -99,9 +100,7 @@ export class MerchantService {
     getMerchant() {
             return { result: true, merchants: this.merchants.find() }
     }
-
-
-
+    
     async deleteMerchant(id: string) {
         try {
             const merchantById = await this.merchants.findById(id);
@@ -150,9 +149,7 @@ export class MerchantService {
             });
 
             // sắp xếp
-            sortedMerchants.sort((a, b) => a.distance - b.distance);
-
-            return { result: true, merchants: sortedMerchants };
+            sortedMerchants.sort((a, b) => a.distance - b.distance);return { result: true, merchants: sortedMerchants };
         } catch (error) {
             return { result: false, merchants: error };
         }

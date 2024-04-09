@@ -4,6 +4,7 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch,
 import { MerchantService } from './merchant.service';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import mongoose from 'mongoose';
+import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
 
 @Controller('merchants')
 export class MerchantController {
@@ -20,18 +21,7 @@ export class MerchantController {
             console.error("Create Shipper Fail", error)
         }
     }
-
-
-    @Post()
-    @UsePipes(new ValidationPipe())
-    createMerchant(@Body() merchantDto: MerchantDto) {
-        console.log(merchantDto);
-
-
-        return this.merchantService.createMerchant(merchantDto);
-    }
-
-
+    
     // sắp xếp vị trí người dùng với cửa hàng từ gần đến xa
     @Post('sortLocation')
     getLocation(@Body() body: { longitude: number, latitude: number }) {
@@ -92,5 +82,10 @@ export class MerchantController {
         }
 
     }
+     // tạo merchant
+     @Post('createMerchant')
+     createUser(@Body(new ValidationPipe()) registerDto: RegisterMerchatDto) {
+        return this.merchantService.createMerchant(registerDto)
+     }
 
 }
