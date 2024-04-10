@@ -2,10 +2,8 @@ import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, R
 import { ShipperService } from './shipper.service';
 import { ShipperDto } from 'src/dto/dto.shipper';
 import mongoose from "mongoose";
-import { diskStorage } from 'multer';
-import { FileInterceptor } from '@nestjs/platform-express';
-import * as path from "path";
-import { extname } from 'path';
+import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
+import { LoginDto } from 'src/dto/dto.login';
 
 
 @Controller('shippers')
@@ -28,10 +26,10 @@ export class ShipperController {
 
      // tạo shipper
      @Post('createShipper')
-     createOrder(@Body() shipperService: ShipperDto) 
+     createOrder(@Body() shippers: RegisterShipperDto) 
      {
          try {
-             const shipper = this.shipperService.createShipper(shipperService);
+             const shipper = this.shipperService.createShipper(shippers);
              return shipper;
          } catch (error) {
              console.error("Create Shipper Fail", error)
@@ -90,5 +88,48 @@ export class ShipperController {
         const isValid = mongoose.Types.ObjectId.isValid(id);
         if(!isValid) throw new HttpException("Invalid ID", 40);
         return  await this.shipperService.updateShipper(id, updateShipper);
+    }
+
+    //login
+    @Post('login')
+    login(@Body(new ValidationPipe()) login: LoginDto) {
+        return this.shipperService.login(login);
+    }
+
+    //quên mật khẩu bằng Email
+   @Post('forgetPassByEmail')
+   forgetPasswordByEmail(@Body() body: { email: string }) {
+       const { email } = body;
+
+       return this.shipperService.forgetPassByEmail(email);
+   }
+
+   //kiểm tra OTP
+   @Post('checkOTP')
+   checkOTP(@Body() body: { email: string, otp: string }){
+       const { email, otp } = body;
+       return this.shipperService.checkOTP(email, otp);
+   }
+
+   //cập nhật mật khẩu
+   @Post('resetPass/:id')
+   resetPass(@Param('id') id: string, @Body() body: { password: string }){
+       const { password } = body;
+       return this.shipperService.resetPass(id, password);
+   }
+
+
+   //đổi mật khẩu
+   @Post('changePass/:id')
+   changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+       const { passOld, passNew } = body;
+       return this.shipperService.changePass(id, passOld, passNew);
+   }
+
+   //gửi email xác thực
+    @Post('verifileMerchant')
+    verifileMerchant(@Body() body: { email: string }) {
+        const { email } = body;
+        return this.shipperService.verifileMerchant(email);
     }
 }

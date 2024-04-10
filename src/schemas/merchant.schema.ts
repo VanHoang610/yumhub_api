@@ -23,17 +23,20 @@ export class Merchant {
     @Prop({required: false})
     rating?: number
 
-    @Prop({required: false}) //giấy phép
-    businessLicense?: string
-
     @Prop({required: false, default: false})
     deleted?: boolean 
     
-    @Prop({required: true}) //kinh độ
+    @Prop({required: false}) //kinh độ
     longitude: number 
 
-    @Prop({required: true}) // vĩ độ
+    @Prop({required: false}) // vĩ độ
     latitude: number
+
+    @Prop({required: false})
+    imageBackground: string
+
+    @Prop({required: false, default: 1})
+    status?: number
 
 }
 

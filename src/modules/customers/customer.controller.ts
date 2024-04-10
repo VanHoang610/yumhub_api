@@ -71,7 +71,7 @@ export class CustomerController {
          return this.customerService.login(users);
      }
 
-      //quên mật khẩu bằng Email
+    //quên mật khẩu bằng Email
     @Post('forgetPassByEmail')
     forgetPasswordByEmail(@Body() body: { email: string }) {
         const { email } = body;

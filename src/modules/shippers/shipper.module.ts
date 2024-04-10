@@ -5,6 +5,7 @@ import { ShipperController } from "./shipper.controller";
 import { ShipperService } from "./shipper.service";
 
 import { Order, OrderSchema } from "src/schemas/order.schema";
+import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema";
 
 
 
@@ -18,6 +19,11 @@ import { Order, OrderSchema } from "src/schemas/order.schema";
             {
                 name: Order.name,
                 schema: OrderSchema
+
+            },
+            {
+                name: ResetPassword.name,
+                schema: ResetPasswordSchema
 
             }
         ]),

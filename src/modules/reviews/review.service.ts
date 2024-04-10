@@ -9,6 +9,7 @@ import { ReviewDto } from 'src/dto/dto.review';
 import { Order } from 'src/schemas/order.schema';
 import { Review } from 'src/schemas/review.schema';
 import { TypeOfReview } from 'src/schemas/typeOfReview.shema';
+import { ImageReview } from 'src/schemas/imageReview.schema';
 
 
 
@@ -18,7 +19,8 @@ export class ReviewService {
 
     constructor(@InjectModel(Review.name) private reviewModel: Model<Review>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
-        @InjectModel(TypeOfReview.name) private reviewType: Model<TypeOfReview>,) { }
+        @InjectModel(TypeOfReview.name) private reviewType: Model<TypeOfReview>,
+        @InjectModel(ImageReview.name) private imageReivewModel: Model<ImageReview>,) { }
 
 
     async createReview(createReview: ReviewDto) {
@@ -71,8 +73,7 @@ export class ReviewService {
                 rating: 4,
                 typeOfReview: "6604e5a181084710d45efe9c",
             }, {
-                _id: "660c9e6cfc13ae76f950fb13",
-                orderID: "660c9dc319f26b917ea15833",
+                _id: "660c9e6cfc13ae76f950fb13",orderID: "660c9dc319f26b917ea15833",
                 description: "Lilllie",
                 rating: 4,
                 typeOfReview: "6604e5a181084710d45efe9e",
@@ -146,9 +147,7 @@ export class ReviewService {
 
     async getAllFeedback(merchantID: string) {
         try {
-            const reviews = await this.reviewModel.find({typeOfReview: '6604e5a181084710d45efe9e', 'orderID.merchantID': merchantID});
-
-            if (!reviews) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
+            const reviews = await this.reviewModel.find({typeOfReview: '6604e5a181084710d45efe9e', 'orderID.merchantID': merchantID});if (!reviews) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
             return reviews
         } catch (error) {
             return { result: false, updateReview: error }
@@ -212,53 +211,66 @@ export class ReviewService {
             }
 
             // Tính điểm trung bình
-            const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;
-            return { result: true, averageRating: averageRating }
+            const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;return { result: true, averageRating: averageRating }
         } catch (error) {
             return { result: false, averageRating: error }
         }
 
     }
+
+
     // lấy ra lịch sử tất cả các đánh giá mình đánh giá
     async getAllHistoryReview(UserId: string) {
         try {
-            const reviews = await this.reviewModel.find().exec(); // Lấy tất cả các review
-
-            const history = []; // Khởi tạo mảng lưu trữ các đánh giá
+            const reviews = await this.reviewModel.find().exec(); 
+            const history = [];
 
             for (const review of reviews) {
                 const userIdFromReview = (await this.findUserIdReview(review._id.toString())).toString(); // Lấy userId từ reviewId
+                const userIdReview = (await this.findUserId(review._id.toString())).toString();// lấy người mình review
                 if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
-                    history.push(review); // Nếu trùng khớp, thêm review vào mảng history
+                    const images = await this.imageReivewModel.find().exec(); 
+                    for (const image of images) {
+                        var imageReviews=[];
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    }
+                    history.push({userID:userIdReview, review: review, image: imageReviews});
                 }
-            }
+            }   
             return { result: true, history: history }; // Trả về mảng lịch sử đánh giá
 
 
         } catch (error) { return { result: false, history: error } }
 
     }
+
+
     // lấy ra tất cả lịch sử những đánh giá mình
     async getAllHistoryBeReview(UserId: string) {
         try {
             const reviews = await this.reviewModel.find().exec(); // Lấy tất cả các review
-
             const history = []; // Khởi tạo mảng lưu trữ các đánh giá
 
             for (const review of reviews) {
                 const userIdFromReview = (await this.findUserId(review._id.toString())).toString(); // Lấy userId từ reviewId
-                
+                const userIdReview = (await this.findUserIdReview(review._id.toString())).toString();// lấy người review mình
                 if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
-                    history.push(review); // Nếu trùng khớp, thêm review vào mảng history
+                    const images = await this.imageReivewModel.find().exec();
+                    for (const image of images) {
+                        var imageReviews=[];
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
+                    history.push({userID:userIdReview, review: review, image: imageReviews}); // Nếu trùng khớp, thêm review vào mảng history
                 }
             }
             return { result: true, history: history }; // Trả về mảng lịch sử đánh giá
         } catch (error) {
             return { result: false, history: error }
         }
-
-
     }
 
 }
-

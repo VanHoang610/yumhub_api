@@ -7,13 +7,18 @@ import { Shipper } from 'src/schemas/shipper.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Order } from 'src/schemas/order.schema';
+import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
+import { LoginDto } from 'src/dto/dto.login';
+import { ResetPassword } from 'src/schemas/resetPass.schema';
+import { Mailer } from 'src/helper/mailer';
 
 
 
 @Injectable()
 export class ShipperService {
     constructor(@InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
-        @InjectModel(Order.name) private orderModel: Model<Order>) { }
+        @InjectModel(Order.name) private orderModel: Model<Order>, 
+        @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>) { }
 
     async addData() {
         try {
@@ -113,49 +118,54 @@ export class ShipperService {
     }
 
 
-    async createShipper(shipperDto: ShipperDto) {
+    async createShipper(shipperDto: RegisterShipperDto) {
         try {
-
             const phoneNumber = shipperDto.phoneNumber;
             const email = shipperDto.email;
-            const password = shipperDto.password;
             const avatar = shipperDto.avatar;
             const fullName = shipperDto.fullName;
-            const rating = shipperDto.rating;
             const sex = shipperDto.sex;
             const birthDay = shipperDto.birthDay;
             const address = shipperDto.address;
             const brandBike = shipperDto.brandBike;
             const modeCode = shipperDto.modeCode;
             const idBike = shipperDto.idBike;
-            const active = shipperDto.active;
-            const longitude = shipperDto.longitude;
-            const latitude = shipperDto.latitude;
-
-            const hashPass = await bcrypt.hash(password, 10)
-
-            const newShipper = new this.shipperModel({
-                phoneNumber: phoneNumber,
-                email: email,
-                password: hashPass,
-                avatar: avatar,
-                fullName: fullName,
-                rating: rating,
-                sex: sex,
-                birthDay: birthDay,
-                address: address,
-                brandBike: brandBike,
-                modeCode: modeCode,
-                idBike: idBike,
-                active: active,
-                longitude: longitude,
-                latitude: latitude
-            });
-            if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
-            await newShipper.save();
-
-            return { result: true, createShipper: newShipper }
-
+            if (!phoneNumber || !email || !avatar || !fullName || !sex ||
+                !birthDay || !address || !brandBike || !modeCode || !idBike) {
+                const newShipper = new this.shipperModel({
+                    phoneNumber: phoneNumber,
+                    email: email,
+                    avatar: avatar,
+                    fullName: fullName,
+                    sex: sex,
+                    birthDay: birthDay,
+                    address: address,
+                    brandBike: brandBike,
+                    modeCode: modeCode,
+                    idBike: idBike,
+                    status: 1
+                });
+                if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
+                await newShipper.save();
+                return { result: true, createShipper: newShipper }
+            } else {
+                const newShipper = new this.shipperModel({
+                    phoneNumber: phoneNumber,
+                    email: email,
+                    avatar: avatar,
+                    fullName: fullName,
+                    sex: sex,
+                    birthDay: birthDay,
+                    address: address,
+                    brandBike: brandBike,
+                    modeCode: modeCode,
+                    idBike: idBike,
+                    status: 2
+                });
+                if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
+                await newShipper.save();
+                return { result: true, createShipper: newShipper }
+            }
         } catch (error) {
             return { result: false, createShipper: error }
         }
@@ -174,7 +184,7 @@ export class ShipperService {
 
     async getHistory(id: string) {
         try {
-            const orders = await this.orderModel.find({shipperID: id }).sort({ timeBook: 1});
+            const orders = await this.orderModel.find({ shipperID: id }).sort({ timeBook: 1 });
             if (!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
             return { result: true, historyShipper: orders }
         } catch (error) {
@@ -203,13 +213,10 @@ export class ShipperService {
     async deleteShipper(id: string) {
         try {
             const ShipperById = await this.shipperModel.findById(id);
-
-            // const UserID = ShipperById.userID;
-            // console.log(UserID);
             const updateUserID = await this.shipperModel.findByIdAndUpdate(ShipperById, { deleted: true }, { new: true })
 
             if (updateUserID) {
-                return {result: true, isDelete:"Xóa thành công Shipper"}
+                return { result: true, isDelete: "Xóa thành công Shipper" }
             } else {
                 throw new Error("Không tìm thấy ID Shipper")
             }
@@ -230,5 +237,121 @@ export class ShipperService {
     }
     async updateAvatar(id: string, avatar: string) {
         return await this.shipperModel.findByIdAndUpdate(id, { avatar });
+    }
+
+
+    async login(user: LoginDto) {
+        try {
+            const checkAccount = await this.shipperModel.findOne({ phoneNumber: user.phoneNumber });
+            if (!checkAccount) throw new HttpException("Không đúng SDT", HttpStatus.NOT_FOUND);
+            const compare = await bcrypt.compare(user.password, checkAccount.password);
+            if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
+            return { result: true, data: checkAccount }
+        } catch (error) {
+            return { result: false, data: error }
+        }
+    }
+
+    async forgetPassByEmail(email: string) {
+        try {
+            const user = await this.shipperModel.findOne({ email: email });
+            if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
+
+            const otp = Math.floor(1000 + Math.random() * 9000);
+
+            const passwordRest = new this.resetPasswordModel({ email: email, otp: otp })
+            await passwordRest.save();
+
+            await Mailer.sendMail({
+                email: user.email,
+                subject: "Khôi phục mật khẩu",
+                content: `Mã OTP của bạn là: ${otp}`
+            });
+
+            setTimeout(async () => {
+                await this.resetPasswordModel.deleteOne({ email: email });
+            }, 120000);
+
+            return { result: true, message: "Hãy kiểm tra email của bạn!" }
+
+        } catch (error) {
+            return { result: false, message: "Gửi OTP thất bại" }
+        }
+    }
+
+    async checkOTP(email: string, otp: string) {
+        try {
+            const user = await this.resetPasswordModel.findOne({ email: email, otp: otp });
+            if (!user) throw new HttpException('Not Find', HttpStatus.NOT_FOUND);
+            await this.resetPasswordModel.deleteOne({ email: email });
+            return { result: true, message: "Xác nhận OTP thành công" }
+        } catch (error) {
+            return { result: false, message: "OTP thất bại" }
+        }
+    }
+
+    async resetPass(id: string, password: string) {
+        try {
+            const user = await this.shipperModel.findById(id);
+            if (!user) throw new HttpException("Not Find Account", HttpStatus.NOT_FOUND);
+            const passwordNew = await bcrypt.hash(password, 10);
+            user.password = passwordNew
+            user.save();
+            return { result: true, data: user }
+        } catch (error) {
+            return { result: false, data: error }
+        }
+    }
+
+    async changePass(id: string, passOld: string, passNew: string) {
+        try {
+            const existingUser = await this.shipperModel.findById(id);
+            if (!existingUser) throw new HttpException("Not Find Account", HttpStatus.NOT_FOUND);
+
+            const compare = await bcrypt.compare(passOld, existingUser.password);
+            if (!compare) throw new HttpException("Password Fail", HttpStatus.NOT_FOUND);
+
+            const hashPassNew = await bcrypt.hash(passNew, 10);
+
+            existingUser.password = hashPassNew;
+            await existingUser.save();
+            return { result: true, data: existingUser }
+        } catch (error) {
+            console.error("Error in changePass:", error);
+            return { result: false, data: error }
+        }
+    }
+
+    async verifileMerchant(email: string) {
+        try {
+            const user = await this.shipperModel.findOne({ email: email });
+            if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
+
+            const password = (Math.floor(100000 + Math.random() * 900000)).toString();
+            const hashPassword = await bcrypt.hash(password, 10);
+            user.password = hashPassword;
+            await user.save();
+
+            const passwordRest = new this.resetPasswordModel({ email: email, otp: password })
+            await passwordRest.save();
+
+            await Mailer.sendMail({
+                email: user.email,
+                subject: "Chúc mừng bạn đã trở thành đối tác của YumHub",
+                content: `Email của bạn là: ${email}
+                            Password của bạn là: ${password}`
+            });
+
+            setTimeout(async () => {
+                await this.resetPasswordModel.deleteOne({ email: email });
+            }, 120000);
+
+            return { result: true, message: "Hãy kiểm tra email của bạn!" }
+
+        } catch (error) {
+            console.log(error);
+            
+            return { result: false, message: "Gửi thất bại" }
+        }
     }
 }
