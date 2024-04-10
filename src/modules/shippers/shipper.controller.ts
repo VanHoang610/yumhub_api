@@ -127,7 +127,7 @@ export class ShipperController {
    }
 
    //gửi email xác thực
-    @Post('verifileMerchant')
+    @Post('verifileShipper')
     verifileMerchant(@Body() body: { email: string }) {
         const { email } = body;
         return this.shipperService.verifileMerchant(email);

@@ -350,7 +350,6 @@ export class ShipperService {
 
         } catch (error) {
             console.log(error);
-            
             return { result: false, message: "Gửi thất bại" }
         }
     }

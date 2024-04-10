@@ -11,11 +11,15 @@ import { UpdateCustomerDto } from "src/dto/dto.updateCustomer";
 import { LoginDto } from "src/dto/dto.login";
 import { ResetPassword } from "src/schemas/resetPass.schema";
 import { Mailer } from "src/helper/mailer";
+import { UserMerchant } from "src/schemas/userMerchant.schema";
+import { Shipper } from "src/schemas/shipper.schema";
 
 @Injectable()
 export class CustomerServices {
     constructor(@InjectModel(Customer.name) private customers: Model<Customer>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
+        @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
+        @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
         @InjectModel(ResetPassword.name) private resetPassModel: Model<ResetPassword>) { }
 
 
@@ -174,8 +178,13 @@ export class CustomerServices {
 
     async login(user: LoginDto) {
     try {
-        const checkAccount = await this.customers.findOne({ phoneNumber: user.phoneNumber });
-        if (!checkAccount) throw new HttpException("Không đúng SDT", HttpStatus.NOT_FOUND);
+        let  checkAccount = await this.customers.findOne({ phoneNumber: user.phoneNumber });
+        if (!checkAccount) {
+            checkAccount = await this.userMerchantModel.findOne({ phoneNumber: user.phoneNumber });
+        } 
+        if (!checkAccount) {
+            checkAccount = await this.shipperModel.findOne({ phoneNumber: user.phoneNumber });
+        } 
         const compare = await bcrypt.compare(user.password, checkAccount.password);
         if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
 

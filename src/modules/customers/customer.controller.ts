@@ -2,7 +2,6 @@ import { Controller, Post, Body, ValidationPipe, Get, Param, Patch, HttpExceptio
 import { CustomerDto } from "src/dto/dto.customer";
 import { CustomerServices } from "./customer.service";
 import mongoose from "mongoose";
-import { retry } from "rxjs";
 import { RegisterCustomerDto } from "src/dto/dto.registerCustomer";
 import { UpdateCustomerDto } from "src/dto/dto.updateCustomer";
 import { LoginDto } from "src/dto/dto.login";
@@ -15,10 +14,10 @@ export class CustomerController {
     constructor(private readonly customerService: CustomerServices) { }
 
     //addData
-    @Get('addData') 
-        addData() {
-            return this.customerService.addData();
-        }
+    @Get('addData')
+    addData() {
+        return this.customerService.addData();
+    }
 
 
     // tạo customer
@@ -49,27 +48,27 @@ export class CustomerController {
 
     // xóa customer
     @Post('deleteCustomer/:id')
-    deleteCustomer(@Param('id') id: string){
+    deleteCustomer(@Param('id') id: string) {
         return this.customerService.deleteCustomer(id);
     }
 
     // sửa customer
     @Patch('updateCustomer/:id')
-    async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateCustomer: UpdateCustomerDto){
+    async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateCustomer: UpdateCustomerDto) {
         return await this.customerService.updateCustomer(id, updateCustomer);
     }
 
-     // lấy dánh sách lịch sử theo id
-     @Get('getHistoryCustomer/:id')
-     getHistoryById(@Param('id') id: string){
-         return this.customerService.getHistoryById(id);
-     }
+    // lấy dánh sách lịch sử theo id
+    @Get('getHistoryCustomer/:id')
+    getHistoryById(@Param('id') id: string) {
+        return this.customerService.getHistoryById(id);
+    }
 
-     //login
-     @Post('login')
-     login(@Body(new ValidationPipe()) users: LoginDto) {
-         return this.customerService.login(users);
-     }
+    //login
+    @Post('login')
+    login(@Body(new ValidationPipe()) users: LoginDto) {
+        return this.customerService.login(users);
+    }
 
     //quên mật khẩu bằng Email
     @Post('forgetPassByEmail')
@@ -81,14 +80,14 @@ export class CustomerController {
 
     //kiểm tra OTP
     @Post('checkOTP')
-    checkOTP(@Body() body: { email: string, otp: string }){
+    checkOTP(@Body() body: { email: string, otp: string }) {
         const { email, otp } = body;
         return this.customerService.checkOTP(email, otp);
     }
 
     //cập nhật mật khẩu
     @Post('resetPass/:id')
-    resetPass(@Param('id') id: string, @Body() body: { password: string }){
+    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
         const { password } = body;
         return this.customerService.resetPass(id, password);
     }
