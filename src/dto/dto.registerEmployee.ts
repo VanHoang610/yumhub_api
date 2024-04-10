@@ -2,35 +2,22 @@ import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Merchant } from "src/schemas/merchant.schema";
 import { TypeOfMerchant } from "src/schemas/typeOfMerchant.schema";
 
-export class RegisterMerchatDto {
-
+export class RegisterEmployeeDto {
     @IsNotEmpty()
     @IsString()
-    name: string
+    merchantID: Merchant
 
+    @IsString()
     @IsNotEmpty()
-    @IsString()
-    address: string
-
-    @IsOptional()
-    @IsString()
-    type: TypeOfMerchant
-
-    @IsOptional()
-    @IsString()
-    openTime: string
-
-    @IsOptional()
-    @IsString()
-    closeTime: string
-
-    @IsOptional()
-    @IsString()
-    imageBackground: string
-
-    @IsNotEmpty()
-    @IsString()
     phoneNumber: string
+
+    @IsString()
+    @IsNotEmpty()
+    password: string
+    
+    @IsString()
+    @IsNotEmpty()
+    email: string
 
     @IsOptional()
     @IsString()
@@ -43,9 +30,5 @@ export class RegisterMerchatDto {
     @IsOptional()
     @IsString()
     avatar: string
-
-    @IsNotEmpty()
-    @IsString()
-    email: string
 
 }

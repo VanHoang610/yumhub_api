@@ -30,8 +30,8 @@ export class Shipper {
     @Prop({required: false}) 
     idBike?: string
 
-    @Prop({required: false, default: true}) 
-    active?: boolean
+    @Prop({required: false, default: 1}) 
+    status?: number
 
     @Prop({required: false}) //kinh độ
     longitude: number
@@ -40,9 +40,9 @@ export class Shipper {
     latitude: number
 
     @Prop({required: true}) 
-    phoneNumber: number
+    phoneNumber: string
 
-    @Prop({required: true})
+    @Prop({required: false})
     password: string
 
     @Prop({required: true}) 

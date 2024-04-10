@@ -8,7 +8,7 @@ export class UserMerchant {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Merchant' }) // Thêm ref và sửa kiểu dữ liệu
     merchantID?: Merchant;
     
-    @Prop({required: false})  //1: admin, 2: employee
+    @Prop({required: false, default: 1})  //1: admin, 2: employee
     role?: number
 
     @Prop({required: false})
@@ -22,8 +22,8 @@ export class UserMerchant {
 
     @Prop({required: true})
     phoneNumber: string
-
-    @Prop({required: true})
+    
+    @Prop({required: false})
     password: string
 
     @Prop({required: true})

@@ -5,6 +5,8 @@ import { MerchantService } from './merchant.service';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import mongoose from 'mongoose';
 import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
+import { LoginDto } from 'src/dto/dto.login';
+import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 
 @Controller('merchants')
 export class MerchantController {
@@ -82,10 +84,60 @@ export class MerchantController {
         }
 
     }
+    
      // tạo merchant
      @Post('createMerchant')
-     createUser(@Body(new ValidationPipe()) registerDto: RegisterMerchatDto) {
+     createUser(@Body() registerDto: RegisterMerchatDto) {
         return this.merchantService.createMerchant(registerDto)
      }
 
+
+     //login
+     @Post('login')
+     login(@Body(new ValidationPipe()) users: LoginDto) {
+         return this.merchantService.login(users);
+     }
+
+     //quên mật khẩu bằng Email
+    @Post('forgetPassByEmail')
+    forgetPasswordByEmail(@Body() body: { email: string }) {
+        const { email } = body;
+
+        return this.merchantService.forgetPassByEmail(email);
+    }
+
+    //kiểm tra OTP
+    @Post('checkOTP')
+    checkOTP(@Body() body: { email: string, otp: string }){
+        const { email, otp } = body;
+        return this.merchantService.checkOTP(email, otp);
+    }
+
+    //cập nhật mật khẩu
+    @Post('resetPass/:id')
+    resetPass(@Param('id') id: string, @Body() body: { password: string }){
+        const { password } = body;
+        return this.merchantService.resetPass(id, password);
+    }
+
+
+    //đổi mật khẩu
+    @Post('changePass/:id')
+    changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+        const { passOld, passNew } = body;
+        return this.merchantService.changePass(id, passOld, passNew);
+    }
+
+    //gửi email xác thực
+     @Post('verifileMerchant')
+     verifileMerchant(@Body() body: { email: string }) {
+         const { email } = body;
+         return this.merchantService.verifileMerchant(email);
+     }
+
+     // tạo tài khoản cho employee
+     @Post('createEmployee')
+     createEmployee(@Body() registerDto: RegisterEmployeeDto) {
+        return this.merchantService.createEmployee(registerDto)
+     }
 }
