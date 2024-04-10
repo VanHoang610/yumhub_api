@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, UsePipes, ValidationPipe, NotFoundException } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, UsePipes, ValidationPipe, NotFoundException, Query } from '@nestjs/common'
 
 
 import { MerchantService } from './merchant.service';
@@ -12,7 +12,28 @@ import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
 
-
+    @Get('RevenueTTT')
+     getRevenueTime(@Body() body: {ID:string, startDate: string, endDate: string }) {
+         try {
+            const {ID, startDate, endDate } = body
+             const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(ID, startDate, endDate);
+             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+             return totalRevenue;
+         } catch (error) {
+             return error
+         }
+     }
+     @Get('RevenueWeek')
+     getRevenueWeek(@Body() body: { date: string}) {
+         try {
+            const { date} = body
+             const totalRevenue = this.merchantService.getWeekDates(date);
+             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+             return totalRevenue;
+         } catch (error) {
+             return error
+         }
+     }
     @Get('addData')
     addData() 
     {
@@ -140,4 +161,6 @@ export class MerchantController {
      createEmployee(@Body() registerDto: RegisterEmployeeDto) {
         return this.merchantService.createEmployee(registerDto)
      }
+     /// doanh thu time to time
+     
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common/decorators/core'
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Date, Model } from 'mongoose';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import { Merchant } from 'src/schemas/merchant.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -13,6 +13,8 @@ import { LoginDto } from 'src/dto/dto.login';
 import { ResetPassword } from 'src/schemas/resetPass.schema';
 import { Mailer } from "src/helper/mailer";
 import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
+import { OrderStatus } from 'src/schemas/orderStatus.schema';
+
 
 @Injectable()
 export class MerchantService {
@@ -21,7 +23,8 @@ export class MerchantService {
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
-        @InjectModel(Shipper.name) private shipperModel: Model<Shipper>) { }
+        @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
+        @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>) { }
 
     async addData() {
         try {
@@ -368,4 +371,37 @@ export class MerchantService {
             return { result: false, newEmployee: error }
         }
     }
+    async revenueMerchantTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
+        try {
+            const DeliveredID = await this.statusModel.findOne({ name: "Delivered" });
+
+            // Tính tổng doanh thu
+            let totalRevenue = 0;
+
+            // Lấy tất cả các hóa đơn của merchant trong khoảng thời gian đã cho
+            const orders = await this.orderModel.find({
+                merchantID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
+                timeBook: { $gte: dateStart, $lte: dateEnd },
+                status: DeliveredID._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+            })
+            for (const order of orders) {
+                totalRevenue += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+            }
+
+            return { result: true, totalRevenue: totalRevenue }
+        } catch (error) {
+            return { result: false, totalRevenue: error }
+        }
+
+    }
+    getWeekDates(dateNow: string) {
+        console.log(dateNow)
+        const today = new Date();
+        console.log(today)
+        const dayOfWeek = today.getDay();
+        console.log(dayOfWeek)
+        const monday = new Date(today.setDate(today.getDate() - (dayOfWeek - 1)))
+        const sunday = new Date(today.setDate(today.getDate() + (7 - dayOfWeek)))
+        return { monday:monday,sunday: sunday };
+      }
 }
