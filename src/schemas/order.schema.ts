@@ -51,7 +51,6 @@ export class Order {
     totalDistance?: string
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus'})  
-     //1: pending, 2:Processing, 3: Shipped, 4: Delivered, 5: Cancel , 6: OnHold, 7: Backordered
     status: OrderStatus 
 
     @Prop({required: false})

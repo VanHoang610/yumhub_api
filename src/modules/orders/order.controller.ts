@@ -44,10 +44,10 @@ export class OrderController {
     async setStatusBackordered(@Param('id') orderId: string) {
         return await this.orderServices.setStatusBackordered(orderId);
     }
-        @Post('statusOrder/:id/:status')
-        async setStatus(@Param('id') orderId: string,@Param('status') status: number) {
-            return await this.orderServices.setStatus(orderId,status);
-        }
+    @Post('statusOrder/:id/:status')
+    async setStatus(@Param('id') orderId: string, @Param('status') status: number) {
+        return await this.orderServices.setStatus(orderId, status);
+    }
 
 
 
@@ -58,13 +58,14 @@ export class OrderController {
             return this.orderServices.getAllOrder();
         } catch (error) {
             return error
-        }
+        }   
     }
 
     //sắp xếp order tăng dần
-    @Get('sortHistory')
-    sortHistory() {
-        return this.orderServices.sortHistory();
+    @Post('sortHistory/:id')
+    sortHistory(@Param('id') id: string, @Body() body: { who: number }) {
+        const { who } = body;
+        return this.orderServices.sortHistory(id, who);
     }
 
     // lấy order theo id

@@ -132,42 +132,23 @@ export class ShipperService {
             const brandBike = shipperDto.brandBike;
             const modeCode = shipperDto.modeCode;
             const idBike = shipperDto.idBike;
-            if (!phoneNumber || !email || !avatar || !fullName || !sex ||
-                !birthDay || !address || !brandBike || !modeCode || !idBike) {
-                const newShipper = new this.shipperModel({
-                    phoneNumber: phoneNumber,
-                    email: email,
-                    avatar: avatar,
-                    fullName: fullName,
-                    sex: sex,
-                    birthDay: birthDay,
-                    address: address,
-                    brandBike: brandBike,
-                    modeCode: modeCode,
-                    idBike: idBike,
-                    status: 1
-                });
-                if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
-                await newShipper.save();
-                return { result: true, createShipper: newShipper }
-            } else {
-                const newShipper = new this.shipperModel({
-                    phoneNumber: phoneNumber,
-                    email: email,
-                    avatar: avatar,
-                    fullName: fullName,
-                    sex: sex,
-                    birthDay: birthDay,
-                    address: address,
-                    brandBike: brandBike,
-                    modeCode: modeCode,
-                    idBike: idBike,
-                    status: 2
-                });
-                if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
-                await newShipper.save();
-                return { result: true, createShipper: newShipper }
-            }
+
+            const newShipper = new this.shipperModel({
+                phoneNumber: phoneNumber,
+                email: email,
+                avatar: avatar,
+                fullName: fullName,
+                sex: sex,
+                birthDay: birthDay,
+                address: address,
+                brandBike: brandBike,
+                modeCode: modeCode,
+                idBike: idBike,
+                status: 1
+            });
+            if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
+            await newShipper.save();
+            return { result: true, createShipper: newShipper }
         } catch (error) {
             return { result: false, createShipper: error }
         }
@@ -244,7 +225,7 @@ export class ShipperService {
 
     async login(user: LoginDto) {
         try {
-            const checkAccount = await this.shipperModel.findOne({ phoneNumber: user.phoneNumber });
+            const checkAccount = await this.shipperModel.findOne({ phoneNumber: user.phoneNumber, status: 2 });
             if (!checkAccount) throw new HttpException("Không đúng SDT", HttpStatus.NOT_FOUND);
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
@@ -332,6 +313,7 @@ export class ShipperService {
             const password = (Math.floor(100000 + Math.random() * 900000)).toString();
             const hashPassword = await bcrypt.hash(password, 10);
             user.password = hashPassword;
+            user.status = 2;
             await user.save();
 
             const passwordRest = new this.resetPasswordModel({ email: email, otp: password })
@@ -352,7 +334,6 @@ export class ShipperService {
 
         } catch (error) {
             console.log(error);
-            
             return { result: false, message: "Gửi thất bại" }
         }
     }

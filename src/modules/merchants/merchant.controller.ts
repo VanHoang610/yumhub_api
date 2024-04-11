@@ -121,17 +121,16 @@ export class MerchantController {
 
     }
     
-     // tạo merchant
-     @Post('createMerchant')
-     createUser(@Body() registerDto: RegisterMerchatDto) {
-        return this.merchantService.createMerchant(registerDto)
-     }
-
-
      //login
      @Post('login')
      login(@Body(new ValidationPipe()) users: LoginDto) {
          return this.merchantService.login(users);
+     }
+    
+     // tạo merchant
+     @Post('createMerchant')
+     createUser(@Body() registerDto: RegisterMerchatDto) {
+        return this.merchantService.createMerchant(registerDto)
      }
 
      //quên mật khẩu bằng Email

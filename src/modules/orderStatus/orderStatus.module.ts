@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { OrderStatus, OrderStatusSchemas } from "src/schemas/orderStatus.schema";
+import { OrderStatusController } from "./orderStatus.controller";
+import { OrderStatusService } from "./orderStatus.service";
 
 @Module({
     imports: [
@@ -10,6 +12,8 @@ import { OrderStatus, OrderStatusSchemas } from "src/schemas/orderStatus.schema"
                 schema: OrderStatusSchemas
             }
         ])
-    ]
+    ],
+    controllers: [OrderStatusController],
+    providers: [OrderStatusService]
 })
 export class OrderStatusModule { };

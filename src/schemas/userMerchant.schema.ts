@@ -20,13 +20,13 @@ export class UserMerchant {
     @Prop({required: false})
     avatar?: string
 
-    @Prop({required: true})
+    @Prop({ unique: true, required: true }) 
     phoneNumber: string
     
     @Prop({required: false})
     password: string
 
-    @Prop({required: true})
+    @Prop({ unique: true, required: true }) 
     email: string
 }
 
