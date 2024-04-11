@@ -98,58 +98,29 @@ export class MerchantService {
 
     async createMerchant(merchant: RegisterMerchatDto) {
         try {
-            if (!merchant.name || !merchant.address || !merchant.closeTime || !merchant.openTime || !merchant.type ||
-                !merchant.imageBackground || !merchant.phoneNumber || !merchant.fullName ||
-                !merchant.sex || !merchant.avatar || !merchant.email) {
-                const newMerchant = new this.merchants({
-                    name: merchant.name,
-                    address: merchant.address,
-                    closeTime: merchant.closeTime,
-                    openTime: merchant.openTime,
-                    type: merchant.type,
-                    imageBackground: merchant.imageBackground,
-                    status: 1
-                });
-                if (!newMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
-                await newMerchant.save();
-                const idMerchant = await newMerchant._id;
-                const newUserMerchant = new this.userMerchantModel({
-                    merchantID: idMerchant,
-                    phoneNumber: merchant.phoneNumber,
-                    fullName: merchant.fullName,
-                    sex: merchant.sex,
-                    avatar: merchant.avatar,
-                    email: merchant.email,
-                });
-
-                if (!newUserMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
-                await newUserMerchant.save();
-                return { result: true, newMerchant: newMerchant, newUserMerchant: newUserMerchant }
-            } else {
-                const newMerchant = new this.merchants({
-                    name: merchant.name,
-                    address: merchant.address,
-                    closeTime: merchant.closeTime,
-                    openTime: merchant.openTime,
-                    type: merchant.type,
-                    imageBackground: merchant.imageBackground,
-                    status: 2
-                });
-                if (!newMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
-                await newMerchant.save();
-                const idMerchant = await newMerchant._id;
-                const newUserMerchant = new this.userMerchantModel({
-                    merchantID: idMerchant,
-                    phoneNumber: merchant.phoneNumber,
-                    fullName: merchant.fullName,
-                    sex: merchant.sex,
-                    avatar: merchant.avatar,
-                    email: merchant.email,
-                });
-                if (!newUserMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
-                await newUserMerchant.save();
-                return { result: true, newMerchant: newMerchant, newUserMerchant: newUserMerchant }
-            }
+            const newMerchant = new this.merchants({
+                name: merchant.name,
+                address: merchant.address,
+                closeTime: merchant.closeTime,
+                openTime: merchant.openTime,
+                type: merchant.type,
+                imageBackground: merchant.imageBackground,
+                status: 1
+            });
+            if (!newMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
+            await newMerchant.save();
+            const idMerchant = await newMerchant._id;
+            const newUserMerchant = new this.userMerchantModel({
+                merchantID: idMerchant,
+                phoneNumber: merchant.phoneNumber,
+                fullName: merchant.fullName,
+                sex: merchant.sex,
+                avatar: merchant.avatar,
+                email: merchant.email,
+            });
+            if (!newUserMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
+            await newUserMerchant.save();
+            return { result: true, newMerchant: newMerchant, newUserMerchant: newUserMerchant }
         } catch (error) {
             console.log(error);
             return { result: false, newMerchant: error }
@@ -244,6 +215,8 @@ export class MerchantService {
         try {
             const checkAccount = await this.userMerchantModel.findOne({ phoneNumber: user.phoneNumber });
             if (!checkAccount) throw new HttpException("Không đúng SDT", HttpStatus.NOT_FOUND);
+            const checkStatus = await this.merchants.findOne({ _id: checkAccount.merchantID, status: 2 });
+            if (!checkStatus) throw new HttpException("Tài khoản chưa đăng ký", HttpStatus.NOT_FOUND);
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
             return { result: true, data: checkAccount }
@@ -326,14 +299,16 @@ export class MerchantService {
         try {
             const user = await this.userMerchantModel.findOne({ email: email });
             if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
-
             const password = (Math.floor(100000 + Math.random() * 900000)).toString();
             const hashPassword = await bcrypt.hash(password, 10);
             user.password = hashPassword;
             await user.save();
-
-            const passwordRest = new this.resetPasswordModel({ email: email, otp: password })
-            await passwordRest.save();
+            console.log(user.password);
+            
+            const merchant = await this.merchants.findOne({ _id: user.merchantID });
+            if (!merchant) throw new HttpException("Merchant không tồn tại", HttpStatus.NOT_FOUND);
+            merchant.status = 2;
+            await merchant.save();
 
             await Mailer.sendMail({
                 email: user.email,
@@ -342,15 +317,10 @@ export class MerchantService {
                             Password của bạn là: ${password}`
             });
 
-            setTimeout(async () => {
-                await this.resetPasswordModel.deleteOne({ email: email });
-            }, 120000);
-
             return { result: true, message: "Hãy kiểm tra email của bạn!" }
-
         } catch (error) {
             console.log(error);
-            
+
             return { result: false, message: "Gửi thất bại" }
         }
     }
@@ -363,7 +333,7 @@ export class MerchantService {
                 role: 2,
                 password: hashPassword
             });
-            if(!newEmployee) throw new HttpException("Register Fail", HttpStatus.NOT_FOUND);
+            if (!newEmployee) throw new HttpException("Register Fail", HttpStatus.NOT_FOUND);
             await newEmployee.save();
             return { result: true, newEmployee: newEmployee }
         } catch (error) {
@@ -371,6 +341,7 @@ export class MerchantService {
             return { result: false, newEmployee: error }
         }
     }
+
     async revenueMerchantTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
         try {
             const DeliveredID = await this.statusModel.findOne({ name: "Delivered" });
@@ -402,6 +373,6 @@ export class MerchantService {
         console.log(dayOfWeek)
         const monday = new Date(today.setDate(today.getDate() - (dayOfWeek - 1)))
         const sunday = new Date(today.setDate(today.getDate() + (7 - dayOfWeek)))
-        return { monday:monday,sunday: sunday };
-      }
+        return { monday: monday, sunday: sunday };
+    }
 }
