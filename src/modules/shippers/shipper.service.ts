@@ -11,6 +11,7 @@ import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
 import { LoginDto } from 'src/dto/dto.login';
 import { ResetPassword } from 'src/schemas/resetPass.schema';
 import { Mailer } from 'src/helper/mailer';
+import { OrderStatus } from 'src/schemas/orderStatus.schema';
 
 
 
@@ -18,7 +19,8 @@ import { Mailer } from 'src/helper/mailer';
 export class ShipperService {
     constructor(@InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
         @InjectModel(Order.name) private orderModel: Model<Order>, 
-        @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>) { }
+        @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
+        @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>) { }
 
     async addData() {
         try {
@@ -352,6 +354,64 @@ export class ShipperService {
             console.log(error);
             
             return { result: false, message: "Gửi thất bại" }
+        }
+    }
+    async revenueShipperTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
+        try {
+            const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
+            // Tính tổng doanh thu
+            var totalRevenue = 0;
+
+            // Lấy tất cả các hóa đơn của merchant trong khoảng thời gian đã cho
+            const orders = await this.orderModel.find({
+                shipperID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
+                timeBook: { $gte: dateStart, $lte: dateEnd },
+                status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+            })
+            for (const order of orders) {
+                totalRevenue += order.deliveryCost; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+                console.log(totalRevenue)
+            }
+
+            return { result: true, revenue: totalRevenue }
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+
+    }
+    async getRevenueWeek(ID: string) {
+        try {
+            const currentDate = new Date();
+            const currentDay = currentDate.getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setHours(0, 0, 0, 0); // Set to 00:00:00.000
+            startOfWeek.setDate(startOfWeek.getDate() - currentDay + 1); // Set to Monday of current week
+            const startDate = startOfWeek.toString()
+            const endOfWeek = new Date(currentDate);
+            endOfWeek.setHours(23, 59, 59, 999); // Set to 23:59:59.999
+            endOfWeek.setDate(endOfWeek.getDate() - currentDay + 7); // Set to Sunday of current week
+            const endDate = endOfWeek.toString()
+            const result = this.revenueShipperTimeTwoTime(ID, startDate, endDate);
+            return { result: true, revenue: (await result).revenue }
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+    }
+    async getRevenueMonth(ID: string, month: string) {
+        try {
+
+            const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
+            const firstDateMonth = new Date(targetYear, targetMonth-1,1)
+  
+            const startDate = firstDateMonth.toString()
+            const firstDateNextMonth = new Date(targetYear,targetMonth , 1)
+            const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
+            const endDate = lastDateOfMonth.toString()
+            console.log(startDate,endDate)
+            const result = this.revenueShipperTimeTwoTime(ID, startDate, endDate);
+            return { result: true, revenue: (await result).revenue }
+        } catch (error) {
+            return { result: false, revenue: error }
         }
     }
 }

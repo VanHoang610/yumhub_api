@@ -11,7 +11,32 @@ import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 @Controller('merchants')
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
-
+    @Get('RevenueWeek')
+    getRevenueWeek(@Body() body: {ID:string}) {
+        try {
+            const {ID } = body
+            const totalRevenue = this.merchantService.getRevenueWeek(ID);
+            if (!totalRevenue) {
+                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            }
+            return totalRevenue;
+        } catch (error) {
+            return error;
+        }
+    }
+    @Get('RevenueMonth')
+    getRevenueMonth(@Body() body: {ID:string, month: string}) {
+        try {
+            const {ID , month} = body
+            const totalRevenue = this.merchantService.getRevenueMonth(ID, month);
+            if (!totalRevenue) {
+                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            }
+            return totalRevenue;
+        } catch (error) {
+            return error;
+        }
+    }
     @Get('RevenueTTT')
      getRevenueTime(@Body() body: {ID:string, startDate: string, endDate: string }) {
          try {
@@ -23,17 +48,7 @@ export class MerchantController {
              return error
          }
      }
-     @Get('RevenueWeek')
-     getRevenueWeek(@Body() body: { date: string}) {
-         try {
-            const { date} = body
-             const totalRevenue = this.merchantService.getWeekDates(date);
-             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return totalRevenue;
-         } catch (error) {
-             return error
-         }
-     }
+    
     @Get('addData')
     addData() 
     {

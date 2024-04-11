@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common/decorators/core'
 import { InjectModel } from '@nestjs/mongoose';
-import { Date, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import { Merchant } from 'src/schemas/merchant.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -112,7 +112,7 @@ export class MerchantService {
                 });
                 if (!newMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
                 await newMerchant.save();
-                const idMerchant = await newMerchant._id;
+                const idMerchant = newMerchant._id;
                 const newUserMerchant = new this.userMerchantModel({
                     merchantID: idMerchant,
                     phoneNumber: merchant.phoneNumber,
@@ -137,7 +137,7 @@ export class MerchantService {
                 });
                 if (!newMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
                 await newMerchant.save();
-                const idMerchant = await newMerchant._id;
+                const idMerchant = newMerchant._id;
                 const newUserMerchant = new this.userMerchantModel({
                     merchantID: idMerchant,
                     phoneNumber: merchant.phoneNumber,
@@ -350,7 +350,7 @@ export class MerchantService {
 
         } catch (error) {
             console.log(error);
-            
+
             return { result: false, message: "Gửi thất bại" }
         }
     }
@@ -363,7 +363,7 @@ export class MerchantService {
                 role: 2,
                 password: hashPassword
             });
-            if(!newEmployee) throw new HttpException("Register Fail", HttpStatus.NOT_FOUND);
+            if (!newEmployee) throw new HttpException("Register Fail", HttpStatus.NOT_FOUND);
             await newEmployee.save();
             return { result: true, newEmployee: newEmployee }
         } catch (error) {
@@ -373,35 +373,61 @@ export class MerchantService {
     }
     async revenueMerchantTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
         try {
-            const DeliveredID = await this.statusModel.findOne({ name: "Delivered" });
-
+            const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
             // Tính tổng doanh thu
-            let totalRevenue = 0;
+            var totalRevenue = 0;
 
             // Lấy tất cả các hóa đơn của merchant trong khoảng thời gian đã cho
             const orders = await this.orderModel.find({
                 merchantID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
                 timeBook: { $gte: dateStart, $lte: dateEnd },
-                status: DeliveredID._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+                status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
             })
             for (const order of orders) {
                 totalRevenue += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+                console.log(totalRevenue)
             }
 
-            return { result: true, totalRevenue: totalRevenue }
+            return { result: true, revenue: totalRevenue }
         } catch (error) {
-            return { result: false, totalRevenue: error }
+            return { result: false, revenue: error }
         }
 
     }
-    getWeekDates(dateNow: string) {
-        console.log(dateNow)
-        const today = new Date();
-        console.log(today)
-        const dayOfWeek = today.getDay();
-        console.log(dayOfWeek)
-        const monday = new Date(today.setDate(today.getDate() - (dayOfWeek - 1)))
-        const sunday = new Date(today.setDate(today.getDate() + (7 - dayOfWeek)))
-        return { monday:monday,sunday: sunday };
-      }
+    async getRevenueWeek(ID: string) {
+        try {
+            const currentDate = new Date();
+            const currentDay = currentDate.getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setHours(0, 0, 0, 0); // Set to 00:00:00.000
+            startOfWeek.setDate(startOfWeek.getDate() - currentDay + 1); // Set to Monday of current week
+            const startDate = startOfWeek.toString()
+            const endOfWeek = new Date(currentDate);
+            endOfWeek.setHours(23, 59, 59, 999); // Set to 23:59:59.999
+            endOfWeek.setDate(endOfWeek.getDate() - currentDay + 7); // Set to Sunday of current week
+            const endDate = endOfWeek.toString()
+            const result = this.revenueMerchantTimeTwoTime(ID, startDate, endDate);
+            return { result: true, revenue: (await result).revenue }
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+    }
+    async getRevenueMonth(ID: string, month: string) {
+        try {
+
+            const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
+            const firstDateMonth = new Date(targetYear, targetMonth-1,1)
+  
+            const startDate = firstDateMonth.toString()
+            const firstDateNextMonth = new Date(targetYear,targetMonth , 1)
+            const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
+            const endDate = lastDateOfMonth.toString()
+            console.log(startDate,endDate)
+            const result = this.revenueMerchantTimeTwoTime(ID, startDate, endDate);
+            return { result: true, revenue: (await result).revenue }
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+    }
 }
+
