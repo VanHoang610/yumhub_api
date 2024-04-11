@@ -11,6 +11,43 @@ export class ShipperController {
 
     constructor(private readonly shipperService: ShipperService) {}
     
+    @Get('RevenueWeek')
+    getRevenueWeek(@Body() body: {ID:string}) {
+        try {
+            const {ID } = body
+            const totalRevenue = this.shipperService.getRevenueWeek(ID);
+            if (!totalRevenue) {
+                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            }
+            return totalRevenue;
+        } catch (error) {
+            return error;
+        }
+    }
+    @Get('RevenueMonth')
+    getRevenueMonth(@Body() body: {ID:string, month: string}) {
+        try {
+            const {ID , month} = body
+            const totalRevenue = this.shipperService.getRevenueMonth(ID, month);
+            if (!totalRevenue) {
+                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            }
+            return totalRevenue;
+        } catch (error) {
+            return error;
+        }
+    }
+    @Get('RevenueTTT')
+     getRevenueTime(@Body() body: {ID:string, startDate: string, endDate: string }) {
+         try {
+            const {ID, startDate, endDate } = body
+             const totalRevenue = this.shipperService.revenueShipperTimeTwoTime(ID, startDate, endDate);
+             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+             return totalRevenue;
+         } catch (error) {
+             return error
+         }
+     }
 
     // add Data
     @Get('addData')
