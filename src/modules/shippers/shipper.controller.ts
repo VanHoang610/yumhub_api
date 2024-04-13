@@ -10,6 +10,12 @@ import { LoginDto } from 'src/dto/dto.login';
 export class ShipperController {
 
     constructor(private readonly shipperService: ShipperService) {}
+
+    @Get('newUser')
+    newShipper() 
+    {
+        return this.shipperService.newShipperInMonth();
+    }
     
     @Get('RevenueWeek')
     getRevenueWeek(@Body() body: {ID:string}) {

@@ -48,7 +48,11 @@ export class MerchantController {
              return error
          }
      }
-    
+     @Get('newUser')
+    newMerchant() 
+    {
+        return this.merchantService.newMerchantInMonth();
+    }
     @Get('addData')
     addData() 
     {

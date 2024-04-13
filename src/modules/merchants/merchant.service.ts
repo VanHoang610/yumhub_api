@@ -105,7 +105,8 @@ export class MerchantService {
                 openTime: merchant.openTime,
                 type: merchant.type,
                 imageBackground: merchant.imageBackground,
-                status: 1
+                status: 1,
+                creatAt: Date.now()
             });
             if (!newMerchant) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
             await newMerchant.save();
@@ -386,7 +387,7 @@ export class MerchantService {
     }
     async getRevenueMonth(ID: string, month: string) {
         try {
-
+            
             const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
             const firstDateMonth = new Date(targetYear, targetMonth-1,1)
   
@@ -394,11 +395,28 @@ export class MerchantService {
             const firstDateNextMonth = new Date(targetYear,targetMonth , 1)
             const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
             const endDate = lastDateOfMonth.toString()
-            console.log(startDate,endDate)
             const result = this.revenueMerchantTimeTwoTime(ID, startDate, endDate);
             return { result: true, revenue: (await result).revenue }
         } catch (error) {
             return { result: false, revenue: error }
+        }
+    }
+    async newMerchantInMonth(){
+        try{
+            const today = new Date()
+            var amount=0
+            var id=[]
+            const firstDayOfMonth= new Date(today.getFullYear(), today.getMonth(), 1);
+            const lasterDayOfMonth= new Date(today.getFullYear(), today.getMonth()+1, 0);
+            const newMerchants = await this.merchants.find({joinDay: { $gte: firstDayOfMonth, $lte: lasterDayOfMonth }})
+
+            for( const merchant of newMerchants){
+                amount+=1
+                id.push(merchant._id)
+            }
+            return {result: true, amount: amount, ID: id}
+        }catch(error){
+            return {result: false, error: error}
         }
     }
 }

@@ -11,6 +11,10 @@ export class MerchantDto {
     address: string
 
     @IsOptional()
+    @IsString()
+    joinDay?: string
+
+    @IsOptional()
     @IsNumber()
     type?: number
 
