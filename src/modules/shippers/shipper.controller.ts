@@ -9,12 +9,12 @@ import { LoginDto } from 'src/dto/dto.login';
 @Controller('shippers')
 export class ShipperController {
 
-    constructor(private readonly shipperService: ShipperService) {}
-    
+    constructor(private readonly shipperService: ShipperService) { }
+
     @Get('RevenueWeek')
-    getRevenueWeek(@Body() body: {ID:string}) {
+    getRevenueWeek(@Body() body: { ID: string }) {
         try {
-            const {ID } = body
+            const { ID } = body
             const totalRevenue = this.shipperService.getRevenueWeek(ID);
             if (!totalRevenue) {
                 throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -25,9 +25,9 @@ export class ShipperController {
         }
     }
     @Get('RevenueMonth')
-    getRevenueMonth(@Body() body: {ID:string, month: string}) {
+    getRevenueMonth(@Body() body: { ID: string, month: string }) {
         try {
-            const {ID , month} = body
+            const { ID, month } = body
             const totalRevenue = this.shipperService.getRevenueMonth(ID, month);
             if (!totalRevenue) {
                 throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -38,21 +38,20 @@ export class ShipperController {
         }
     }
     @Get('RevenueTTT')
-     getRevenueTime(@Body() body: {ID:string, startDate: string, endDate: string }) {
-         try {
-            const {ID, startDate, endDate } = body
-             const totalRevenue = this.shipperService.revenueShipperTimeTwoTime(ID, startDate, endDate);
-             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return totalRevenue;
-         } catch (error) {
-             return error
-         }
-     }
+    getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
+        try {
+            const { ID, startDate, endDate } = body
+            const totalRevenue = this.shipperService.revenueShipperTimeTwoTime(ID, startDate, endDate);
+            if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            return totalRevenue;
+        } catch (error) {
+            return error
+        }
+    }
 
     // add Data
     @Get('addData')
-    addData() 
-    {
+    addData() {
         try {
             const shipper = this.shipperService.addData();
             return shipper;
@@ -61,70 +60,67 @@ export class ShipperController {
         }
     }
 
-     // tạo shipper
-     @Post('createShipper')
-     createOrder(@Body() shippers: RegisterShipperDto) 
-     {
-         try {
-             const shipper = this.shipperService.createShipper(shippers);
-             return shipper;
-         } catch (error) {
-             console.error("Create Shipper Fail", error)
-         }
-     }
- 
-     //lấy tất cả shipper
-     @Get('getAllShipper')
-     getAllShipper(){
-         try {
-             const shipper = this.shipperService.getAllShipper();
-             if(!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return shipper;
-         } catch (error) {
-             return error
-         }
-     }
+    // tạo shipper
+    @Post('createShipper')
+    createOrder(@Body() shippers: RegisterShipperDto) {
+        try {
+            const shipper = this.shipperService.createShipper(shippers);
+            return shipper;
+        } catch (error) {
+            console.error("Create Shipper Fail", error)
+        }
+    }
+
+    //lấy tất cả shipper
+    @Get('getAllShipper')
+    getAllShipper() {
+        try {
+            const shipper = this.shipperService.getAllShipper();
+            if (!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            return shipper;
+        } catch (error) {
+            return error
+        }
+    }
 
 
-     //lấy lịch sử shipper
-     @Get('getHistoryOrder/:id')
-     getHistoryShipper(@Param('id') id: string){
-         try {
-             const shipper = this.shipperService.getHistory(id);
-             if(!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return {result: true,  history: shipper};
-         } catch (error) {
-             return {result:false,error} 
-         }
-     }
+    //lấy lịch sử shipper
+    @Get('getHistoryOrder/:id')
+    getHistoryShipper(@Param('id') id: string) {
+        try {
+            const shipper = this.shipperService.getHistory(id);
+            if (!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            return { result: true, history: shipper };
+        } catch (error) {
+            return { result: false, error }
+        }
+    }
 
-      // sửa location của shipper
-      @Patch('updateLocation/:id')
-      updateLocation(@Param('id') id: string, @Body() body: {longitude: number, latitude: number}) {
-          try {
-                const { longitude, latitude } = body;
-              const review = this.shipperService.updateLocation(id, longitude, latitude);
-              return review;
-          } catch (error) {
-              console.error("Update location fail", error)
-          }
-      }
-  
+    // sửa location của shipper
+    @Patch('updateLocation/:id')
+    updateLocation(@Param('id') id: string, @Body() body: { longitude: number, latitude: number }) {
+        try {
+            const { longitude, latitude } = body;
+            const review = this.shipperService.updateLocation(id, longitude, latitude);
+            return review;
+        } catch (error) {
+            console.error("Update location fail", error)
+        }
+    }
+
     // @Get('getPhoneNumberShipper/:id')
     // getPhoneNumberShipper(@Param('id') id: string){
     //     return this.shipperService.getPhoneNumberShipper(id);
     // }
-    
+
     @Post('deleteShipper/:id')
-    deleteShipper(@Param('id') id: string){
+    deleteShipper(@Param('id') id: string) {
         return this.shipperService.deleteShipper(id);
     }
 
     @Patch('updateShipper/:id')
-    async updateShipper(@Param('id') id: string, @Body(new ValidationPipe()) updateShipper: ShipperDto){
-        const isValid = mongoose.Types.ObjectId.isValid(id);
-        if(!isValid) throw new HttpException("Invalid ID", 40);
-        return  await this.shipperService.updateShipper(id, updateShipper);
+    async updateShipper(@Param('id') id: string, @Body(new ValidationPipe()) updateShipper: ShipperDto) {
+        return await this.shipperService.updateShipper(id, updateShipper);
     }
 
     //login
@@ -134,39 +130,51 @@ export class ShipperController {
     }
 
     //quên mật khẩu bằng Email
-   @Post('forgetPassByEmail')
-   forgetPasswordByEmail(@Body() body: { email: string }) {
-       const { email } = body;
+    @Post('forgetPassByEmail')
+    forgetPasswordByEmail(@Body() body: { email: string }) {
+        const { email } = body;
 
-       return this.shipperService.forgetPassByEmail(email);
-   }
+        return this.shipperService.forgetPassByEmail(email);
+    }
 
-   //kiểm tra OTP
-   @Post('checkOTP')
-   checkOTP(@Body() body: { email: string, otp: string }){
-       const { email, otp } = body;
-       return this.shipperService.checkOTP(email, otp);
-   }
+    //kiểm tra OTP
+    @Post('checkOTP')
+    checkOTP(@Body() body: { email: string, otp: string }) {
+        const { email, otp } = body;
+        return this.shipperService.checkOTP(email, otp);
+    }
 
-   //cập nhật mật khẩu
-   @Post('resetPass/:id')
-   resetPass(@Param('id') id: string, @Body() body: { password: string }){
-       const { password } = body;
-       return this.shipperService.resetPass(id, password);
-   }
+    //cập nhật mật khẩu
+    @Post('resetPass/:id')
+    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
+        const { password } = body;
+        return this.shipperService.resetPass(id, password);
+    }
 
 
-   //đổi mật khẩu
-   @Post('changePass/:id')
-   changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
-       const { passOld, passNew } = body;
-       return this.shipperService.changePass(id, passOld, passNew);
-   }
+    //đổi mật khẩu
+    @Post('changePass/:id')
+    changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+        const { passOld, passNew } = body;
+        return this.shipperService.changePass(id, passOld, passNew);
+    }
 
-   //gửi email xác thực
+    //gửi email xác thực
     @Post('verifileShipper')
     verifileMerchant(@Body() body: { email: string }) {
         const { email } = body;
         return this.shipperService.verifileMerchant(email);
+    }
+
+    // danh sách shipper cần duyệt
+    @Get('listShipperApproval')
+    listShipperApproval() {
+        return this.shipperService.listShipperApproval();
+    }
+
+    // chi tiết tài khoản merchant
+    @Get('getShipperById/:id')
+    getShipperById(@Param('id') id: string) {
+        return this.shipperService.getShipperById(id);
     }
 }

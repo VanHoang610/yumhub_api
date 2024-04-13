@@ -188,9 +188,9 @@ export class ShipperService {
             return { result: false, newLocation: error }
         }
     }
-    getShipperById(id: string) {
-        return this.shipperModel.findById(id);
-    }
+    // getShipperById(id: string) {
+    //     return this.shipperModel.findById(id);
+    // }
 
 
     async deleteShipper(id: string) {
@@ -212,10 +212,10 @@ export class ShipperService {
     async updateShipper(id: string, updateShipper: ShipperDto) {
         try {
             const shipperNew = await this.shipperModel.findByIdAndUpdate(id, updateShipper, { new: true });
-            return { shipperNew: shipperNew }
+            return { result: true, data: shipperNew }
         } catch (error) {
             console.error('Error updating shipper:', error);
-            throw error;
+            return { result: false,  error }
         }
     }
     async updateAvatar(id: string, avatar: string) {
@@ -393,6 +393,27 @@ export class ShipperService {
             return { result: true, revenue: (await result).revenue }
         } catch (error) {
             return { result: false, revenue: error }
+        }
+    }
+
+
+
+    async listShipperApproval() {
+        try {
+            const listShipper = await this.shipperModel.find({status: 1});
+            return { result: true, listMerchantApproval: listShipper}
+        } catch (error) {
+            return { result: false, error }
+        }
+    }
+
+    
+    async getShipperById(id: string) {
+        try {
+            const detailShipper = await this.shipperModel.findById(id);
+            return { result: true, detailShipper: detailShipper}
+        } catch (error) {
+            return { result: false, error }
         }
     }
 }

@@ -7,14 +7,15 @@ import mongoose from 'mongoose';
 import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
 import { LoginDto } from 'src/dto/dto.login';
 import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
+import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
 
 @Controller('merchants')
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
     @Get('RevenueWeek')
-    getRevenueWeek(@Body() body: {ID:string}) {
+    getRevenueWeek(@Body() body: { ID: string }) {
         try {
-            const {ID } = body
+            const { ID } = body
             const totalRevenue = this.merchantService.getRevenueWeek(ID);
             if (!totalRevenue) {
                 throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -25,9 +26,9 @@ export class MerchantController {
         }
     }
     @Get('RevenueMonth')
-    getRevenueMonth(@Body() body: {ID:string, month: string}) {
+    getRevenueMonth(@Body() body: { ID: string, month: string }) {
         try {
-            const {ID , month} = body
+            const { ID, month } = body
             const totalRevenue = this.merchantService.getRevenueMonth(ID, month);
             if (!totalRevenue) {
                 throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -38,20 +39,19 @@ export class MerchantController {
         }
     }
     @Get('RevenueTTT')
-     getRevenueTime(@Body() body: {ID:string, startDate: string, endDate: string }) {
-         try {
-            const {ID, startDate, endDate } = body
-             const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(ID, startDate, endDate);
-             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return totalRevenue;
-         } catch (error) {
-             return error
-         }
-     }
-    
+    getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
+        try {
+            const { ID, startDate, endDate } = body
+            const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(ID, startDate, endDate);
+            if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            return totalRevenue;
+        } catch (error) {
+            return error
+        }
+    }
+
     @Get('addData')
-    addData() 
-    {
+    addData() {
         try {
             const shipper = this.merchantService.addData();
             return shipper;
@@ -59,7 +59,7 @@ export class MerchantController {
             console.error("Create Shipper Fail", error)
         }
     }
-    
+
     // sắp xếp vị trí người dùng với cửa hàng từ gần đến xa
     @Post('sortLocation')
     getLocation(@Body() body: { longitude: number, latitude: number }) {
@@ -89,12 +89,6 @@ export class MerchantController {
     deleteCustomer(@Param('id') id: string) {
         return this.merchantService.deleteMerchant(id);
     }
-    @Patch('updateMerchant/:id')
-    async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateMerchant: MerchantDto) {
-        const isValid = mongoose.Types.ObjectId.isValid(id);
-        if (!isValid) throw new HttpException("Invalid ID", 40);
-        return await this.merchantService.updateMerchant(id, updateMerchant);
-    }
 
     //lấy lịch sử merchant
     @Get('getHistoryOrder/:id')
@@ -120,20 +114,20 @@ export class MerchantController {
         }
 
     }
-    
-     //login
-     @Post('login')
-     login(@Body(new ValidationPipe()) users: LoginDto) {
-         return this.merchantService.login(users);
-     }
-    
-     // tạo merchant
-     @Post('createMerchant')
-     createUser(@Body() registerDto: RegisterMerchatDto) {
-        return this.merchantService.createMerchant(registerDto)
-     }
 
-     //quên mật khẩu bằng Email
+    //login
+    @Post('login')
+    login(@Body(new ValidationPipe()) users: LoginDto) {
+        return this.merchantService.login(users);
+    }
+
+    // tạo merchant
+    @Post('createMerchant')
+    createUser(@Body() registerDto: RegisterMerchatDto) {
+        return this.merchantService.createMerchant(registerDto)
+    }
+
+    //quên mật khẩu bằng Email
     @Post('forgetPassByEmail')
     forgetPasswordByEmail(@Body() body: { email: string }) {
         const { email } = body;
@@ -143,14 +137,14 @@ export class MerchantController {
 
     //kiểm tra OTP
     @Post('checkOTP')
-    checkOTP(@Body() body: { email: string, otp: string }){
+    checkOTP(@Body() body: { email: string, otp: string }) {
         const { email, otp } = body;
         return this.merchantService.checkOTP(email, otp);
     }
 
     //cập nhật mật khẩu
     @Post('resetPass/:id')
-    resetPass(@Param('id') id: string, @Body() body: { password: string }){
+    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
         const { password } = body;
         return this.merchantService.resetPass(id, password);
     }
@@ -164,17 +158,42 @@ export class MerchantController {
     }
 
     //gửi email xác thực
-     @Post('verifileMerchant')
-     verifileMerchant(@Body() body: { email: string }) {
-         const { email } = body;
-         return this.merchantService.verifileMerchant(email);
-     }
+    @Post('verifileMerchant')
+    verifileMerchant(@Body() body: { email: string }) {
+        const { email } = body;
+        return this.merchantService.verifileMerchant(email);
+    }
 
-     // tạo tài khoản cho employee
-     @Post('createEmployee')
-     createEmployee(@Body() registerDto: RegisterEmployeeDto) {
+    // tạo tài khoản cho employee
+    @Post('createEmployee')
+    createEmployee(@Body() registerDto: RegisterEmployeeDto) {
         return this.merchantService.createEmployee(registerDto)
-     }
-     /// doanh thu time to time
-     
+    }
+
+
+    // sửa tài khoản userMerchant
+    @Patch('updateUserMerchant/:id')
+    updateUserMerchant(@Param('id') id: string, @Body() update: UpdateUserMerchantDto) {
+        return this.merchantService.updateUserMerchant(id, update);
+    }
+
+    // xóa tài khoản userMerchant
+    @Post('deleteUserMerchant/:id')
+    deleteUserMerchant(@Param('id') id: string) {
+        return this.merchantService.deleteUserMerchant(id)
+    }
+
+
+    // danh sách merchant cần duyệt
+    @Post('listMerchantApproval')
+    listMerchantApproval() {
+        console.log("sfdsf");
+        return this.merchantService.listMerchantApproval();
+    }
+
+    // chi tiết tài khoản merchant
+    @Get('getMerchantById/:id')
+    getMerchantById(@Param('id') id: string) {
+        return this.merchantService.getMerchantById(id);
+    }
 }

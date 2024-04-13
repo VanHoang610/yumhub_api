@@ -14,6 +14,8 @@ import { ResetPassword } from 'src/schemas/resetPass.schema';
 import { Mailer } from "src/helper/mailer";
 import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
+import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
+import { log } from 'console';
 
 
 @Injectable()
@@ -33,61 +35,67 @@ export class MerchantService {
                     _id: "660c99c2fc13ae788b50fbdc",
                     name: "Neutrogena Men Age Fighter Face",
                     type: "6604e35881084710d45efe8c",
-                    openTime: "2/13/2024",
-                    closeTime: "6/17/2023",
+                    openTime: "6:40 AM",
+                    closeTime: "4:43 PM",
                     rating: "4780644259",
                     address: "3 Mesta Parkway",
                     businessLicense: 4,
                     deleted: false,
                     longitude: -79.2056361,
                     latitude: 43.1508732,
+                    status: 1
                 }, {
                     _id: "660c99c2fc13ae788b50fbe0",
                     name: "Acyclovir",
                     type: "6604e35881084710d45efe8c",
-                    openTime: "11/4/2023",
-                    closeTime: "9/15/2023",
+                    openTime: "10:00 AM",
+                    closeTime: "8:11 PM",
                     rating: "5999573513",
                     address: "00 Algoma Trail",
                     businessLicense: 2,
                     deleted: false,
                     longitude: -78.69957,
                     latitude: 46.31681,
+                    status: 1
                 }, {
                     _id: "660c99c2fc13ae788b50fbdf",
                     name: "Grippe",
                     type: "6604e35881084710d45efe8d",
-                    openTime: "9/14/2023",
-                    closeTime: "5/9/2023",
+                    openTime: "1:05 PM",
+                    closeTime: "4:05 PM",
                     rating: "0797479198",
                     address: "57084 Onsgard Junction",
                     businessLicense: 2,
                     deleted: false,
                     longitude: 97.8503951,
                     latitude: 2.6928351,
+                    status: 1
                 }, {
                     _id: "660c99c2fc13ae788b50fbde",
                     name: "ibuprofen",
                     type: "6604e35881084710d45efe8f",
-                    openTime: "3/20/2024",
-                    closeTime: "7/18/2023",
+                    openTime: "12:23 AM",
+                    closeTime: "9:06 PM",
                     rating: "2935049756",
                     address: "586 Roth Street",
                     businessLicense: 4,
                     deleted: true,
                     longitude: 17.5275042,
                     latitude: 43.9760578,
+                    status: 1
                 }, {
-                    _id: "660c99c2fc13ae788b50fbdd", name: "TRAMADOL HYDROCHLORIDE",
+                    _id: "660c99c2fc13ae788b50fbdd",
+                    name: "TRAMADOL HYDROCHLORIDE",
                     type: "6604e35881084710d45efe8e",
-                    openTime: "1/1/2024",
-                    closeTime: "9/22/2023",
+                    openTime: "9:23 AM",
+                    closeTime: "4:25 PM",
                     rating: "1965644376",
                     address: "863 Summerview Way",
                     businessLicense: 3,
                     deleted: false,
                     longitude: 113.116527,
                     latitude: 26.12715,
+                    status: 1
                 }]);
             return { result: true, newMerchant: newMerchants }
         } catch (error) {
@@ -129,9 +137,9 @@ export class MerchantService {
         }
     }
 
-    getMerchantById(id: string) {
-        return this.merchants.findById(id);
-    }
+    // getMerchantById(id: string) {
+    //     return this.merchants.findById(id);
+    // }
 
     getMerchant() {
         return { result: true, merchants: this.merchants.find() }
@@ -174,18 +182,46 @@ export class MerchantService {
         }
     }
 
-
     async sortLocation(longitude: number, latitude: number) {
         try {
-            const merchants = await this.merchants.find().exec();
-
+            const now = new Date();
+            const merchants = await this.merchants.find({}).exec();
             const sortedMerchants = merchants.map(merchant => {
-                const distance = Math.sqrt(Math.pow(merchant.longitude - longitude, 2) + Math.pow(merchant.latitude - latitude, 2));
-                return { ...merchant.toObject(), distance };
-            });
+                const openTimeParts = merchant.openTime.split(":");
+                const closeTimeParts = merchant.closeTime.split(":");
 
-            // sắp xếp
-            sortedMerchants.sort((a, b) => a.distance - b.distance); return { result: true, merchants: sortedMerchants };
+                const openHour = parseInt(openTimeParts[0]);
+                const openMinute = parseInt(openTimeParts[1].split(" ")[0]);
+                const openAMPM = openTimeParts[1].split(" ")[1];
+                const openTime = new Date();
+                openTime.setHours(openAMPM === "PM" ? openHour + 12 : openHour);
+                openTime.setMinutes(openMinute);
+
+                const closeHour = parseInt(closeTimeParts[0]);
+                const closeMinute = parseInt(closeTimeParts[1].split(" ")[0]);
+                const closeAMPM = closeTimeParts[1].split(" ")[1];
+                const closeTime = new Date();
+                closeTime.setHours(closeAMPM === "PM" ? closeHour + 12 : closeHour);
+                closeTime.setMinutes(closeMinute);
+
+                // console.log(now.getHours() + "Giờ hiện tại" + openTime.getHours() + "Giờ mở cửa" + closeTime.getHours() + "Giờ đóng cửa");
+
+                if (
+                    (now.getHours() > openTime.getHours() || 
+                    (now.getHours() === openTime.getHours() && now.getMinutes() >= openTime.getMinutes())) && 
+                    (now.getHours() < closeTime.getHours() || 
+                    (now.getHours() === closeTime.getHours() && now.getMinutes() <= closeTime.getMinutes()))
+                ) {
+                    const distance = Math.sqrt(Math.pow(merchant.longitude - longitude, 2) + Math.pow(merchant.latitude - latitude, 2));
+                    return { ...merchant.toObject(), distance };
+                } else {
+                    return null; 
+                }
+            }).filter(merchant => merchant !== null); // Lọc bỏ các cửa hàng có giá trị null
+
+            // Sắp xếp các cửa hàng theo khoảng cách
+            sortedMerchants.sort((a, b) => a.distance - b.distance);
+            return { result: true, merchants: sortedMerchants };
         } catch (error) {
             return { result: false, merchants: error };
         }
@@ -195,7 +231,7 @@ export class MerchantService {
     async get5NearestShippers(id: string) {
         try {
             const merchant = await this.merchants.findById(id).exec();
-            const shipper = await this.shipperModel.find().exec();
+            const shipper = await this.shipperModel.find({ status: 3 }).exec();
 
             //tính quãng đường
             const sortShipper = shipper.map(shipper => {
@@ -305,7 +341,7 @@ export class MerchantService {
             user.password = hashPassword;
             await user.save();
             console.log(user.password);
-            
+
             const merchant = await this.merchants.findOne({ _id: user.merchantID });
             if (!merchant) throw new HttpException("Merchant không tồn tại", HttpStatus.NOT_FOUND);
             merchant.status = 2;
@@ -388,17 +424,57 @@ export class MerchantService {
         try {
 
             const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
-            const firstDateMonth = new Date(targetYear, targetMonth-1,1)
-  
+            const firstDateMonth = new Date(targetYear, targetMonth - 1, 1)
+
             const startDate = firstDateMonth.toString()
-            const firstDateNextMonth = new Date(targetYear,targetMonth , 1)
+            const firstDateNextMonth = new Date(targetYear, targetMonth, 1)
             const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
             const endDate = lastDateOfMonth.toString()
-            console.log(startDate,endDate)
+            console.log(startDate, endDate)
             const result = this.revenueMerchantTimeTwoTime(ID, startDate, endDate);
             return { result: true, revenue: (await result).revenue }
         } catch (error) {
             return { result: false, revenue: error }
+        }
+    }
+
+    async updateUserMerchant(id: string, update: UpdateUserMerchantDto) {
+        try {
+            const updated = await this.userMerchantModel.findByIdAndUpdate(id, update, { new: true });
+            if (!updated) throw new HttpException("Update UserMerchant Fail", HttpStatus.NOT_FOUND);
+            return { result: true, data: updated }
+        } catch (error) {
+            return { result: false, error }
+        }
+    }
+
+    async deleteUserMerchant(id: string) {
+        try {
+            const updated = await this.userMerchantModel.findByIdAndUpdate(id, { deleted: true }, { new: true });
+            if (!updated) throw new HttpException("Update UserMerchant Fail", HttpStatus.NOT_FOUND);
+            return { result: true, message: "Delete Success" }
+        } catch (error) {
+            return { result: false, error }
+        }
+    }
+
+    async listMerchantApproval() {
+        try {
+            const listMerchant = await this.merchants.find({ status: 1 });
+            return { result: true, listMerchantApproval: listMerchant }
+        } catch (error) {
+            console.log(error);
+            return { result: false, error }
+        }
+    }
+
+
+    async getMerchantById(id: string) {
+        try {
+            const detailMerchant = await this.merchants.findById(id);
+            return { result: true, detailMerchant: detailMerchant }
+        } catch (error) {
+            return { result: false, error }
         }
     }
 }

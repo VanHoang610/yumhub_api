@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Get, HttpException, HttpStatus, Param, ValidationPipe } from '@nestjs/common'
 import { OrderService } from './order.service';
 import { OrderDto } from 'src/dto/dto.order';
+import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 
 @Controller('orders')
 export class OrderController {
@@ -77,5 +78,16 @@ export class OrderController {
             return error
         }
     }
+
+    // updateOrder
+    @Post('updateOrder/:id')
+    updateOrder(@Param('id') id: string, @Body() update: UpdateOrderDto) {
+        try {
+            return this.orderServices.updateOrder(id, update);
+        } catch (error) {
+            return error
+        }
+    }
+
 
 }

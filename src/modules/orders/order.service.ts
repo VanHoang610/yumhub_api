@@ -9,6 +9,7 @@ import { Merchant } from 'src/schemas/merchant.schema';
 import { Shipper } from 'src/schemas/shipper.schema';
 import { Voucher } from 'src/schemas/voucher.schema';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
+import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 
 
 
@@ -422,6 +423,16 @@ export class OrderService {
             return "Đã thay đổi trạng thái"
         } catch (error) {
             return error
+        }
+    }
+
+    async updateOrder(id: string, updateOrder: UpdateOrderDto) {
+        try {
+            const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, {new: true});
+            if(!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
+            return { result: true, updateOrder: update}
+        } catch (error) {
+            return { result: false, updateOrder: error}
         }
     }
 }

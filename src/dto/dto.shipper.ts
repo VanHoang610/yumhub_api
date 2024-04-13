@@ -2,15 +2,15 @@ import { IsBoolean, IsEmpty, IsNumber, IsOptional, IsString } from "class-valida
 
 export class ShipperDto {
 
-    @IsEmpty()
+    @IsOptional()
     @IsString()
     phoneNumber: string
 
-    @IsEmpty()
+    @IsOptional()
     @IsString()
     email: string
 
-    @IsEmpty()
+    @IsOptional()
     @IsString()
     password: string
 
@@ -21,10 +21,6 @@ export class ShipperDto {
     @IsString()
     @IsOptional()
     fullName?: string
-
-    @IsOptional()
-    @IsString()
-    rating?: string
 
     @IsOptional()
     @IsString()
@@ -46,16 +42,8 @@ export class ShipperDto {
     @IsString()
     modeCode?: string
     
+    @IsOptional()
     @IsString()
     idBike: string
 
-    @IsOptional()
-    @IsBoolean()
-    active?: boolean
-
-    @IsNumber()
-    longitude: number
-
-    @IsNumber()
-    latitude: number
 }
