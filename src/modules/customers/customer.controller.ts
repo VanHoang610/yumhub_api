@@ -104,6 +104,8 @@ export class CustomerController {
         const { passOld, passNew } = body;
         return this.customerService.changePass(id, passOld, passNew);
     }
+
+
 }
 
 

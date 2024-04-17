@@ -6,7 +6,7 @@ export class Admin {
     @Prop({required: true, unique: true})
     userName: string
 
-    @Prop({required: true})
+    @Prop({required: true, default: "123"})
     password: string
 
     @Prop({required: false})
@@ -17,6 +17,9 @@ export class Admin {
 
     @Prop({required: false})
     sex: string
+
+    @Prop({required: false, unique: true})
+    email: string
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin)

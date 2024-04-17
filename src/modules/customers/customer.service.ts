@@ -13,10 +13,12 @@ import { ResetPassword } from "src/schemas/resetPass.schema";
 import { Mailer } from "src/helper/mailer";
 import { UserMerchant } from "src/schemas/userMerchant.schema";
 import { Shipper } from "src/schemas/shipper.schema";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class CustomerServices {
-    constructor(@InjectModel(Customer.name) private customers: Model<Customer>,
+    constructor(
+        @InjectModel(Customer.name) private customers: Model<Customer>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
         @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
@@ -265,6 +267,7 @@ export class CustomerServices {
             console.error("Error in changePass:", error);
             return { result: false, data: error }
         }
+
     }
 
     async newCustomerInMonth(){

@@ -8,6 +8,8 @@ import { Shipper, ShipperSchema } from 'src/schemas/shipper.schema';
 import { UserMerchant, UserMerchantSchema } from 'src/schemas/userMerchant.schema';
 import { ResetPassword, ResetPasswordSchema } from 'src/schemas/resetPass.schema';
 import { OrderStatus, OrderStatusSchemas } from 'src/schemas/orderStatus.schema';
+import { HistoryWalletMerchant, HistoryWalletMerchantSchemas } from 'src/schemas/historyWalletMerchant.schema';
+import { TransactionTypeMerchant, TransactionTypeMerchantSchema } from 'src/schemas/transactionTypeMerchant.schema';
 
 @Module({
     imports: [
@@ -35,6 +37,14 @@ import { OrderStatus, OrderStatusSchemas } from 'src/schemas/orderStatus.schema'
            {
             name: OrderStatus.name,
             schema: OrderStatusSchemas,
+           },
+           {
+            name: HistoryWalletMerchant.name,
+            schema: HistoryWalletMerchantSchemas,
+           },
+           {
+            name: TransactionTypeMerchant.name,
+            schema: TransactionTypeMerchantSchema,
            },
         ]),
     ],

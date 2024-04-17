@@ -7,11 +7,13 @@ import { ShipperService } from "./shipper.service";
 import { Order, OrderSchema } from "src/schemas/order.schema";
 import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema";
 import { OrderStatus, OrderStatusSchemas } from "src/schemas/orderStatus.schema";
+import { HistoryWalletShipper, HistoryWalletShipperSchemas } from "src/schemas/historyWalletShipper.schma";
+import { TransactionTypeShipper, TransactionTypeShipperSchema } from "src/schemas/transantionTypeShipper.schame";
 
 
 
 @Module({
-    imports:[
+    imports: [
         MongooseModule.forFeature([
             {
                 name: Shipper.name,
@@ -30,7 +32,16 @@ import { OrderStatus, OrderStatusSchemas } from "src/schemas/orderStatus.schema"
             {
                 name: OrderStatus.name,
                 schema: OrderStatusSchemas,
-               },
+            },
+            {
+                name: HistoryWalletShipper.name,
+                schema: HistoryWalletShipperSchemas
+
+            },
+            {
+                name: TransactionTypeShipper.name,
+                schema: TransactionTypeShipperSchema,
+            },
         ]),
     ],
     controllers: [ShipperController],

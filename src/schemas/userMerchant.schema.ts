@@ -28,6 +28,9 @@ export class UserMerchant {
 
     @Prop({ unique: true, required: true }) 
     email: string
+
+    @Prop({ required: false, default: false }) 
+    deleted: boolean
 }
 
 export const UserMerchantSchema = SchemaFactory.createForClass(UserMerchant)
