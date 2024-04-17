@@ -16,6 +16,10 @@ export class ShipperDto {
 
     @IsOptional()
     @IsString()
+    joinDay?: string
+
+    @IsOptional()
+    @IsString()
     avatar?: string
     
     @IsString()

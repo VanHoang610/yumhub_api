@@ -19,6 +19,8 @@ export class Review {
     @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfReview'})
     typeOfReview: TypeOfReview
 
+    @Prop({required: false, default: Date.now})
+    createAt?: Date
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review)

@@ -159,7 +159,8 @@ export class ShipperService {
                 brandBike: brandBike,
                 modeCode: modeCode,
                 idBike: idBike,
-                status: 1
+                status: 1,
+                joinDay: Date.now()
             });
             if (!newShipper) throw new HttpException("Create Failed", HttpStatus.NOT_FOUND);
             await newShipper.save();
@@ -495,6 +496,24 @@ export class ShipperService {
             return { result: true, TransactionHistory: history };
         } catch (error) {
             return { result: false, error };
+
+    async newShipperInMonth(){
+        try{
+            const today = new Date()
+            var amount=0
+            var id=[]
+            const firstDayOfMonth= new Date(today.getFullYear(), today.getMonth(), 1);
+            const lasterDayOfMonth= new Date(today.getFullYear(), today.getMonth()+1, 0);
+            const newShippers = await this.shipperModel.find({joinDay: { $gte: firstDayOfMonth, $lte: lasterDayOfMonth }})
+
+            for( const Shipper of newShippers){
+                amount+=1
+                id.push(Shipper._id)
+            }
+            return {result: true, amount: amount, ID: id}
+        }catch(error){
+            return {result: false, error: error}
+
         }
     }
 }

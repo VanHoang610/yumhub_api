@@ -20,31 +20,6 @@ export class OrderController {
         return await this.orderServices.createOrder(orderDto);
     }
 
-    @Post('statusprocessing/:id')
-    async setStatusProcessing(@Param('id') orderId: string) {
-        return await this.orderServices.setStatusProcessing(orderId);
-    }
-    @Post('statusshipped/:id')
-    async setStatusShipped(@Param('id') orderId: string) {
-        return await this.orderServices.setStatusShipped(orderId);
-    }
-    @Post('statusdelivered/:id')
-    async setStatusDelivered(@Param('id') orderId: string) {
-        return await this.orderServices.setStatusDelivered(orderId);
-    }
-    @Post('statuscancel/:id')
-    async setStatusCancel(@Param('id') orderId: string) {
-        return await this.orderServices.setStatusCancel(orderId);
-    }
-    @Post('statusonhold/:id')
-    async setStatusOnHold(@Param('id') orderId: string) {
-        return await this.orderServices.setStatusOnHold(orderId);
-    }
-
-    @Post('statusbackordered/:id')
-    async setStatusBackordered(@Param('id') orderId: string) {
-        return await this.orderServices.setStatusBackordered(orderId);
-    }
     @Post('statusOrder/:id/:status')
     async setStatus(@Param('id') orderId: string, @Param('status') status: number) {
         return await this.orderServices.setStatus(orderId, status);
@@ -78,6 +53,17 @@ export class OrderController {
             return error
         }
     }
+    @Get('RevenueYumhub')
+     getRevenueTime(@Body() body: { month:string }) {
+         try {
+            const {month} = body
+             const totalRevenue = this.orderServices.revenueMonth(month);
+             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+             return totalRevenue;
+         } catch (error) {
+             return error
+         }
+     }
 
     // updateOrder
     @Post('updateOrder/:id')

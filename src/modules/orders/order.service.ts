@@ -197,149 +197,7 @@ export class OrderService {
         }
     }
     // lấy id của Đơn hàng đã được tạo nhưng chưa được xác nhận hoặc xử lý.
-    async getStatusPending() {
-        let idStatus: object;
-        const Statuss = await this.statusModel.find().exec();
-        for (const status of Statuss) {
-            if (status.name === "pending") {
-                idStatus = status._id
-                break
-            }
-        }
-        return idStatus
-    }
-    async setStatusPending(orderId: string) {
-        let idStatus = this.getStatusPending
-        const updatedOrder = await this.orderModel.findOneAndUpdate(
-            { _id: orderId },
-            { status: idStatus },
-            { new: true } // Trả về bản ghi đã cập nhật
-        );
-    }
-    //Đơn hàng đang được xử lý, đang trong quá trình chuẩn bị hoặc đang chờ đợi để được giao.
-    async setStatusProcessing(orderId: string) {
-        try {
-            let idStatus: object;
-            const Statuss = await this.statusModel.find().exec();
-            for (const status of Statuss) {
-                if (status.name === "Processing") {
-                    idStatus = status._id
-                    break
-                }
-            } const updatedOrder = await this.orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { status: idStatus },
-                { new: true } // Trả về bản ghi đã cập nhật
-            );
-            return "Đã thay đổi trạng thái"
-        } catch (error) {
-            return error
-        }
-
-    }
-    //Đơn hàng đã được giao cho nhà vận chuyển hoặc đang trên đường đi đến địa chỉ của khách hàng.
-    async setStatusShipped(orderId: string) {
-        try {
-            let idStatus: object;
-            const Statuss = await this.statusModel.find().exec();
-            for (const status of Statuss) {
-                if (status.name === "Shipped") {
-                    idStatus = status._id
-                    break
-                }
-            }
-            const updatedOrder = await this.orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { status: idStatus },
-                { new: true } // Trả về bản ghi đã cập nhật
-            );
-            return "Đã thay đổi trạng thái"
-        } catch (error) {
-            return error
-        }
-    }
-    //Đơn hàng đã được giao thành công và được nhận bởi khách hàng.
-    async setStatusDelivered(orderId: string) {
-        try {
-            let idStatus: object;
-            const Statuss = await this.statusModel.find().exec();
-            for (const status of Statuss) {
-                if (status.name === "Delivered") {
-                    idStatus = status._id
-                    break
-                }
-            }
-            const updatedOrder = await this.orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { status: idStatus },
-                { new: true } // Trả về bản ghi đã cập nhật
-            );
-            return "Đã thay đổi trạng thái"
-        } catch (error) {
-            return error
-        }
-    }
-    //Đơn hàng đã bị hủy trước khi được giao hoặc sau khi đã được giao.
-    async setStatusCancel(orderId: string) {
-        try {
-            let idStatus: object;
-            const Statuss = await this.statusModel.find().exec();
-            for (const status of Statuss) {
-                if (status.name === "Cancel") {
-                    idStatus = status._id
-                    break
-                }
-            }
-            const updatedOrder = await this.orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { status: idStatus },
-                { new: true } // Trả về bản ghi đã cập nhật
-            );
-            return "Đã thay đổi trạng thái"
-        } catch (error) {
-            return error
-        }
-    }
-    //Đơn hàng đang bị tạm ngưng xử lý, thường do các vấn đề tài chính hoặc thông tin không chính xác từ khách hàng.
-    async setStatusOnHold(orderId: string) {
-        try {
-            let idStatus: object; const Statuss = await this.statusModel.find().exec();
-            for (const status of Statuss) {
-                if (status.name === "OnHold") {
-                    idStatus = status._id
-                    break
-                }
-            }
-            const updatedOrder = await this.orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { status: idStatus },
-                { new: true } // Trả về bản ghi đã cập nhật
-            );
-            return "Đã thay đổi trạng thái"
-        } catch (error) {
-            return error
-        }
-    }
-    async setStatusBackordered(orderId: string) {
-        try {
-            let idStatus: object;
-            const Statuss = await this.statusModel.find().exec();
-            for (const status of Statuss) {
-                if (status.name === "Backordered") {
-                    idStatus = status._id
-                    break
-                }
-            }
-            const updatedOrder = await this.orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { status: idStatus },
-                { new: true } // Trả về bản ghi đã cập nhật
-            );
-            return "Đã thay đổi trạng thái"
-        } catch (error) {
-            return error
-        }
-    }
+   
     async setStatus(orderId: string, status: string | number) {
         try {
             let idStatus: object;
@@ -412,7 +270,8 @@ export class OrderService {
                     }
                     break;
                 default:
-                    return typeof status;
+
+                    return "nhập 1-8";
 
             }
             const updatedOrder = await this.orderModel.findOneAndUpdate(
@@ -426,6 +285,7 @@ export class OrderService {
         }
     }
 
+
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
             const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, {new: true});
@@ -434,5 +294,43 @@ export class OrderService {
         } catch (error) {
             return { result: false, updateOrder: error}
         }
+
+    // doanh thu
+    async revenueMonth( month: string) {
+        try {
+
+            const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
+            // Tính tổng doanh thu
+            var totalRevenueFood = 0;
+            var totalRevenueShipper = 0;
+            var totalVoucher =0
+            
+            const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
+            const firstDateMonth = new Date(targetYear, targetMonth-1,1)
+            const firstDateNextMonth = new Date(targetYear,targetMonth , 1)
+            const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
+
+
+            const orders = await this.orderModel.find({
+                timeBook: { $gte: firstDateMonth, $lte: lastDateOfMonth },
+                status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+            })
+            for (const order of orders) {
+                totalRevenueFood += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+                totalRevenueShipper +=order.deliveryCost
+                if (order.voucherID){
+                    var voucherID=this.voucherModel.findById(order.voucherID)
+                    totalVoucher += (await voucherID).discountAmount
+                }
+            }
+            var totalRevenue = totalRevenueFood + totalRevenueShipper
+            
+            var totalProfit = totalRevenue-totalVoucher
+            return { result: true, revenue: totalRevenue,revenueFood: totalRevenueFood,  revenueShip:totalRevenueShipper, voucher:totalVoucher, Profit:totalProfit}
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+
+
     }
 }

@@ -11,6 +11,9 @@ export class Merchant {
     @Prop({required: true})
     address: string
 
+    @Prop({required: false, default: Date.now})
+    joinDay?: Date
+
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TypeOfMerchant'})  //1: chay, 2: mặn
     type?: TypeOfMerchant
 

@@ -40,17 +40,21 @@ export class MerchantController {
         }
     }
     @Get('RevenueTTT')
-    getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
-        try {
-            const { ID, startDate, endDate } = body
-            const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(ID, startDate, endDate);
-            if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return totalRevenue;
-        } catch (error) {
-            return error
-        }
+     getRevenueTime(@Body() body: {ID:string, startDate: string, endDate: string }) {
+         try {
+            const {ID, startDate, endDate } = body
+             const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(ID, startDate, endDate);
+             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+             return totalRevenue;
+         } catch (error) {
+             return error
+         }
+     }
+     @Get('newUser')
+    newMerchant() 
+    {
+        return this.merchantService.newMerchantInMonth();
     }
-
     @Get('addData')
     addData() {
         try {

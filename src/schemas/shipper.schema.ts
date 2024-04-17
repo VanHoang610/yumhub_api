@@ -9,6 +9,9 @@ export class Shipper {
     @Prop({required: false})
     avatar?: string
 
+    @Prop({required: false, default: Date.now})
+    joinDay?: Date
+
     @Prop({required: false})
     rating?: string
 

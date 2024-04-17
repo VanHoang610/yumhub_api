@@ -19,6 +19,11 @@ export class CustomerController {
         return this.customerService.addData();
     }
 
+    @Get('newUser')
+    newCustomer() 
+    {
+        return this.customerService.newCustomerInMonth();
+    }
 
     // tạo customer
     @Post('createCustomer')

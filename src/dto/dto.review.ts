@@ -19,5 +19,8 @@ export class ReviewDto {
     @IsNotEmpty()
     typeOfReview: TypeOfReview
 
+    @IsOptional()
+    @IsString()
+    createAt?: string
 
 }

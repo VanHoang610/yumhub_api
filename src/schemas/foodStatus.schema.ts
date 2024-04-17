@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 
 @Schema()
-export class OrderStatus {
+export class FoodStatus {
 
     @Prop({required: true})
     name: string
 }
 
-export const OrderStatusSchemas = SchemaFactory.createForClass(OrderStatus);
+export const FoodStatusSchemas = SchemaFactory.createForClass(FoodStatus);

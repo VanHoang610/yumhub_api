@@ -189,6 +189,7 @@ export class CustomerServices {
             }
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
+
             return { result: true, data: checkAccount }
         } catch (error) {
             return { result: false, data: error }
@@ -266,7 +267,26 @@ export class CustomerServices {
             console.error("Error in changePass:", error);
             return { result: false, data: error }
         }
+
     }
 
+    async newCustomerInMonth(){
+        try{
+            const today = new Date()
+            var amount=0
+            var id=[]
+            const firstDayOfMonth= new Date(today.getFullYear(), today.getMonth(), 1);
+            const lasterDayOfMonth= new Date(today.getFullYear(), today.getMonth()+1, 0);
+            const newCustomers = await this.customers.find({joinDay: { $gte: firstDayOfMonth, $lte: lasterDayOfMonth }})
+
+            for( const customer of newCustomers){
+                amount+=1
+                id.push(customer._id)
+            }
+            return {result: true, amount: amount, ID: id}
+        }catch(error){
+            return {result: false, error: error}
+        }
+    }
 }
 
