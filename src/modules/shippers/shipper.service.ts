@@ -12,6 +12,9 @@ import { LoginDto } from 'src/dto/dto.login';
 import { ResetPassword } from 'src/schemas/resetPass.schema';
 import { Mailer } from 'src/helper/mailer';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
+import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
+import { HistoryWalletShipper } from 'src/schemas/historyWalletShipper.schma';
+import { TransactionTypeShipper } from 'src/schemas/transantionTypeShipper.schame';
 
 
 
@@ -20,6 +23,8 @@ export class ShipperService {
     constructor(@InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
         @InjectModel(Order.name) private orderModel: Model<Order>, 
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
+        @InjectModel(HistoryWalletShipper.name) private historyShipperModel: Model<HistoryWalletShipper>,
+        @InjectModel(TransactionTypeShipper.name) private typeShipperModel: Model<TransactionTypeShipper>,
         @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>) { }
 
     async addData() {
@@ -41,7 +46,9 @@ export class ShipperService {
                     idBike: "$2a$04$qUdzkcwnmTJRu/yf7ctpwuRbBDebzPQDUFtAIQ0JyuT2XgTdQzRpu",
                     active: false,
                     longitude: 112.5766579,
-                    latitude: -6.9852949
+                    latitude: -6.9852949,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "6604e1ec5a6c5ad8711aebfa",
                     phoneNumber: "07766168182",
@@ -58,7 +65,9 @@ export class ShipperService {
                     idBike: "$2a$04$Y9WIWV2Du0NeGtxM/zJ1ZOar/UWF7xgVuGMDZMh/GeyzAZyaplZ2a",
                     active: false,
                     longitude: 95.8601611,
-                    latitude: 20.8765931
+                    latitude: 20.8765931,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "6604e1ec5a6c5ad8711aebfb",
                     phoneNumber: "0776216818",
@@ -75,7 +84,9 @@ export class ShipperService {
                     idBike: "$2a$04$/zOzvhL8ZQhwhzbmwC.Gg.eUJxfl0UD2tsrv9.8zDmOcWgBPiOU/q",
                     active: false,
                     longitude: -104.86783,
-                    latitude: 50.65009
+                    latitude: 50.65009,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "6604e1ec5a6c5ad8711aebfc",
                     phoneNumber: "0776616811",
@@ -92,7 +103,9 @@ export class ShipperService {
                     idBike: "$2a$04$2STPCuPNZ2fcPB7HbjSjdefI0g3..w6Q7UGIDLUZUygqfZWyw7QBa",
                     active: true,
                     longitude: 11.2533509,
-                    latitude: 58.695946
+                    latitude: 58.695946,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "6604e1ec5a6c5ad8711aebfd",
                     phoneNumber: "0776616815",
@@ -109,7 +122,9 @@ export class ShipperService {
                     idBike: "$2a$04$ONJxx1ONd3XgiHR0oMziyOrOSuYnKfdusIFgzxqGc8p1ieayGug0q",
                     active: true,
                     longitude: -75.2435307,
-                    latitude: 20.5800358
+                    latitude: 20.5800358,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }
 
             ])
@@ -414,6 +429,72 @@ export class ShipperService {
             return { result: true, detailShipper: detailShipper}
         } catch (error) {
             return { result: false, error }
+        }
+    }
+
+
+    async topUptopUpShipper(id: string, topUp: HistoryMerchantDto) {
+        try {
+            const shipper = await this.shipperModel.findById(id);
+            const idShipper = shipper._id;
+
+            const typeShipper = await this.typeShipperModel.findOne({ name: "topUp" }).exec();
+    
+            const currentBalance = shipper.balance;
+            const updateBalance = currentBalance + topUp.amountTransantion;
+            shipper.balance = updateBalance;
+            await shipper.save();
+            const createHistory = await this.historyShipperModel.create(
+                {
+                    "shipperID": idShipper,
+                    "amountTransantion": topUp.amountTransantion,
+                    "description": topUp.description,
+                    "transantionType": typeShipper._id,
+                    "time": new Date()
+                }
+            )
+            return { result: true, WalletShipper: createHistory };
+        } catch (error) {
+            console.log(error);
+            return { result: false, error };
+        }
+    }
+
+
+    async cashOutShipper(id: string, topUp: HistoryMerchantDto) {
+        try {
+            const shipper = await this.shipperModel.findById(id);
+            const idShipper = shipper._id;
+
+            const typeShipper = await this.typeShipperModel.findOne({ name: "topUp" }).exec();
+    
+            const currentBalance = shipper.balance;
+            const updateBalance = currentBalance - topUp.amountTransantion;
+            shipper.balance = updateBalance;
+            await shipper.save();
+            const createHistory = await this.historyShipperModel.create(
+                {
+                    "shipperID": idShipper,
+                    "amountTransantion": topUp.amountTransantion,
+                    "description": topUp.description,
+                    "transantionType": typeShipper._id,
+                    "time": new Date()
+                }
+            )
+            return { result: true, WalletShipper: createHistory };
+        } catch (error) {
+            return { result: false, error };
+        }
+    }
+
+    async transactionHistory(id: string) {
+        try {
+            const shipper = await this.shipperModel.findById(id);
+            const idShipper = shipper._id;
+            const history = await this.historyShipperModel.find({ shipperID: idShipper }).exec();
+            return { result: true, TransactionHistory: history };
+        } catch (error) {
+            return { result: false, error };
         }
     }
 }

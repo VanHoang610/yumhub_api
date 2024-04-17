@@ -7,5 +7,5 @@ import { UserMerchant } from 'src/schemas/userMerchant.schema';
 @Injectable()
 export class UserMerchantService {
 
-    constructor(@InjectModel(Merchant.name) private userMerchants: Model<UserMerchant>) {}
+    constructor(@InjectModel(UserMerchant.name) private userMerchants: Model<UserMerchant>) {}
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common/decorators/core'
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, now } from 'mongoose';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import { Merchant } from 'src/schemas/merchant.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -16,7 +16,11 @@ import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
 import { log } from 'console';
-
+import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
+import { HistoryWalletMerchant } from 'src/schemas/historyWalletMerchant.schema';
+import { TransactionTypeMerchant } from 'src/schemas/transactionTypeMerchant.schema';
+import { ObjectId } from 'mongoose';
+import { type } from 'os';
 
 @Injectable()
 export class MerchantService {
@@ -26,7 +30,9 @@ export class MerchantService {
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
-        @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>) { }
+        @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
+        @InjectModel(HistoryWalletMerchant.name) private historyMerchantModel: Model<HistoryWalletMerchant>,
+        @InjectModel(TransactionTypeMerchant.name) private typeMerchantModel: Model<TransactionTypeMerchant>,) { }
 
     async addData() {
         try {
@@ -43,7 +49,9 @@ export class MerchantService {
                     deleted: false,
                     longitude: -79.2056361,
                     latitude: 43.1508732,
-                    status: 1
+                    status: 1,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "660c99c2fc13ae788b50fbe0",
                     name: "Acyclovir",
@@ -56,7 +64,9 @@ export class MerchantService {
                     deleted: false,
                     longitude: -78.69957,
                     latitude: 46.31681,
-                    status: 1
+                    status: 1,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "660c99c2fc13ae788b50fbdf",
                     name: "Grippe",
@@ -69,7 +79,9 @@ export class MerchantService {
                     deleted: false,
                     longitude: 97.8503951,
                     latitude: 2.6928351,
-                    status: 1
+                    status: 1,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "660c99c2fc13ae788b50fbde",
                     name: "ibuprofen",
@@ -82,7 +94,9 @@ export class MerchantService {
                     deleted: true,
                     longitude: 17.5275042,
                     latitude: 43.9760578,
-                    status: 1
+                    status: 1,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }, {
                     _id: "660c99c2fc13ae788b50fbdd",
                     name: "TRAMADOL HYDROCHLORIDE",
@@ -95,7 +109,9 @@ export class MerchantService {
                     deleted: false,
                     longitude: 113.116527,
                     latitude: 26.12715,
-                    status: 1
+                    status: 1,
+                    joinDay: "11/23/2023",
+                    balance: 50000,
                 }]);
             return { result: true, newMerchant: newMerchants }
         } catch (error) {
@@ -207,15 +223,15 @@ export class MerchantService {
                 // console.log(now.getHours() + "Giờ hiện tại" + openTime.getHours() + "Giờ mở cửa" + closeTime.getHours() + "Giờ đóng cửa");
 
                 if (
-                    (now.getHours() > openTime.getHours() || 
-                    (now.getHours() === openTime.getHours() && now.getMinutes() >= openTime.getMinutes())) && 
-                    (now.getHours() < closeTime.getHours() || 
-                    (now.getHours() === closeTime.getHours() && now.getMinutes() <= closeTime.getMinutes()))
+                    (now.getHours() > openTime.getHours() ||
+                        (now.getHours() === openTime.getHours() && now.getMinutes() >= openTime.getMinutes())) &&
+                    (now.getHours() < closeTime.getHours() ||
+                        (now.getHours() === closeTime.getHours() && now.getMinutes() <= closeTime.getMinutes()))
                 ) {
                     const distance = Math.sqrt(Math.pow(merchant.longitude - longitude, 2) + Math.pow(merchant.latitude - latitude, 2));
                     return { ...merchant.toObject(), distance };
                 } else {
-                    return null; 
+                    return null;
                 }
             }).filter(merchant => merchant !== null); // Lọc bỏ các cửa hàng có giá trị null
 
@@ -477,5 +493,73 @@ export class MerchantService {
             return { result: false, error }
         }
     }
+
+
+
+    async topUpMerchant(id: string, topUp: HistoryMerchantDto) {
+        try {
+            const merchant = await this.merchants.findById(id);
+            const idMerchant = merchant._id;
+
+            const typeMerchant = await this.typeMerchantModel.findOne({ name: "topUp" }).exec();
+    
+            const currentBalance = merchant.balance;
+            const updateBalance = currentBalance + topUp.amountTransantion;
+            merchant.balance = updateBalance;
+            await merchant.save();
+            const createHistory = await this.historyMerchantModel.create(
+                {
+                    "merchantID": idMerchant,
+                    "amountTransantion": topUp.amountTransantion,
+                    "description": topUp.description,
+                    "transantionType": typeMerchant._id,
+                    "time": new Date()
+                }
+            )
+    
+            return { result: true, WalletMerchant: createHistory };
+        } catch (error) {
+            return { result: false, error };
+        }
+    }
+
+
+    async cashOutMerchant(id: string, topUp: HistoryMerchantDto) {
+        try {
+            const merchant = await this.merchants.findById(id);
+            const idMerchant = merchant._id;
+
+            const typeMerchant = await this.typeMerchantModel.findOne({ name: "cashOut" }).exec();
+    
+            const currentBalance = merchant.balance;
+            const updateBalance = currentBalance - topUp.amountTransantion;
+            merchant.balance = updateBalance;
+            await merchant.save();
+            const createHistory = await this.historyMerchantModel.create(
+                {
+                    "merchantID": idMerchant,
+                    "amountTransantion": topUp.amountTransantion,
+                    "description": topUp.description,
+                    "transantionType": typeMerchant._id,    
+                    "time": new Date()
+                }
+            )
+            return { result: true, WalletMerchant: createHistory };
+        } catch (error) {
+            return { result: false, error };
+        }
+    }
+
+    async transactionHistory(id: string) {
+        try {
+            const merchant = await this.merchants.findById(id);
+            const idMerchant = merchant._id;
+            const history = await this.historyMerchantModel.find({ merchantID: idMerchant }).exec();
+            return { result: true, TransactionHistory: history };
+        } catch (error) {
+            return { result: false, error };
+        }
+    }
+    
 }
 

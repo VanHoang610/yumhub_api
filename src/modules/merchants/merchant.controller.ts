@@ -8,6 +8,7 @@ import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
 import { LoginDto } from 'src/dto/dto.login';
 import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
+import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 
 @Controller('merchants')
 export class MerchantController {
@@ -187,7 +188,6 @@ export class MerchantController {
     // danh sách merchant cần duyệt
     @Post('listMerchantApproval')
     listMerchantApproval() {
-        console.log("sfdsf");
         return this.merchantService.listMerchantApproval();
     }
 
@@ -196,4 +196,22 @@ export class MerchantController {
     getMerchantById(@Param('id') id: string) {
         return this.merchantService.getMerchantById(id);
     }
+
+    // nạp tiền merchant
+    @Post('topUp/:id')
+    topUpMerchant(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+        return this.merchantService.topUpMerchant(id, topUp);
+    }
+
+     // rút tiền merchant
+     @Post('cashOut/:id')
+     cashOutMerchant(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+         return this.merchantService.cashOutMerchant(id, topUp);
+     }
+
+     // lịch sử nạp/rút tiền merchant
+     @Get('transactionHistory/:id')
+     transactionHistory(@Param('id') id: string) {
+         return this.merchantService.transactionHistory(id);
+     }
 }

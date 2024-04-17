@@ -15,14 +15,11 @@ export class HistoryWalletMerchant {
     @Prop({required: false})
     description: string
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TransantionTypeMerchant'})
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TransactionTypeMerchant'})
     transantionType: TransactionTypeMerchant
 
     @Prop({required: false, default: Date.now})
     time: Date
-
-    @Prop({required: true})
-    balance: number
 }
 
 export const HistoryWalletMerchantSchemas = SchemaFactory.createForClass(HistoryWalletMerchant);

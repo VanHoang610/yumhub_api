@@ -19,9 +19,6 @@ export class HistoryWalletShipper {
 
     @Prop({required: false, default: Date.now})
     time: Date
-
-    @Prop({required: true})
-    balance: number
 }
 
 export const HistoryWalletShipperSchemas = SchemaFactory.createForClass(HistoryWalletShipper);

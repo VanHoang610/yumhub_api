@@ -4,6 +4,7 @@ import { ShipperDto } from 'src/dto/dto.shipper';
 import mongoose from "mongoose";
 import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
 import { LoginDto } from 'src/dto/dto.login';
+import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 
 
 @Controller('shippers')
@@ -177,4 +178,23 @@ export class ShipperController {
     getShipperById(@Param('id') id: string) {
         return this.shipperService.getShipperById(id);
     }
+
+
+    // nạp tiền shipper
+    @Post('topUp/:id')
+    topUpShipper(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+        return this.shipperService.topUptopUpShipper(id, topUp);
+    }
+
+     // rút tiền shipper
+     @Post('cashOut/:id')
+     cashOutMtopUpShipper(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+         return this.shipperService.cashOutShipper(id, topUp);
+     }
+
+     // lịch sử nạp/rút tiền shipper
+     @Get('transactionHistory/:id')
+     transactionHistory(@Param('id') id: string) {
+         return this.shipperService.transactionHistory(id);
+     }
 }
