@@ -21,6 +21,6 @@ export class ReviewDto {
 
     @IsOptional()
     @IsString()
-    creatAt?: string
+    createAt?: string
 
 }

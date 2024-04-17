@@ -1,12 +1,20 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { Merchant } from "./merchant.schema";
+import { FoodStatus } from "./foodStatus.schema";
+import { TypeOfFood } from "./typeOfFood.schema";
 
 
 @Schema()
 export class Food {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Merchant'})
     merchantID?: Merchant
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'FoodStatus'})  
+    status: FoodStatus
+    
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TypeOfFood'})  
+    typeOfFood: TypeOfFood
 
     @Prop({required: false})
     image?: string
@@ -20,11 +28,7 @@ export class Food {
     @Prop({required: false}) // giá bán
     priceForSale?: number
 
-    @Prop({required: false}) //1: thức ăn, 2: nước uống
-    typeOfFood?: number 
-    
-    @Prop({required: false, default: false}) 
-    deleted?: boolean
+   
 }   
 
 export const FoodSchema = SchemaFactory.createForClass(Food)

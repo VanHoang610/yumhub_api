@@ -20,7 +20,7 @@ export class Review {
     typeOfReview: TypeOfReview
 
     @Prop({required: false, default: Date.now})
-    creatAt?: Date
+    createAt?: Date
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review)

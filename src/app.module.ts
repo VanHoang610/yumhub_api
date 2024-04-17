@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-// import { UserModule } from './modules/users/user.module';
 import { CustomerModule } from './modules/customers/customer.module';
 import { MerchantModule } from './modules/merchants/merchant.module';
 import { ShipperModule } from './modules/shippers/shipper.module';
@@ -10,7 +9,6 @@ import { PaymentMethodModule } from './modules/paymentMethods/paymentMethod.modu
 import { AddressModule } from './modules/address/address.module';
 import { DocumentModule } from './modules/documents/document.module';
 import { OrderModule } from './modules/orders/order.module';
-// import { TransferModule } from './modules/transfers/transfer.module';
 import { UserMerchantModule } from './modules/userMerchant/merchant.module';
 import { DocumentTypeModule } from './modules/documentTypes/document.module';
 import { FoodModule } from './modules/foods/food.module';
@@ -29,15 +27,16 @@ import { TypeOfMerchantModule } from './modules/typeOfMerchant/typeOfMerchant.mo
 import { TypeOfReviewModule } from './modules/typeOfReview/typeOfReview.module';
 import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.module';
 import { TypeOfFood } from './schemas/typeOfFood.schema';
+import { FoodStatus } from './schemas/foodStatus.schema';
+import { foodStatusModule } from './modules/foodStatus/foodStatus.module';
+import { TypeOfFoodModule } from './modules/typeOfFood/typeOfFood.module';
 
 @Module({
   imports: [
-    // UserModule,
     CustomerModule,
     MerchantModule,
     ShipperModule,
     UserMerchantModule,
-    // TransferModule,
     PaymentMethodModule,
     AddressModule,
     OrderModule,
@@ -60,7 +59,8 @@ import { TypeOfFood } from './schemas/typeOfFood.schema';
     TypeOfMerchantModule,
     TypeOfReviewModule,
     TypeOfVoucherModule,
-    TypeOfFood,
+    TypeOfFoodModule,
+    foodStatusModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],
