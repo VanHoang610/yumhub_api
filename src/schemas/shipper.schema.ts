@@ -54,9 +54,6 @@ export class Shipper {
     @Prop({required: false, default: false}) 
     deleted?: boolean
 
-    @Prop({required: false, default: new Date()})
-    joinDay?: Date
-
     @Prop({required: false, default: 0})
     balance?: number
 }

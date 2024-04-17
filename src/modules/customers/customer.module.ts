@@ -7,8 +7,7 @@ import { Order, OrderSchema } from "src/schemas/order.schema";
 import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema";
 import { UserMerchant, UserMerchantSchema } from "src/schemas/userMerchant.schema";
 import { Shipper, ShipperSchema } from "src/schemas/shipper.schema";
-import { JwtModule } from "@nestjs/jwt";
-import { jwtConstants } from "../auth/constants";
+
 
 @Module({
     imports: [
@@ -34,11 +33,7 @@ import { jwtConstants } from "../auth/constants";
                 schema: ShipperSchema
             }
         ]),
-        JwtModule.register({
-            global: true,
-            secret: jwtConstants.secret,
-            signOptions: { expiresIn: '60s' },
-          }),
+       
     ],
     controllers: [CustomerController],
     providers: [CustomerServices]

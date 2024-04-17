@@ -73,7 +73,7 @@ export class AdminService {
     async forgetPassByEmail(email: string) {
         try {
             const user = await this.adminModel.findOne({ email: email });
-            if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
+if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
 
             const otp = Math.floor(1000 + Math.random() * 9000);
 

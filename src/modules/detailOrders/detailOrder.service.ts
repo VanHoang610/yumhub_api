@@ -25,7 +25,7 @@ export class DetailOrderService {
             }
 
             // Tính toán giá của chi tiết sản phẩm
-            const price = food.price * quantity;
+            const price = food.priceForSale * quantity;
 
             // Tạo đối tượng chi tiết sản phẩm mới
             const newDetailProduct = new this.detailOrderModel({

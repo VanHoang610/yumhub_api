@@ -41,9 +41,6 @@ export class Merchant {
     @Prop({required: false, default: 1})
     status?: number
 
-    @Prop({required: false, default: new Date()})
-    joinDay?: Date
-
     @Prop({required: false, default: 0})
     balance?: number
 

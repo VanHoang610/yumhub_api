@@ -197,7 +197,7 @@ export class OrderService {
         }
     }
     // lấy id của Đơn hàng đã được tạo nhưng chưa được xác nhận hoặc xử lý.
-   
+
     async setStatus(orderId: string, status: string | number) {
         try {
             let idStatus: object;
@@ -288,26 +288,26 @@ export class OrderService {
 
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
-            const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, {new: true});
-            if(!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
-            return { result: true, updateOrder: update}
+            const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, { new: true });
+            if (!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
+            return { result: true, updateOrder: update }
         } catch (error) {
-            return { result: false, updateOrder: error}
+            return { result: false, updateOrder: error }
         }
-
+    }
     // doanh thu
-    async revenueMonth( month: string) {
+    async revenueMonth(month: string) {
         try {
 
             const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
             // Tính tổng doanh thu
             var totalRevenueFood = 0;
             var totalRevenueShipper = 0;
-            var totalVoucher =0
-            
+            var totalVoucher = 0
+
             const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
-            const firstDateMonth = new Date(targetYear, targetMonth-1,1)
-            const firstDateNextMonth = new Date(targetYear,targetMonth , 1)
+            const firstDateMonth = new Date(targetYear, targetMonth - 1, 1)
+            const firstDateNextMonth = new Date(targetYear, targetMonth, 1)
             const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
 
 
@@ -317,16 +317,16 @@ export class OrderService {
             })
             for (const order of orders) {
                 totalRevenueFood += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
-                totalRevenueShipper +=order.deliveryCost
-                if (order.voucherID){
-                    var voucherID=this.voucherModel.findById(order.voucherID)
+                totalRevenueShipper += order.deliveryCost
+                if (order.voucherID) {
+                    var voucherID = this.voucherModel.findById(order.voucherID)
                     totalVoucher += (await voucherID).discountAmount
                 }
             }
             var totalRevenue = totalRevenueFood + totalRevenueShipper
-            
-            var totalProfit = totalRevenue-totalVoucher
-            return { result: true, revenue: totalRevenue,revenueFood: totalRevenueFood,  revenueShip:totalRevenueShipper, voucher:totalVoucher, Profit:totalProfit}
+
+            var totalProfit = totalRevenue - totalVoucher
+            return { result: true, revenue: totalRevenue, revenueFood: totalRevenueFood, revenueShip: totalRevenueShipper, voucher: totalVoucher, Profit: totalProfit }
         } catch (error) {
             return { result: false, revenue: error }
         }

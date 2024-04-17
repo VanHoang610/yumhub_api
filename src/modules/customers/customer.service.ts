@@ -13,7 +13,7 @@ import { ResetPassword } from "src/schemas/resetPass.schema";
 import { Mailer } from "src/helper/mailer";
 import { UserMerchant } from "src/schemas/userMerchant.schema";
 import { Shipper } from "src/schemas/shipper.schema";
-import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class CustomerServices {

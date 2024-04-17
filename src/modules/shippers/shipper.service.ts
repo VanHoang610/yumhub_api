@@ -496,6 +496,8 @@ export class ShipperService {
             return { result: true, TransactionHistory: history };
         } catch (error) {
             return { result: false, error };
+        }
+    }
 
     async newShipperInMonth(){
         try{

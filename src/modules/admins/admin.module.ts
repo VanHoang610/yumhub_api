@@ -4,6 +4,8 @@ import { Admin, AdminSchema } from "src/schemas/admin.schema";
 import { AdminController } from "./admin.controller";
 import { AdminService } from "./admin.service";
 import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema";
+import { JwtModule } from "@nestjs/jwt";
+import { jwtConstants } from "../auth/constants";
 
 @Module({
     imports: [
@@ -16,7 +18,12 @@ import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema
                 name: ResetPassword.name,
                 schema: ResetPasswordSchema
             }
-        ])
+        ]),
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '60s' },
+          }),
     ],
     controllers: [AdminController],
     providers: [AdminService]
