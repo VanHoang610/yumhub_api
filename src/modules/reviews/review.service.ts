@@ -10,6 +10,9 @@ import { Order } from 'src/schemas/order.schema';
 import { Review } from 'src/schemas/review.schema';
 import { TypeOfReview } from 'src/schemas/typeOfReview.shema';
 import { ImageReview } from 'src/schemas/imageReview.schema';
+import { Customer } from 'src/schemas/customer.schemas';
+import { Merchant } from 'src/schemas/merchant.schema';
+import { Shipper } from 'src/schemas/shipper.schema';
 
 
 
@@ -20,7 +23,11 @@ export class ReviewService {
     constructor(@InjectModel(Review.name) private reviewModel: Model<Review>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(TypeOfReview.name) private reviewType: Model<TypeOfReview>,
-        @InjectModel(ImageReview.name) private imageReivewModel: Model<ImageReview>,) { }
+        @InjectModel(ImageReview.name) private imageReivewModel: Model<ImageReview>,
+        @InjectModel(Customer.name) private customers: Model<Customer>,
+        @InjectModel(Shipper.name) private shippers: Model<Shipper>,
+        @InjectModel(Merchant.name) private merchants: Model<Merchant>,
+    ) { }
 
 
     async createReview(createReview: ReviewDto) {
@@ -159,34 +166,43 @@ export class ReviewService {
     async findUserId(reviewID: string) {
         const review = (await this.reviewModel.findById(reviewID));
         const order = (await this.reviewModel.findById(reviewID)).orderID;
+        var userID: Object;
         var user: Object;
         const reviewType = await this.reviewType.findById(review.typeOfReview).exec();
         var nameType = reviewType.name
         if (nameType == "shipperToCustomer") { // người bị review là customer
-            user = (await this.orderModel.findById(order)).customerID;
+            userID = (await this.orderModel.findById(order)).customerID;
+            user = await this.customers.findById(userID)
         } else if (nameType == "customerToMerchant") { // 2 là merchant
-            user = (await this.orderModel.findById(order)).merchantID;
+            userID = (await this.orderModel.findById(order)).merchantID;
+            user = await this.merchants.findById(userID)
         } else if (nameType == "customerToShipper") { // 3 là shipper
-            user = (await this.orderModel.findById(order)).shipperID;  
+            userID = (await this.orderModel.findById(order)).shipperID;
+            user = await this.shippers.findById(userID)  
         }
-        return user;
+        return {userID: userID, user: user}
     }
 
     //tìm id user review 
     async findUserIdReview(reviewID: string) {
         const review = (await this.reviewModel.findById(reviewID));
         const order = (await this.reviewModel.findById(reviewID)).orderID;
+        var userID: Object;
         var user: Object;
         const reviewType = await this.reviewType.findById(review.typeOfReview).exec();
         var nameType = reviewType.name
         if (nameType == "shipperToCustomer") { // người review là shipper
-            user = (await this.orderModel.findById(order)).shipperID;
+            userID = (await this.orderModel.findById(order)).shipperID;
+            user = await this.shippers.findById(userID) 
         } else if (nameType == "customerToMerchant") { // 2 là customer
-            user = (await this.orderModel.findById(order)).customerID;
+            userID = (await this.orderModel.findById(order)).customerID;
+            user = await this.customers.findById(userID) 
         } else if (nameType == "customerToShipper"){ // 3 là customertoshipper thì cũng là customer
-            user = (await this.orderModel.findById(order)).customerID;
+            userID = (await this.orderModel.findById(order)).customerID;
+            user = await this.customers.findById(userID) 
         }
-        return user;
+        
+        return {userID: userID, user: user}
     }
 
     async calculateAverageRating(userId: string) {
@@ -226,12 +242,14 @@ export class ReviewService {
             const history = [];
 
             for (const review of reviews) {
-                const userIdFromReview = (await this.findUserIdReview(review._id.toString())).toString(); // Lấy userId từ reviewId
-                const userIdReview = (await this.findUserId(review._id.toString())).toString();// lấy người mình review
+                
+                const userIdFromReview = (await this.findUserIdReview(review._id.toString())).userID.toString(); // Lấy userId từ reviewId
+                const userIdReview = (await this.findUserId(review._id.toString())).user;// lấy người mình review
                 if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
                     const images = await this.imageReivewModel.find().exec(); 
+                    var imageReviews=[];
                     for (const image of images) {
-                        var imageReviews=[];
+                        
                         if((image.reviewID).toString() === (review._id).toString()){
                             imageReviews.push(image.image)
                         }
@@ -254,12 +272,12 @@ export class ReviewService {
             const history = []; // Khởi tạo mảng lưu trữ các đánh giá
 
             for (const review of reviews) {
-                const userIdFromReview = (await this.findUserId(review._id.toString())).toString(); // Lấy userId từ reviewId
-                const userIdReview = (await this.findUserIdReview(review._id.toString())).toString();// lấy người review mình
+                const userIdFromReview = (await this.findUserId(review._id.toString())).userID.toString(); // Lấy userId từ reviewId
+                const userIdReview = (await this.findUserIdReview(review._id.toString())).user;// lấy người review mình
                 if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
                     const images = await this.imageReivewModel.find().exec();
+                    var imageReviews=[];
                     for (const image of images) {
-                        var imageReviews=[];
                         if((image.reviewID).toString() === (review._id).toString()){
                             imageReviews.push(image.image)
                         }

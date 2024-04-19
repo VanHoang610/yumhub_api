@@ -8,6 +8,9 @@ import { Order, OrderSchema } from 'src/schemas/order.schema';
 
 import { TypeOfReview, TypeOfReviewSchema } from 'src/schemas/typeOfReview.shema';
 import { ImageReview, ImageReviewSchema } from 'src/schemas/imageReview.schema';
+import { Customer, CustomerSchema } from 'src/schemas/customer.schemas';
+import { Shipper, ShipperSchema } from 'src/schemas/shipper.schema';
+import { Merchant, MerchantSchema } from 'src/schemas/merchant.schema';
 
 
 
@@ -30,6 +33,18 @@ import { ImageReview, ImageReviewSchema } from 'src/schemas/imageReview.schema';
             {
                 name: ImageReview.name,
                 schema: ImageReviewSchema,
+            },
+            {
+                name: Customer.name,
+                schema: CustomerSchema,
+            },
+            {
+                name: Shipper.name,
+                schema: ShipperSchema,
+            },
+            {
+                name: Merchant.name,
+                schema: MerchantSchema,
             }
         ])
     ],

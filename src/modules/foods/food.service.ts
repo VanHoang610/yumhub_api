@@ -53,16 +53,16 @@ export class FoodService {
                         }
                     }
                     break;
-                case 2:
-                    for (const status of Statuss) {
-                        if (status.name === "processingImage") {
-                            idStatus = status._id
-                            break
-                        }
-                    }
+                // case 2:
+                //     for (const status of Statuss) {
+                //         if (status.name === "processingImage") {
+                //             idStatus = status._id
+                //             break
+                //         }
+                //     }
 
-                    break;
-                case 3:
+                    // break;
+                case 2:
                     for (const status of Statuss) {
                         if (status.name === "onSale") {
                             idStatus = status._id
@@ -70,7 +70,7 @@ export class FoodService {
                         }
                     }
                     break;
-                case 4:
+                case 3:
                     for (const status of Statuss) {
                         if (status.name === "outOfStock") {
                             idStatus = status._id
@@ -78,7 +78,7 @@ export class FoodService {
                         }
                     }
                     break;
-                case 5:
+                case 4:
                     for (const status of Statuss) {
                         if (status.name === "deleted") {
                             idStatus = status._id
@@ -89,7 +89,7 @@ export class FoodService {
 
                 default:
 
-                    return "nhập 1-5";
+                    return "nhập 1-4";
 
             }
             const updatedOrder = await this.FoodModel.findOneAndUpdate(
@@ -119,39 +119,77 @@ export class FoodService {
             case 1:
                 
                 return {processingFood: await this.FoodModel.find({ status: "661f9962fc13ae6967a24534" }).exec()}
+            // case 2:
+            //     return {processingImage: await this.FoodModel.find({ status: "661f9962fc13ae6967a24535" }).exec()}
             case 2:
-                return {processingImage: await this.FoodModel.find({ status: "661f9962fc13ae6967a24535" }).exec()}
-            case 3:
                 return {onSale: await this.FoodModel.find({ status: "661fb317ee3a326f69b55386" }).exec()}
-            case 4:
+            case 3:
                 return {outOfStock: await this.FoodModel.find({ status: "661f9962fc13ae6967a24536" }).exec()}
-            case 5:
+            case 4:
                 return {deleted: await this.FoodModel.find({ status: "661f9962fc13ae6967a24537" }).exec()}
         }
     }
 
     async getFoodByMerchant(merchantid: string){
         try {
-            const Foods = await this.FoodModel.find({merchantID :merchantid});
+            const Foods = await this.FoodModel.find({merchantID :merchantid, status:"661fb317ee3a326f69b55386"});
+            const outOfStock = await this.FoodModel.find({merchantID :merchantid, status:"661f9962fc13ae6967a24536"});
             if (!Foods) return { Message: "Not found food" }
-            return { result: true, Foods: Foods }
+            return { result: true, onSale: Foods,  outOfStock:outOfStock}
         } catch (error) {
             return { result: false, Foods: error }
         }
     }
 
-    async updateImg(foodId:string, img: string){
+
+
+    // async updateImg(foodId:string, img: string){
         
-        try{
-            const Foods = await this.FoodModel.findByIdAndUpdate(
-                foodId, // Truyền foodId làm tham số đầu tiên
-                { image: img, status: "661f9962fc13ae6967a24535" }, // Object chứa các trường và giá trị cập nhật
-                { new: true } // Tùy chọn để trả về document sau khi cập nhật
-            );
-            if (!Foods) return { Message: "Not found food" };
-            return { result: true, Foods: Foods };
-        } catch (error) {
-            return { result: false, Foods: error };
-        }
+    //     try{
+    //         const Foods = await this.FoodModel.findByIdAndUpdate(
+    //             foodId, // Truyền foodId làm tham số đầu tiên
+    //             { image: img, status: "661f9962fc13ae6967a24535" }, // Object chứa các trường và giá trị cập nhật
+    //             { new: true } // Tùy chọn để trả về document sau khi cập nhật
+    //         );
+    //         if (!Foods) return { Message: "Not found food" };
+    //         return { result: true, Foods: Foods };
+    //     } catch (error) {
+    //         return { result: false, Foods: error };
+    //     }
+    // }
+
+    async searchFoodByName(any: string){
+        
+        return this.FoodModel.find({ nameFood: { $regex: any, $options: 'i' } }).exec();
     }
+    
+    async searchFoods(type: string, price: number, name: string) {
+        // Tạo một object để chứa các điều kiện lọc
+        const query: any = {status: '661fb317ee3a326f69b55386'};// status onSale
+      
+        // Thêm điều kiện lọc theo loại
+        if (type) {
+          // Đầu tiên, bạn cần lấy ID của loại từ bảng phụ hoặc danh sách loại cố định
+          const typeDocument = await this.TypeOfFoodModel.findOne({ name: type });
+            
+          // Nếu tìm thấy loại, thêm điều kiện lọc vào query
+          if (typeDocument) {
+            query.typeOfFood = typeDocument._id;
+          }
+        }
+      
+        // Thêm điều kiện lọc theo giá
+        if (price) {
+          query.price = { $lte: price }; // Tìm các món ăn có giá nhỏ hơn hoặc bằng price
+        }
+      
+
+        // Thêm điều kiện lọc theo tên món ăn
+        if (name) {
+          query.nameFood = { $regex: name, $options: 'i' }; // Tìm các món ăn có tên chứa name
+        }
+      
+        // Thực hiện truy vấn MongoDB với các điều kiện lọc
+        return this.FoodModel.find(query).exec();
+      }
 }

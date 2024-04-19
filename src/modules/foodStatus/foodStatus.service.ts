@@ -15,10 +15,6 @@ export class FoodStatusService {
                     "name": "processingFood"
                 },
                 {
-                    "_id": "661f9962fc13ae6967a24535",
-                    "name": "processingImage"
-                },
-                {
                     "_id": "661fb317ee3a326f69b55386",
                     "name": "onSale"
                 },

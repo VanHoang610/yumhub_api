@@ -581,6 +581,10 @@ export class MerchantService {
             return {result: false, error: error}
         }
     }
-
+    async searchMerchant(any: string){
+        
+        return this.merchants.find({ name: { $regex: any, $options: 'i' } }).exec();
+    }
+   
 }
 

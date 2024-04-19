@@ -218,4 +218,13 @@ export class MerchantController {
      transactionHistory(@Param('id') id: string) {
          return this.merchantService.transactionHistory(id);
      }
+     @Get("searchNameFood/:any")
+     searchFood(@Param("any") any: string){
+         try {
+             
+             return this.merchantService.searchMerchant(any);
+         } catch (error) {
+             return error
+         }
+     }
 }
