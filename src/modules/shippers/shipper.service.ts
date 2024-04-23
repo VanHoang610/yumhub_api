@@ -204,9 +204,7 @@ export class ShipperService {
             return { result: false, newLocation: error }
         }
     }
-    // getShipperById(id: string) {
-    //     return this.shipperModel.findById(id);
-    // }
+    
 
 
     async deleteShipper(id: string) {
@@ -355,24 +353,40 @@ export class ShipperService {
     }
     async revenueShipperTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
         try {
+            const start = new Date(dateStart).setHours(0, 0, 0, 0);;
+            const end = new Date(dateEnd).setHours(23, 59, 59, 999);;
             const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
+            const CancelID = await this.statusModel.findOne({ name: "cancel" });
             // Tính tổng doanh thu
             var totalRevenue = 0;
-
+            const shipper = await this.shipperModel.findById(id);
+            if (!shipper){
+                return {result:"nhập sai ID Shipper", revenue:0,  cancel:0}
+            }
             // Lấy tất cả các hóa đơn của merchant trong khoảng thời gian đã cho
             const orders = await this.orderModel.find({
                 shipperID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
-                timeBook: { $gte: dateStart, $lte: dateEnd },
+                timeBook: { $gte: start, $lte: end },
                 status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
             })
+            const orderCancel = await this.orderModel.find({
+                shipperID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
+                timeBook: { $gte: start, $lte: end },
+                status: CancelID?._id // Sử dụng CancelID?._id để tránh lỗi nếu không tìm thấy
+            })
+            
+            var numberOfOrders =0
             for (const order of orders) {
+                numberOfOrders+=1
                 totalRevenue += order.deliveryCost; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
-                console.log(totalRevenue)
             }
-
-            return { result: true, revenue: totalRevenue }
+            var numberOfOrderCancel =0
+            for (const order of orderCancel) {
+                numberOfOrderCancel+=1
+            }
+            return { result: true, revenue: totalRevenue, success: numberOfOrders ,cancel: numberOfOrderCancel }
         } catch (error) {
-            return { result: false, revenue: error }
+            return { result: false, revenue: error, cancel:error }
         }
 
     }
@@ -389,7 +403,7 @@ export class ShipperService {
             endOfWeek.setDate(endOfWeek.getDate() - currentDay + 7); // Set to Sunday of current week
             const endDate = endOfWeek.toString()
             const result = this.revenueShipperTimeTwoTime(ID, startDate, endDate);
-            return { result: true, revenue: (await result).revenue }
+            return { result: true, revenue: (await result).revenue, success:(await result).success, cancel:(await result).cancel}
         } catch (error) {
             return { result: false, revenue: error }
         }
@@ -406,7 +420,7 @@ export class ShipperService {
             const endDate = lastDateOfMonth.toString()
             console.log(startDate,endDate)
             const result = this.revenueShipperTimeTwoTime(ID, startDate, endDate);
-            return { result: true, revenue: (await result).revenue }
+            return { result: true, revenue: (await result).revenue, success:(await result).success, cancel:(await result).cancel }
         } catch (error) {
             return { result: false, revenue: error }
         }
