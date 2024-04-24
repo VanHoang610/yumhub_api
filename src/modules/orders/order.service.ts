@@ -330,7 +330,18 @@ export class OrderService {
         } catch (error) {
             return { result: false, revenue: error }
         }
+    }
 
-
+    async getOrderByShipperAndStatus( orderDto: OrderDto) {
+        try {
+            const shipperID = orderDto.shipperID;
+            const nameStatus = orderDto.nameStatus;
+            const statusOrder = await this.statusModel.findOne({name: nameStatus});
+            const status = statusOrder._id; 
+            const order = await this.orderModel.findOne({shipperID: shipperID, status: status});
+            return { result: true, order: order }
+        } catch (error) {
+            return { result: false, order: error }
+        }
     }
 }

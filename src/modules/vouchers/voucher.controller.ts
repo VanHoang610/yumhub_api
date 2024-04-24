@@ -1,8 +1,9 @@
 
-import { Controller, Post, Body, Get, HttpException, HttpStatus, Patch, Param, ValidationPipe } from '@nestjs/common'
+import { Controller, Post, Body, Get, HttpException, HttpStatus, Patch, Param, ValidationPipe, UseGuards } from '@nestjs/common'
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from 'src/dto/dto.createVoucher';
 import mongoose from 'mongoose';
+import { AuthGuard } from 'src/helper/auth.middleware';
 
 @Controller('vouchers')
 export class VoucherController {
@@ -21,6 +22,7 @@ export class VoucherController {
     }
     //tạo voucher
     @Post('createVoucher')
+    @UseGuards(AuthGuard)
     createVoucher(@Body() createVoucher: CreateVoucherDto) {
         try {
             const voucher = this.voucherService.createVoucher(createVoucher);
@@ -31,6 +33,7 @@ export class VoucherController {
     }
 
     @Get('allVoucher')
+    @UseGuards(AuthGuard)
     getAllVoucher(){
         try {
             const voucher = this.voucherService.getAllVoucher();
@@ -41,6 +44,7 @@ export class VoucherController {
         }
     }
     @Get('valid')
+    @UseGuards(AuthGuard)
     async getValidVoucher() {
       try {
         const vouchers = await this.voucherService.findValidVoucher();
@@ -53,6 +57,7 @@ export class VoucherController {
       }
     }
     @Patch('updateVoucher/:id')
+    @UseGuards(AuthGuard)
     async updateShipper(@Param('id') id: string, @Body(new ValidationPipe()) updateVoucher: CreateVoucherDto){
         const isValid = mongoose.Types.ObjectId.isValid(id);
         if(!isValid) throw new HttpException("Invalid ID", 40);

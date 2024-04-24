@@ -21,11 +21,14 @@ import { HistoryWalletMerchant } from 'src/schemas/historyWalletMerchant.schema'
 import { TransactionTypeMerchant } from 'src/schemas/transactionTypeMerchant.schema';
 import { ObjectId } from 'mongoose';
 import { type } from 'os';
+import { Food } from 'src/schemas/food.schema';
 
 @Injectable()
 export class MerchantService {
 
-    constructor(@InjectModel(Merchant.name) private merchants: Model<Merchant>,
+    constructor(
+        @InjectModel(Food.name) private foodModel: Model<Food>,
+        @InjectModel(Merchant.name) private merchants: Model<Merchant>,
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
@@ -584,6 +587,20 @@ export class MerchantService {
     async searchMerchant(any: string){
         
         return this.merchants.find({ name: { $regex: any, $options: 'i' } }).exec();
+    }
+
+    async getFoodByMerchant(id: string) {
+        try {
+            const merchant = await this.merchants.findById(id);
+            if (!merchant) throw new HttpException('Not Find Merchant', HttpStatus.NOT_FOUND);
+            const idMerchant = merchant._id;
+            const allFood = await this.foodModel.find({ merchantID: idMerchant, status: "661fb317ee3a326f69b55386" });
+            if (!allFood) throw new HttpException('Not Find Food', HttpStatus.NOT_FOUND);
+
+            return { result: true, allFood: allFood }
+        } catch (error) {
+            return { result: false, allFood: error }
+        }
     }
    
 }

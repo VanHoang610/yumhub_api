@@ -1,10 +1,11 @@
-import { Controller, Post, Body, ValidationPipe, Get, Param, Patch, HttpException, Delete } from "@nestjs/common";
+import { Controller, Post, Body, ValidationPipe, Get, Param, Patch, HttpException, Delete, UseGuards } from "@nestjs/common";
 import { CustomerDto } from "src/dto/dto.customer";
 import { CustomerServices } from "./customer.service";
 import mongoose from "mongoose";
 import { RegisterCustomerDto } from "src/dto/dto.registerCustomer";
 import { UpdateCustomerDto } from "src/dto/dto.updateCustomer";
 import { LoginDto } from "src/dto/dto.login";
+import { AuthGuard } from "src/helper/auth.middleware";
 
 
 
@@ -33,12 +34,14 @@ export class CustomerController {
 
     // lấy customer theo id
     @Get(':id')
+    @UseGuards(AuthGuard)
     getCustomerByID(@Param('id') id: string) {
         return this.customerService.getCustomerById(id);
     }
 
     // lấy tất cả customer
     @Get()
+    @UseGuards(AuthGuard)
     getCustomer() {
         return this.customerService.getCustmer();
     }
@@ -46,6 +49,7 @@ export class CustomerController {
 
     // lấy SDT 
     @Get('getPhoneNumber/:id')
+    @UseGuards(AuthGuard)
     getPhoneNumber(@Param('id') id: string) {
         return this.customerService.getPhoneNumber(id);
     }
@@ -53,18 +57,21 @@ export class CustomerController {
 
     // xóa customer
     @Post('deleteCustomer/:id')
+    @UseGuards(AuthGuard)
     deleteCustomer(@Param('id') id: string) {
         return this.customerService.deleteCustomer(id);
     }
 
     // sửa customer
     @Patch('updateCustomer/:id')
+    @UseGuards(AuthGuard)
     async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateCustomer: UpdateCustomerDto) {
         return await this.customerService.updateCustomer(id, updateCustomer);
     }
 
     // lấy dánh sách lịch sử theo id
     @Get('getHistoryCustomer/:id')
+    @UseGuards(AuthGuard)
     getHistoryById(@Param('id') id: string) {
         return this.customerService.getHistoryById(id);
     }
@@ -100,12 +107,11 @@ export class CustomerController {
 
     //đổi mật khẩu
     @Post('changePass/:id')
+    @UseGuards(AuthGuard)
     changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
         const { passOld, passNew } = body;
         return this.customerService.changePass(id, passOld, passNew);
     }
-
-
 }
 
 

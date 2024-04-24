@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
 import { LoginDto } from 'src/dto/dto.login';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
+import { AuthGuard } from 'src/helper/auth.middleware';
 
 
 @Controller('shippers')
@@ -14,12 +15,14 @@ export class ShipperController {
     constructor(private readonly shipperService: ShipperService) {}
 
     @Get('newUser')
+    @UseGuards(AuthGuard)
     newShipper() 
     {
         return this.shipperService.newShipperInMonth();
     }
     
     @Get('RevenueWeek')
+    @UseGuards(AuthGuard)
     getRevenueWeek(@Body() body: { ID: string }) {
         try {
             const { ID } = body
@@ -33,6 +36,7 @@ export class ShipperController {
         }
     }
     @Get('RevenueMonth')
+    @UseGuards(AuthGuard)
     getRevenueMonth(@Body() body: { ID: string, month: string }) {
         try {
             const { ID, month } = body
@@ -46,6 +50,7 @@ export class ShipperController {
         }
     }
     @Get('RevenueTTT')
+    @UseGuards(AuthGuard)
     getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
         try {
             const { ID, startDate, endDate } = body
@@ -81,6 +86,7 @@ export class ShipperController {
 
     //lấy tất cả shipper
     @Get('getAllShipper')
+    @UseGuards(AuthGuard)
     getAllShipper() {
         try {
             const shipper = this.shipperService.getAllShipper();
@@ -94,6 +100,7 @@ export class ShipperController {
 
     //lấy lịch sử shipper
     @Get('getHistoryOrder/:id')
+    @UseGuards(AuthGuard)
     getHistoryShipper(@Param('id') id: string) {
         try {
             const shipper = this.shipperService.getHistory(id);
@@ -106,6 +113,7 @@ export class ShipperController {
 
     // sửa location của shipper
     @Patch('updateLocation/:id')
+    @UseGuards(AuthGuard)
     updateLocation(@Param('id') id: string, @Body() body: { longitude: number, latitude: number }) {
         try {
             const { longitude, latitude } = body;
@@ -122,11 +130,13 @@ export class ShipperController {
     // }
 
     @Post('deleteShipper/:id')
+    @UseGuards(AuthGuard)
     deleteShipper(@Param('id') id: string) {
         return this.shipperService.deleteShipper(id);
     }
 
     @Patch('updateShipper/:id')
+    @UseGuards(AuthGuard)
     async updateShipper(@Param('id') id: string, @Body(new ValidationPipe()) updateShipper: ShipperDto) {
         return await this.shipperService.updateShipper(id, updateShipper);
     }
@@ -162,6 +172,7 @@ export class ShipperController {
 
     //đổi mật khẩu
     @Post('changePass/:id')
+    @UseGuards(AuthGuard)
     changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
         const { passOld, passNew } = body;
         return this.shipperService.changePass(id, passOld, passNew);
@@ -176,12 +187,14 @@ export class ShipperController {
 
     // danh sách shipper cần duyệt
     @Get('listShipperApproval')
+    @UseGuards(AuthGuard)
     listShipperApproval() {
         return this.shipperService.listShipperApproval();
     }
 
     // chi tiết tài khoản merchant
     @Get('getShipperById/:id')
+    @UseGuards(AuthGuard)
     getShipperById(@Param('id') id: string) {
         return this.shipperService.getShipperById(id);
     }
@@ -189,18 +202,21 @@ export class ShipperController {
 
     // nạp tiền shipper
     @Post('topUp/:id')
+    @UseGuards(AuthGuard)
     topUpShipper(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
         return this.shipperService.topUptopUpShipper(id, topUp);
     }
 
      // rút tiền shipper
      @Post('cashOut/:id')
+     @UseGuards(AuthGuard)
      cashOutMtopUpShipper(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
          return this.shipperService.cashOutShipper(id, topUp);
      }
 
      // lịch sử nạp/rút tiền shipper
      @Get('transactionHistory/:id')
+     @UseGuards(AuthGuard)
      transactionHistory(@Param('id') id: string) {
          return this.shipperService.transactionHistory(id);
      }

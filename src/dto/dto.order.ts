@@ -51,4 +51,6 @@ export class OrderDto {
     @IsString()
     imageGiveFood?: string
 
+    @IsString()
+    nameStatus?: string
 }

@@ -1,7 +1,9 @@
-import { Body, Controller, Post, Get, HttpException, HttpStatus, Param, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Post, Get, HttpException, HttpStatus, Param, ValidationPipe, UseGuards } from '@nestjs/common'
 import { OrderService } from './order.service';
 import { OrderDto } from 'src/dto/dto.order';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
+import { AuthGuard } from 'src/helper/auth.middleware';
+import { retry } from 'rxjs';
 
 @Controller('orders')
 export class OrderController {
@@ -16,29 +18,31 @@ export class OrderController {
 
     // tạo order
     @Post('createOrder')
+    @UseGuards(AuthGuard)
     async createOrder(@Body() orderDto: OrderDto) {
         return await this.orderServices.createOrder(orderDto);
     }
 
     @Post('statusOrder/:id/:status')
+    @UseGuards(AuthGuard)
     async setStatus(@Param('id') orderId: string, @Param('status') status: number) {
         return await this.orderServices.setStatus(orderId, status);
     }
 
-
-
     //lấy tất cả order
     @Get('getAllOrder')
+    @UseGuards(AuthGuard)
     getAllOrder() {
         try {
             return this.orderServices.getAllOrder();
         } catch (error) {
             return error
-        }   
+        }
     }
 
     //sắp xếp order tăng dần
     @Post('sortHistory/:id')
+    @UseGuards(AuthGuard)
     sortHistory(@Param('id') id: string, @Body() body: { who: number }) {
         const { who } = body;
         return this.orderServices.sortHistory(id, who);
@@ -46,6 +50,7 @@ export class OrderController {
 
     // lấy order theo id
     @Get('getOrderById/:id')
+    @UseGuards(AuthGuard)
     getOrderById(@Param('id') id: string) {
         try {
             return this.orderServices.getOrderById(id);
@@ -54,19 +59,21 @@ export class OrderController {
         }
     }
     @Get('RevenueYumhub')
-     getRevenueTime(@Body() body: { month:string }) {
-         try {
-            const {month} = body
-             const totalRevenue = this.orderServices.revenueMonth(month);
-             if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-             return totalRevenue;
-         } catch (error) {
-             return error
-         }
-     }
+    @UseGuards(AuthGuard)
+    getRevenueTime(@Body() body: { month: string }) {
+        try {
+            const { month } = body
+            const totalRevenue = this.orderServices.revenueMonth(month);
+            if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+            return totalRevenue;
+        } catch (error) {
+            return error
+        }
+    }
 
     // updateOrder
     @Post('updateOrder/:id')
+    @UseGuards(AuthGuard)
     updateOrder(@Param('id') id: string, @Body() update: UpdateOrderDto) {
         try {
             return this.orderServices.updateOrder(id, update);
@@ -75,5 +82,13 @@ export class OrderController {
         }
     }
 
-
+    //hiển thị đơn hàng cho shipper 
+    @Post('getOrderByShipperAndStatus')
+    getOrderByShipperAndStatus(@Body() orderDto: OrderDto) {
+        try {
+            return this.orderServices.getOrderByShipperAndStatus(orderDto)
+        } catch (error) {
+            return error
+        }
+    }
 }

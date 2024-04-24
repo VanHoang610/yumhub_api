@@ -10,6 +10,9 @@ import { ResetPassword, ResetPasswordSchema } from 'src/schemas/resetPass.schema
 import { OrderStatus, OrderStatusSchemas } from 'src/schemas/orderStatus.schema';
 import { HistoryWalletMerchant, HistoryWalletMerchantSchemas } from 'src/schemas/historyWalletMerchant.schema';
 import { TransactionTypeMerchant, TransactionTypeMerchantSchema } from 'src/schemas/transactionTypeMerchant.schema';
+import { Food, FoodSchema } from 'src/schemas/food.schema';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from '../auth/constants';
 
 @Module({
     imports: [
@@ -46,7 +49,16 @@ import { TransactionTypeMerchant, TransactionTypeMerchantSchema } from 'src/sche
             name: TransactionTypeMerchant.name,
             schema: TransactionTypeMerchantSchema,
            },
+           {
+            name: Food.name,
+            schema: FoodSchema,
+           },
         ]),
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '30d' },
+        })
     ],
     controllers: [MerchantController],
     providers: [MerchantService],

@@ -9,6 +9,8 @@ import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema
 import { OrderStatus, OrderStatusSchemas } from "src/schemas/orderStatus.schema";
 import { HistoryWalletShipper, HistoryWalletShipperSchemas } from "src/schemas/historyWalletShipper.schma";
 import { TransactionTypeShipper, TransactionTypeShipperSchema } from "src/schemas/transantionTypeShipper.schame";
+import { JwtModule } from "@nestjs/jwt";
+import { jwtConstants } from "../auth/constants";
 
 
 
@@ -43,6 +45,11 @@ import { TransactionTypeShipper, TransactionTypeShipperSchema } from "src/schema
                 schema: TransactionTypeShipperSchema,
             },
         ]),
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: '30d' },
+        })
     ],
     controllers: [ShipperController],
     providers: [ShipperService]

@@ -1,6 +1,7 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Query, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common'
 import { FoodService } from './food.service';
 import { FoodDto } from 'src/dto/dto.food';
+import { AuthGuard } from 'src/helper/auth.middleware';
 
 @Controller("food")
 export class FoodController {
@@ -12,6 +13,7 @@ export class FoodController {
     }
 
     @Post('Status')
+    @UseGuards(AuthGuard)
     setFood(@Body() body: { ID: string, status: number }) {
         try {
             const { ID, status } = body
@@ -26,6 +28,7 @@ export class FoodController {
     }
 
     @Get('getFoodByStatus')
+    @UseGuards(AuthGuard)
     getFoodByStatus(@Body() body: { status: number }) {
         try {
             const { status } = body
@@ -35,6 +38,7 @@ export class FoodController {
         }
     }
     @Get('getFoodById/:id')
+    @UseGuards(AuthGuard)
     getFoodById(@Param('id') id: string) {
         try {
             return this.foodService.getFoodById(id);
@@ -43,6 +47,7 @@ export class FoodController {
         }
     }
     @Get('getFoodByMerchant/:id')
+    @UseGuards(AuthGuard)
     getFoodByMerchant(@Param('id') id: string) {
         try {
             return this.foodService.getFoodByMerchant(id);
@@ -62,6 +67,7 @@ export class FoodController {
     // }
 
     @Get("searchNameFood/:any")
+    @UseGuards(AuthGuard)
     searchFood(@Param("any") any: string) {
         try {
 
@@ -71,6 +77,7 @@ export class FoodController {
         }
     }
     @Get('/search')
+    @UseGuards(AuthGuard)
     async searchFoods(
         @Body() body: {
             type: string,

@@ -73,7 +73,7 @@ export class AdminService {
     async forgetPassByEmail(email: string) {
         try {
             const user = await this.adminModel.findOne({ email: email });
-if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
+            if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
 
             const otp = Math.floor(1000 + Math.random() * 9000);
 
@@ -127,7 +127,7 @@ if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUN
             if (!existingUser) throw new HttpException("Not Find Account", HttpStatus.NOT_FOUND);
 
             const compare = await bcrypt.compare(passOld, existingUser.password);
-            if (!compare) throw new HttpException("Password Fail", HttpStatus.NOT_FOUND);
+            if (!compare) throw new HttpException("Password Fail", HttpStatus.UNAUTHORIZED);
 
             const hashPassNew = await bcrypt.hash(passNew, 10);
 

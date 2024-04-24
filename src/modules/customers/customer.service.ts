@@ -13,11 +13,13 @@ import { ResetPassword } from "src/schemas/resetPass.schema";
 import { Mailer } from "src/helper/mailer";
 import { UserMerchant } from "src/schemas/userMerchant.schema";
 import { Shipper } from "src/schemas/shipper.schema";
+import { JwtService } from "@nestjs/jwt";
 
 
 @Injectable()
 export class CustomerServices {
     constructor(
+        private jwtService: JwtService,
         @InjectModel(Customer.name) private customers: Model<Customer>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
@@ -187,10 +189,22 @@ export class CustomerServices {
             if (!checkAccount) {
                 checkAccount = await this.shipperModel.findOne({ phoneNumber: user.phoneNumber });
             }
+            if(!checkAccount) throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
-
-            return { result: true, data: checkAccount }
+            // Tạo token
+            const payload = {
+                phoneNumber: checkAccount.phoneNumber,
+                sex: checkAccount.sex,
+                email: checkAccount.email,
+                fullName: checkAccount.fullName,
+                avatar: checkAccount.avatar,
+                birthDay: checkAccount.birthDay,
+                joinDay: checkAccount.joinDay,
+            };
+            const token = await this.jwtService.signAsync(payload);
+            checkAccount.password = undefined;
+            return { result: true, data: { checkAccount, token } }
         } catch (error) {
             return { result: false, data: error }
         }
