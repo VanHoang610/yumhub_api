@@ -15,12 +15,15 @@ import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { HistoryWalletShipper } from 'src/schemas/historyWalletShipper.schma';
 import { TransactionTypeShipper } from 'src/schemas/transantionTypeShipper.schame';
+import { JwtService } from '@nestjs/jwt';
 
 
 
 @Injectable()
 export class ShipperService {
-    constructor(@InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
+    constructor(
+        private jwtService: JwtService,
+        @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
         @InjectModel(Order.name) private orderModel: Model<Order>, 
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
         @InjectModel(HistoryWalletShipper.name) private historyShipperModel: Model<HistoryWalletShipper>,
@@ -243,7 +246,23 @@ export class ShipperService {
             if (!checkAccount) throw new HttpException("Không đúng SDT", HttpStatus.NOT_FOUND);
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
-            return { result: true, data: checkAccount }
+
+            // Tạo token
+            const payload = {
+                phoneNumber: checkAccount.phoneNumber,
+                sex: checkAccount.sex,
+                email: checkAccount.email,
+                fullName: checkAccount.fullName,
+                avatar: checkAccount.avatar,
+                birthDay: checkAccount.birthDay,
+                joinDay: checkAccount.joinDay,
+                brandBike: checkAccount.brandBike,
+                modeCode: checkAccount.modeCode,
+                idBike: checkAccount.idBike,
+            };
+            const token = await this.jwtService.signAsync(payload);
+            checkAccount.password = undefined;
+            return { result: true, data: { checkAccount, token } }
         } catch (error) {
             return { result: false, data: error }
         }

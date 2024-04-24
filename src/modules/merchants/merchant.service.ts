@@ -22,11 +22,13 @@ import { TransactionTypeMerchant } from 'src/schemas/transactionTypeMerchant.sch
 import { ObjectId } from 'mongoose';
 import { type } from 'os';
 import { Food } from 'src/schemas/food.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class MerchantService {
 
     constructor(
+        private jwtService: JwtService,
         @InjectModel(Food.name) private foodModel: Model<Food>,
         @InjectModel(Merchant.name) private merchants: Model<Merchant>,
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
@@ -276,7 +278,20 @@ export class MerchantService {
             if (!checkStatus) throw new HttpException("Tài khoản chưa đăng ký", HttpStatus.NOT_FOUND);
             const compare = await bcrypt.compare(user.password, checkAccount.password);
             if (!compare) throw new HttpException("Không đúng mật khẩu", HttpStatus.NOT_FOUND);
-            return { result: true, data: checkAccount }
+
+            // Tạo token
+            const payload = {
+                phoneNumber: checkAccount.phoneNumber,
+                sex: checkAccount.sex,
+                email: checkAccount.email,
+                fullName: checkAccount.fullName,
+                avatar: checkAccount.avatar,
+                merchantID: checkAccount.merchantID,
+                role: checkAccount.role,
+            };
+            const token = await this.jwtService.signAsync(payload);
+            checkAccount.password = undefined;
+            return { result: true, data: { checkAccount, token } }
         } catch (error) {
             return { result: false, data: error }
         }
