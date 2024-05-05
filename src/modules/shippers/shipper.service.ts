@@ -412,7 +412,10 @@ export class ShipperService {
     async getRevenueWeek(ID: string) {
         try {
             const currentDate = new Date();
-            const currentDay = currentDate.getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+            var currentDay = currentDate.getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+            if (currentDay==0){
+                currentDay=7
+            }
             const startOfWeek = new Date(currentDate);
             startOfWeek.setHours(0, 0, 0, 0); // Set to 00:00:00.000
             startOfWeek.setDate(startOfWeek.getDate() - currentDay + 1); // Set to Monday of current week

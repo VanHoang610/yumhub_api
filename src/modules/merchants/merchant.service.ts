@@ -416,31 +416,53 @@ export class MerchantService {
 
     async revenueMerchantTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
         try {
+            
+            const start = new Date(dateStart).setHours(0, 0, 0, 0);;
+            const end = new Date(dateEnd).setHours(23, 59, 59, 999);;
             const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
-            // Tính tổng doanh thu
-            var totalRevenue = 0;
+            const CancelID = await this.statusModel.findOne({ name: "cancel" });
 
-            // Lấy tất cả các hóa đơn của merchant trong khoảng thời gian đã cho
+            var totalRevenue = 0;
+            const merchant = await this.merchants.findById(id);
+            if (!merchant){
+                return {result:"nhập sai ID Merchant", revenue:0,  cancel:0}
+            }
+
+            // Lấy tất cả các hóa đơn của merchant thành công trong khoảng thời gian đã cho
             const orders = await this.orderModel.find({
                 merchantID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
                 timeBook: { $gte: dateStart, $lte: dateEnd },
                 status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
             })
+            // Lấy tất cả các hóa đơn của merchant huỷ trong khoảng thời gian đã cho
+            const orderCancel = await this.orderModel.find({
+                merchantID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
+                timeBook: { $gte: start, $lte: end },
+                status: CancelID?._id // Sử dụng CancelID?._id để tránh lỗi nếu không tìm thấy
+            })
+            var numberOfOrders=0;
             for (const order of orders) {
+                numberOfOrders+=1
                 totalRevenue += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
-                console.log(totalRevenue)
+            }
+            var numberOfOrderCancel =0
+            for (const order of orderCancel) {
+                numberOfOrderCancel+=1
             }
 
-            return { result: true, revenue: totalRevenue }
+            return { result: true, revenue: totalRevenue, success: numberOfOrders ,cancel: numberOfOrderCancel }
         } catch (error) {
-            return { result: false, revenue: error }
+            return { result: false, revenue: error, cancel:error }
         }
 
     }
     async getRevenueWeek(ID: string) {
         try {
             const currentDate = new Date();
-            const currentDay = currentDate.getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+            var currentDay = currentDate.getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+            if (currentDay==0){
+                currentDay=7
+            }
             const startOfWeek = new Date(currentDate);
             startOfWeek.setHours(0, 0, 0, 0); // Set to 00:00:00.000
             startOfWeek.setDate(startOfWeek.getDate() - currentDay + 1); // Set to Monday of current week
@@ -450,7 +472,7 @@ export class MerchantService {
             endOfWeek.setDate(endOfWeek.getDate() - currentDay + 7); // Set to Sunday of current week
             const endDate = endOfWeek.toString()
             const result = this.revenueMerchantTimeTwoTime(ID, startDate, endDate);
-            return { result: true, revenue: (await result).revenue }
+            return { result: true, revenue: (await result).revenue, success:(await result).success, cancel:(await result).cancel}
         } catch (error) {
             return { result: false, revenue: error }
         }
@@ -466,7 +488,7 @@ export class MerchantService {
             const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
             const endDate = lastDateOfMonth.toString()
             const result = this.revenueMerchantTimeTwoTime(ID, startDate, endDate);
-            return { result: true, revenue: (await result).revenue }
+            return { result: true, revenue: (await result).revenue, success:(await result).success, cancel:(await result).cancel }
         } catch (error) {
             return { result: false, revenue: error }
         }

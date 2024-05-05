@@ -21,7 +21,7 @@ export class ShipperController {
         return this.shipperService.newShipperInMonth();
     }
     
-    @Get('RevenueWeek')
+    @Post('RevenueWeek')
     @UseGuards(AuthGuard)
     getRevenueWeek(@Body() body: { ID: string }) {
         try {
@@ -35,7 +35,7 @@ export class ShipperController {
             return error;
         }
     }
-    @Get('RevenueMonth')
+    @Post('RevenueMonth')
     @UseGuards(AuthGuard)
     getRevenueMonth(@Body() body: { ID: string, month: string }) {
         try {
@@ -49,7 +49,7 @@ export class ShipperController {
             return error;
         }
     }
-    @Get('RevenueTTT')
+    @Post('RevenueTTT')
     @UseGuards(AuthGuard)
     getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
         try {
