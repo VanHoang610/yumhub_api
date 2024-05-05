@@ -10,6 +10,9 @@ import { Shipper } from 'src/schemas/shipper.schema';
 import { Voucher } from 'src/schemas/voucher.schema';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
+import { Review } from 'src/schemas/review.schema';
+import { ImageReview } from 'src/schemas/imageReview.schema';
+
 
 
 
@@ -22,7 +25,8 @@ export class OrderService {
         @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
         @InjectModel(Voucher.name) private voucherModel: Model<Voucher>,
         @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
-
+        @InjectModel(Review.name) private reviewModel: Model<Review>,
+        @InjectModel(ImageReview.name) private ImgReviewModel: Model<ImageReview>,
     ) { };
 
     async addData() {
@@ -342,6 +346,27 @@ export class OrderService {
             return { result: true, order: order }
         } catch (error) {
             return { result: false, order: error }
+        }
+    }
+
+    async shipperReview(id: string) {
+        try {
+            const shippers = await this.orderModel.find({ shipperID: id }).exec();
+            const history = [];
+    
+            await Promise.all(shippers.map(async (shipper) => {
+                const review = await this.reviewModel.findOne({ orderID: shipper._id, typeOfReview: "6604e5a181084710d45efe9d" });
+                if (review) {
+                    const customer = await this.customerModel.findById(shipper.customerID);
+                    const allImg = (await this.ImgReviewModel.find({ reviewID: review._id })).map(img => img.image);
+                    history.push({ user: customer, review: review, image: allImg });
+                }
+            }));
+    
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
         }
     }
 }

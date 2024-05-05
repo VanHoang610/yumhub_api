@@ -9,6 +9,8 @@ import { Shipper, ShipperSchema } from 'src/schemas/shipper.schema';
 import { Voucher, VoucherSchema } from 'src/schemas/voucher.schema';
 import { OrderStatus, OrderStatusSchemas } from 'src/schemas/orderStatus.schema';
 import { DetailOrder, DetailOrderSchema } from 'src/schemas/detailOrder.schema';
+import { Review, ReviewSchema } from 'src/schemas/review.schema';
+import { ImageReview, ImageReviewSchema } from 'src/schemas/imageReview.schema';
 
 @Module({
     imports:[
@@ -36,6 +38,14 @@ import { DetailOrder, DetailOrderSchema } from 'src/schemas/detailOrder.schema';
             {
                 name: OrderStatus.name,
                 schema: OrderStatusSchemas
+            },
+            {
+                name: Review.name,
+                schema: ReviewSchema
+            },
+            {
+                name: ImageReview.name,
+                schema: ImageReviewSchema
             }
         ])
     ],

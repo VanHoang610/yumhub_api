@@ -84,9 +84,9 @@ export class MerchantController {
         }
     }
 
-    @Get(':id')
+    @Get()
     @UseGuards(AuthGuard)
-    getMerchantByID(@Param('id') id: string) {
+    getMerchantByID(@Query('id') id: string) {
         return this.merchantService.getMerchantById(id);
     }
 
@@ -99,16 +99,16 @@ export class MerchantController {
         return this.merchantService.getMerchant();
     }
 
-    @Post('deleteMerchant/:id')
+    @Post('deleteMerchant')
     @UseGuards(AuthGuard)
-    deleteCustomer(@Param('id') id: string) {
+    deleteCustomer(@Query('id') id: string) {
         return this.merchantService.deleteMerchant(id);
     }
 
     //lấy lịch sử merchant
-    @Get('getHistoryOrder/:id')
+    @Get('getHistoryOrder')
     @UseGuards(AuthGuard)
-    getHistoryShipper(@Param('id') id: string) {
+    getHistoryShipper(@Query('id') id: string) {
         try {
             const merchant = this.merchantService.getHistory(id);
             if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -119,9 +119,9 @@ export class MerchantController {
     }
 
     //lấy 5 shipper gần cửa hàng nhất
-    @Get('get5NearestShippers/:id')
+    @Get('get5NearestShippers')
     @UseGuards(AuthGuard)
-    get5NearestShippers(@Param('id') id: string) {
+    get5NearestShippers(@Query('id') id: string) {
         try {
             const merchant = this.merchantService.get5NearestShippers(id);
             if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -160,17 +160,17 @@ export class MerchantController {
     }
 
     //cập nhật mật khẩu
-    @Post('resetPass/:id')
-    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
+    @Post('resetPass')
+    resetPass(@Query('id') id: string, @Body() body: { password: string }) {
         const { password } = body;
         return this.merchantService.resetPass(id, password);
     }
 
 
     //đổi mật khẩu
-    @Post('changePass/:id')
+    @Post('changePass')
     @UseGuards(AuthGuard)
-    changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+    changePassword(@Query('id') id: string, @Body() body: { passOld: string, passNew: string }) {
         const { passOld, passNew } = body;
         return this.merchantService.changePass(id, passOld, passNew);
     }
@@ -190,16 +190,16 @@ export class MerchantController {
 
 
     // sửa tài khoản userMerchant
-    @Patch('updateUserMerchant/:id')
+    @Patch('updateUserMerchant')
     @UseGuards(AuthGuard)
-    updateUserMerchant(@Param('id') id: string, @Body() update: UpdateUserMerchantDto) {
+    updateUserMerchant(@Query('id') id: string, @Body() update: UpdateUserMerchantDto) {
         return this.merchantService.updateUserMerchant(id, update);
     }
 
     // xóa tài khoản userMerchant
     @Post('deleteUserMerchant/:id')
     @UseGuards(AuthGuard)
-    deleteUserMerchant(@Param('id') id: string) {
+    deleteUserMerchant(@Query('id') id: string) {
         return this.merchantService.deleteUserMerchant(id)
     }
 
@@ -212,9 +212,9 @@ export class MerchantController {
     }
 
     // chi tiết tài khoản merchant
-    @Get('getMerchantById/:id')
+    @Get('getMerchantById')
     @UseGuards(AuthGuard)
-    getMerchantById(@Param('id') id: string) {
+    getMerchantById(@Query('id') id: string) {
         return this.merchantService.getMerchantById(id);
     }
 
