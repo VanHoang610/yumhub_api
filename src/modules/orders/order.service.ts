@@ -12,8 +12,7 @@ import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 import { Review } from 'src/schemas/review.schema';
 import { ImageReview } from 'src/schemas/imageReview.schema';
-
-
+const { ObjectId } = require('mongodb');
 
 
 @Injectable()
@@ -353,9 +352,9 @@ export class OrderService {
         try {
             const shippers = await this.orderModel.find({ shipperID: id }).exec();
             var history = [];
-
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9d");
             await Promise.all(shippers.map(async (shipper) => {
-                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: "6604e5a181084710d45efe9d" });
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId });
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
                     var imageReviews=[];
@@ -379,9 +378,9 @@ export class OrderService {
         try {
             const shippers = await this.orderModel.find({ shipperID: id }).exec();
             var history = [];
-
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");
             await Promise.all(shippers.map(async (shipper) => {
-                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: "6604e5a181084710d45efe9e" }).exec();       
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId }).exec();       
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
                     var imageReviews=[];
@@ -396,6 +395,103 @@ export class OrderService {
             }));
 
             return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
+    }
+    async merchantBeReview(id: string) {
+        try {
+            const merchants = await this.orderModel.find({ merchantID: id }).exec();
+            var history = [];
+            
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9c");
+            await Promise.all(merchants.map(async (merchant) => {
+                const reviews = await this.reviewModel.find({ orderID: merchant._id, typeOfReview: typeOfReviewObjectId });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews=[];
+                    for (const image of images) {
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
+                    const customer = await this.customerModel.findById(merchant.customerID);
+                    history.push({ user: customer, review: review, image: imageReviews });
+                }
+            }));
+
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
+    }
+    async customerBeReview(id: string) {
+        try {
+            const customers = await this.orderModel.find({ customerID: id }).exec();
+            var history = [];
+            
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");
+            await Promise.all(customers.map(async (customer) => {
+                const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews=[];
+                    for (const image of images) {
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
+                    const shipper = await this.shipperModel.findById(customer.shipperID);
+                    history.push({ user: shipper, review: review, image: imageReviews });
+                }
+            }));
+
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
+    }
+    async customerReview(id: string) {
+        try {
+            const customers = await this.orderModel.find({ customerID: id }).exec();
+            var historyToShipper = [];
+            
+            const typeOfReviewObjectId1 = new ObjectId("6604e5a181084710d45efe9d");
+            await Promise.all(customers.map(async (customer) => {
+                const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId1 });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews=[];
+                    for (const image of images) {
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
+                    const shipper = await this.shipperModel.findById(customer.shipperID);
+                    historyToShipper.push({ user: shipper, review: review, image: imageReviews });
+                }
+            }));
+
+            var historyToMerchant = [];
+            const typeOfReviewObjectId2 = new ObjectId("6604e5a181084710d45efe9c");
+            await Promise.all(customers.map(async (customer) => {
+                const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId2 });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews=[];
+                    for (const image of images) {
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
+                    const merchant = await this.merchantModel.findById(customer.merchantID);
+                    historyToMerchant.push({ user: merchant, review: review, image: imageReviews });
+                }
+            }));
+            return { result: true, historyToShipper: historyToShipper, historyToMerchant:historyToMerchant};
         } catch (error) {
             console.error(error);
             return { result: false, error: error.message };

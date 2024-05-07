@@ -112,4 +112,32 @@ export class OrderController {
             return error
         }
     }
+
+    @Get('historyMerchantIsReview')
+    @UseGuards(AuthGuard)
+    historyMerchantIsReviewed(@Query('id') id: string) {
+        try {
+            return this.orderServices.merchantBeReview(id);
+        } catch (error) {
+            return error
+        }
+    }
+    @Get('historyCustomerIsReview')
+    @UseGuards(AuthGuard)
+    historyCustomerIsReview(@Query('id') id: string) {
+        try {
+            return this.orderServices.customerBeReview(id);
+        } catch (error) {
+            return error
+        }
+    }
+    @Get('historyCustomerReview')
+    @UseGuards(AuthGuard)
+    historyCustomerReview(@Query('id') id: string) {
+        try {
+            return this.orderServices.customerReview(id);
+        } catch (error) {
+            return error
+        }
+    }
 }
