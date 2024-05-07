@@ -93,9 +93,19 @@ export class OrderController {
             return error
         }
     }
-    @Get('historyReviewShipper/:id')
+    @Get('historyShipperIsReview')
     @UseGuards(AuthGuard)
-    historyReviewShipper(@Param('id') id: string) {
+    historyShipperIsReviewed(@Query('id') id: string) {
+        try {
+            return this.orderServices.shipperBeReview(id);
+        } catch (error) {
+            return error
+        }
+    }
+
+    @Get('historyShipperReview')
+    @UseGuards(AuthGuard)
+    historyShipperReview(@Query('id') id: string) {
         try {
             return this.orderServices.shipperReview(id);
         } catch (error) {

@@ -336,33 +336,65 @@ export class OrderService {
         }
     }
 
-    async getOrderByShipperAndStatus( orderDto: OrderDto) {
+    async getOrderByShipperAndStatus(orderDto: OrderDto) {
         try {
             const shipperID = orderDto.shipperID;
             const nameStatus = orderDto.nameStatus;
-            const statusOrder = await this.statusModel.findOne({name: nameStatus});
-            const status = statusOrder._id; 
-            const order = await this.orderModel.findOne({shipperID: shipperID, status: status});
+            const statusOrder = await this.statusModel.findOne({ name: nameStatus });
+            const status = statusOrder._id;
+            const order = await this.orderModel.findOne({ shipperID: shipperID, status: status });
             return { result: true, order: order }
         } catch (error) {
             return { result: false, order: error }
         }
     }
 
+    async shipperBeReview(id: string) {
+        try {
+            const shippers = await this.orderModel.find({ shipperID: id }).exec();
+            var history = [];
+
+            await Promise.all(shippers.map(async (shipper) => {
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: "6604e5a181084710d45efe9d" });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews=[];
+                    for (const image of images) {
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
+                    const customer = await this.customerModel.findById(shipper.customerID);
+                    history.push({ user: customer, review: review, image: imageReviews });
+                }
+            }));
+
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
+    }
     async shipperReview(id: string) {
         try {
             const shippers = await this.orderModel.find({ shipperID: id }).exec();
-            const history = [];
-    
+            var history = [];
+
             await Promise.all(shippers.map(async (shipper) => {
-                const review = await this.reviewModel.findOne({ orderID: shipper._id, typeOfReview: "6604e5a181084710d45efe9d" });
-                if (review) {
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: "6604e5a181084710d45efe9e" }).exec();       
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews=[];
+                    for (const image of images) {
+                        if((image.reviewID).toString() === (review._id).toString()){
+                            imageReviews.push(image.image)
+                        }
+                    } 
                     const customer = await this.customerModel.findById(shipper.customerID);
-                    const allImg = (await this.ImgReviewModel.find({ reviewID: review._id })).map(img => img.image);
-                    history.push({ user: customer, review: review, image: allImg });
+                    history.push({ user: customer, review: review, image: imageReviews });
                 }
             }));
-    
+
             return { result: true, history: history };
         } catch (error) {
             console.error(error);
