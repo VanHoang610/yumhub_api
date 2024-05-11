@@ -234,61 +234,8 @@ export class ReviewService {
 
     }
 
-
-    // lấy ra lịch sử tất cả các đánh giá mình đánh giá
-    async getAllHistoryReview(UserId: string) {
-        try {
-            const reviews = await this.reviewModel.find().exec(); 
-            const history = [];
-
-            for (const review of reviews) {
-                
-                const userIdFromReview = (await this.findUserIdReview(review._id.toString())).userID.toString(); // Lấy userId từ reviewId
-                const userIdReview = (await this.findUserId(review._id.toString())).user;// lấy người mình review
-                if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
-                    const images = await this.imageReivewModel.find().exec(); 
-                    var imageReviews=[];
-                    for (const image of images) {
-                        
-                        if((image.reviewID).toString() === (review._id).toString()){
-                            imageReviews.push(image.image)
-                        }
-                    }
-                    history.push({userID:userIdReview, review: review, image: imageReviews});
-                }
-            }   
-            return { result: true, history: history }; // Trả về mảng lịch sử đánh giá
-
-
-        } catch (error) { return { result: false, history: error } }
-
-    }
-
-
-    // lấy ra tất cả lịch sử những đánh giá mình
-    async getAllHistoryBeReview(UserId: string) {
-        try {
-            const reviews = await this.reviewModel.find().exec(); // Lấy tất cả các review
-            const history = []; // Khởi tạo mảng lưu trữ các đánh giá
-
-            for (const review of reviews) {
-                const userIdFromReview = (await this.findUserId(review._id.toString())).userID.toString(); // Lấy userId từ reviewId
-                const userIdReview = (await this.findUserIdReview(review._id.toString())).user;// lấy người review mình
-                if (userIdFromReview === UserId) { // So sánh userId từ review với UserId
-                    const images = await this.imageReivewModel.find().exec();
-                    var imageReviews=[];
-                    for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
-                            imageReviews.push(image.image)
-                        }
-                    } 
-                    history.push({userID:userIdReview, review: review, image: imageReviews}); // Nếu trùng khớp, thêm review vào mảng history
-                }
-            }
-            return { result: true, history: history }; // Trả về mảng lịch sử đánh giá
-        } catch (error) {
-            return { result: false, history: error }
-        }
+    async DeleteReview(id: string){
+        return this.reviewModel.findByIdAndDelete(id)
     }
 
 }

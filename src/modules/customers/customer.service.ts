@@ -14,7 +14,8 @@ import { Mailer } from "src/helper/mailer";
 import { UserMerchant } from "src/schemas/userMerchant.schema";
 import { Shipper } from "src/schemas/shipper.schema";
 import { JwtService } from "@nestjs/jwt";
-
+import { Review } from "src/schemas/review.schema";
+const { ObjectId } = require('mongodb');
 
 @Injectable()
 export class CustomerServices {
@@ -24,7 +25,8 @@ export class CustomerServices {
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
         @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
-        @InjectModel(ResetPassword.name) private resetPassModel: Model<ResetPassword>) { }
+        @InjectModel(ResetPassword.name) private resetPassModel: Model<ResetPassword>,
+        @InjectModel(Review.name) private reviewModel: Model<Review>,) { }
 
 
     async addData() {
@@ -301,6 +303,26 @@ export class CustomerServices {
         }catch(error){
             return {result: false, error: error}
         }
+    }
+    async getRating(id : string){
+        const orders = await this.orderModel.find({customerID:id}).exec()
+        
+        if (!orders){
+            return {result: true, rating:0}
+        }
+        const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");// shipper review customer
+        var numberOfReview =0
+        var totalPointReview =0
+        for (const order of orders){
+            const reviews =  await this.reviewModel.find({orderID:order._id, typeOfReview:typeOfReviewObjectId})
+            
+            for (const review of reviews){
+                totalPointReview+=review.rating
+                numberOfReview+=1
+            }
+        }
+        const rating = numberOfReview>0? totalPointReview/numberOfReview: 0
+        return {result: true, rating:rating}
     }
 }
 

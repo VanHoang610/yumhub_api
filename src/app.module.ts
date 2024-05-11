@@ -26,8 +26,6 @@ import { TransactionTypeShipperModule } from './modules/transactionTypeShipper/t
 import { TypeOfMerchantModule } from './modules/typeOfMerchant/typeOfMerchant.module';
 import { TypeOfReviewModule } from './modules/typeOfReview/typeOfReview.module';
 import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.module';
-import { TypeOfFood } from './schemas/typeOfFood.schema';
-import { FoodStatus } from './schemas/foodStatus.schema';
 import { foodStatusModule } from './modules/foodStatus/foodStatus.module';
 import { TypeOfFoodModule } from './modules/typeOfFood/typeOfFood.module';
 

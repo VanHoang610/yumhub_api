@@ -16,7 +16,8 @@ import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { HistoryWalletShipper } from 'src/schemas/historyWalletShipper.schma';
 import { TransactionTypeShipper } from 'src/schemas/transantionTypeShipper.schame';
 import { JwtService } from '@nestjs/jwt';
-
+import { Review } from 'src/schemas/review.schema';
+const { ObjectId } = require('mongodb');
 
 
 @Injectable()
@@ -28,7 +29,8 @@ export class ShipperService {
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
         @InjectModel(HistoryWalletShipper.name) private historyShipperModel: Model<HistoryWalletShipper>,
         @InjectModel(TransactionTypeShipper.name) private typeShipperModel: Model<TransactionTypeShipper>,
-        @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>) { }
+        @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
+        @InjectModel(Review.name) private reviewModel: Model<Review>,) { }
 
     async addData() {
         try {
@@ -553,5 +555,23 @@ export class ShipperService {
             return {result: false, error: error}
 
         }
+    }
+    async getRating(id : string){
+        const orders = await this.orderModel.find({shipperID:id}).exec()
+        if (!orders){
+            return {result: true, rating:0}
+        }
+        const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9d");// customer review shipper
+        var numberOfReview =0
+        var totalPointReview =0
+        for (const order of orders){
+            const reviews = await this.reviewModel.find({orderID:order._id, typeOfReview:typeOfReviewObjectId})
+            for (const review of reviews){
+                totalPointReview+=review.rating
+                numberOfReview+=1
+            }
+        }
+        const rating = numberOfReview>0? totalPointReview/numberOfReview: 0
+        return {result: true, rating:rating}
     }
 }

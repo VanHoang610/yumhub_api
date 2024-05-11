@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ShipperService } from './shipper.service';
 import { ShipperDto } from 'src/dto/dto.shipper';
 import mongoose from "mongoose";
@@ -219,5 +219,10 @@ export class ShipperController {
      @UseGuards(AuthGuard)
      transactionHistory(@Param('id') id: string) {
          return this.shipperService.transactionHistory(id);
+     }
+     @Get('rating')
+     @UseGuards(AuthGuard)
+     rating(@Query('id') id: string) {
+         return this.shipperService.getRating(id);
      }
 }

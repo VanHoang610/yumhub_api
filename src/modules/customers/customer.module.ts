@@ -9,6 +9,7 @@ import { UserMerchant, UserMerchantSchema } from "src/schemas/userMerchant.schem
 import { Shipper, ShipperSchema } from "src/schemas/shipper.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "../auth/constants";
+import { Review, ReviewSchema } from "src/schemas/review.schema";
 
 
 @Module({
@@ -33,6 +34,10 @@ import { jwtConstants } from "../auth/constants";
             {
                 name: Shipper.name,
                 schema: ShipperSchema
+            },
+            {
+                name: Review.name,
+                schema: ReviewSchema
             }
         ]),
         JwtModule.register({

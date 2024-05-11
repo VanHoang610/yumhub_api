@@ -11,6 +11,7 @@ import { HistoryWalletShipper, HistoryWalletShipperSchemas } from "src/schemas/h
 import { TransactionTypeShipper, TransactionTypeShipperSchema } from "src/schemas/transantionTypeShipper.schame";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "../auth/constants";
+import { Review, ReviewSchema } from "src/schemas/review.schema";
 
 
 
@@ -43,6 +44,10 @@ import { jwtConstants } from "../auth/constants";
             {
                 name: TransactionTypeShipper.name,
                 schema: TransactionTypeShipperSchema,
+            },
+            {
+                name: Review.name,
+                schema: ReviewSchema,
             },
         ]),
         JwtModule.register({

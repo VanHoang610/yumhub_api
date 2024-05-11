@@ -246,4 +246,9 @@ export class MerchantController {
     getFoodByMerchant(@Param('id') id: string) {
         return this.merchantService.getFoodByMerchant(id)
     }
+    @Get('rating')
+     @UseGuards(AuthGuard)
+     rating(@Query('id') id: string) {
+         return this.merchantService.getRating(id);
+     }
 }

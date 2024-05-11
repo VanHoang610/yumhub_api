@@ -20,7 +20,7 @@ export class Customer {
     joinDay?: Date
 
     @Prop({required: false})
-    rating?: string
+    rating?: number
 
     @Prop({required: true})
     phoneNumber: string

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, ValidationPipe, Get, Param, Patch, HttpException, Delete, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, ValidationPipe, Get, Param, Patch, HttpException, Delete, UseGuards, Query } from "@nestjs/common";
 import { CustomerDto } from "src/dto/dto.customer";
 import { CustomerServices } from "./customer.service";
 import mongoose from "mongoose";
@@ -14,6 +14,14 @@ export class CustomerController {
 
     constructor(private readonly customerService: CustomerServices) { }
 
+    // lấy rating
+    @Get('rating')
+     @UseGuards(AuthGuard)
+     rating(@Query('id') id: string) {
+        console.log("1");
+        
+         return this.customerService.getRating(id);
+     }
     //addData
     @Get('addData')
     addData() {
@@ -61,7 +69,7 @@ export class CustomerController {
     deleteCustomer(@Param('id') id: string) {
         return this.customerService.deleteCustomer(id);
     }
-
+    
     // sửa customer
     @Patch('updateCustomer/:id')
     @UseGuards(AuthGuard)
@@ -98,20 +106,21 @@ export class CustomerController {
     }
 
     //cập nhật mật khẩu
-    @Post('resetPass/:id')
-    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
+    @Post('resetPass')
+    resetPass(@Query('id') id: string, @Body() body: { password: string }) {
         const { password } = body;
         return this.customerService.resetPass(id, password);
     }
 
 
     //đổi mật khẩu
-    @Post('changePass/:id')
+    @Post('changePass')
     @UseGuards(AuthGuard)
-    changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+    changePassword(@Query('id') id: string, @Body() body: { passOld: string, passNew: string }) {
         const { passOld, passNew } = body;
         return this.customerService.changePass(id, passOld, passNew);
     }
+    
 }
 
 

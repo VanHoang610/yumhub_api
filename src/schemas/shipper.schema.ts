@@ -13,7 +13,7 @@ export class Shipper {
     joinDay?: Date
 
     @Prop({required: false})
-    rating?: string
+    rating?: number
 
     @Prop({required: false})
     sex?: string

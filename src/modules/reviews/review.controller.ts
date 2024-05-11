@@ -1,5 +1,5 @@
 
-import { Controller, Post, Body, Get, Param, Patch, NotFoundException, UseGuards } from '@nestjs/common'
+import { Controller, Post, Body, Get, Param, Patch, NotFoundException, UseGuards, Delete, Query } from '@nestjs/common'
 import { ReviewService } from './review.service';
 import { ReviewDto } from 'src/dto/dto.review';
 import { RegisterReviewDto } from 'src/dto/dto.registerReview';
@@ -43,12 +43,22 @@ export class ReviewController {
             console.error(error)
         }
     }
-
+    
+    @Delete('delete')
+    @UseGuards(AuthGuard)
+    deleteReview(@Query('id') id: string) {
+        try {
+            this.reviewService.DeleteReview(id);
+            return "đã xoá thành công";
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     // sửa review
-    @Patch('updateReview/:id')
+    @Patch('updateReview')
     @UseGuards(AuthGuard)
-    updateReview(@Param('id') id: string, @Body() updateReview: ReviewDto) {
+    updateReview(@Query('id') id: string, @Body() updateReview: ReviewDto) {
         try {
             const review = this.reviewService.updateReview(id, updateReview);
             return review;
@@ -72,16 +82,5 @@ export class ReviewController {
     async getReview(@Param('id') id: string) {
         return await this.reviewService.findUserId(id);
     }
-    // lịch sử review ngta
-    @Get("gethistoryreview/:id")
-    @UseGuards(AuthGuard)
-    async getHistoryReview(@Param('id') id: string) {
-        return await this.reviewService.getAllHistoryReview(id);
-    }
-    // lịch sử ngta review mình
-    @Get("gethistorybereview/:id")
-    @UseGuards(AuthGuard)
-    async getAllHistoryBeReview(@Param('id') id: string) {
-        return await this.reviewService.getAllHistoryBeReview(id);
-    }
+    
 }
