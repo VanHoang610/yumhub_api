@@ -99,9 +99,9 @@ export class ShipperController {
 
 
     //lấy lịch sử shipper
-    @Get('getHistoryOrder/:id')
+    @Get('getHistoryOrder')
     @UseGuards(AuthGuard)
-    getHistoryShipper(@Param('id') id: string) {
+    getHistoryShipper(@Query('id') id: string) {
         try {
             const shipper = this.shipperService.getHistory(id);
             if (!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -112,9 +112,9 @@ export class ShipperController {
     }
 
     // sửa location của shipper
-    @Patch('updateLocation/:id')
+    @Patch('updateLocation')
     @UseGuards(AuthGuard)
-    updateLocation(@Param('id') id: string, @Body() body: { longitude: number, latitude: number }) {
+    updateLocation(@Query('id') id: string, @Body() body: { longitude: number, latitude: number }) {
         try {
             const { longitude, latitude } = body;
             const review = this.shipperService.updateLocation(id, longitude, latitude);
@@ -129,15 +129,15 @@ export class ShipperController {
     //     return this.shipperService.getPhoneNumberShipper(id);
     // }
 
-    @Post('deleteShipper/:id')
+    @Post('deleteShipper')
     @UseGuards(AuthGuard)
-    deleteShipper(@Param('id') id: string) {
+    deleteShipper(@Query('id') id: string) {
         return this.shipperService.deleteShipper(id);
     }
 
-    @Patch('updateShipper/:id')
+    @Patch('updateShipper')
     @UseGuards(AuthGuard)
-    async updateShipper(@Param('id') id: string, @Body(new ValidationPipe()) updateShipper: ShipperDto) {
+    async updateShipper(@Query('id') id: string, @Body(new ValidationPipe()) updateShipper: ShipperDto) {
         return await this.shipperService.updateShipper(id, updateShipper);
     }
 
@@ -163,17 +163,17 @@ export class ShipperController {
     }
 
     //cập nhật mật khẩu
-    @Post('resetPass/:id')
-    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
+    @Post('resetPass')
+    resetPass(@Query('id') id: string, @Body() body: { password: string }) {
         const { password } = body;
         return this.shipperService.resetPass(id, password);
     }
 
 
     //đổi mật khẩu
-    @Post('changePass/:id')
+    @Post('changePass')
     @UseGuards(AuthGuard)
-    changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+    changePassword(@Query('id') id: string, @Body() body: { passOld: string, passNew: string }) {
         const { passOld, passNew } = body;
         return this.shipperService.changePass(id, passOld, passNew);
     }
@@ -193,31 +193,31 @@ export class ShipperController {
     }
 
     // chi tiết tài khoản merchant
-    @Get('getShipperById/:id')
+    @Get('getShipperById')
     @UseGuards(AuthGuard)
-    getShipperById(@Param('id') id: string) {
+    getShipperById(@Query('id') id: string) {
         return this.shipperService.getShipperById(id);
     }
 
 
     // nạp tiền shipper
-    @Post('topUp/:id')
+    @Post('topUp')
     @UseGuards(AuthGuard)
-    topUpShipper(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+    topUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
         return this.shipperService.topUptopUpShipper(id, topUp);
     }
 
      // rút tiền shipper
-     @Post('cashOut/:id')
+     @Post('cashOut')
      @UseGuards(AuthGuard)
-     cashOutMtopUpShipper(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+     cashOutMtopUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
          return this.shipperService.cashOutShipper(id, topUp);
      }
 
      // lịch sử nạp/rút tiền shipper
-     @Get('transactionHistory/:id')
+     @Get('transactionHistory')
      @UseGuards(AuthGuard)
-     transactionHistory(@Param('id') id: string) {
+     transactionHistory(@Query('id') id: string) {
          return this.shipperService.transactionHistory(id);
      }
      @Get('rating')

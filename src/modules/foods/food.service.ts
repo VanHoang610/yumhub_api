@@ -190,6 +190,7 @@ export class FoodService {
         }
       
         // Thực hiện truy vấn MongoDB với các điều kiện lọc
-        return this.FoodModel.find(query).exec();
+        const foods= await this.FoodModel.find(query).exec();
+        return {result: true, food:foods}
       }
 }

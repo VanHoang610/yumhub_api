@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common'
 import { DetailOrderService } from './detailOrder.service';
 import { DetailOrderDto } from 'src/dto/dto.detailOrder';
 import { AuthGuard } from 'src/helper/auth.middleware';
@@ -19,9 +19,9 @@ export class DetailOrderController {
         }
     }
 
-    @Get('order/:id')
+    @Get('order')
     @UseGuards(AuthGuard)
-    getAllorder(@Param('id') Orderid: string){
+    getAllorder(@Query('id') Orderid: string){
         try {
             const detail = this.detailOrderService.showDetail(Orderid);
             if(!detail) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -30,9 +30,9 @@ export class DetailOrderController {
             return error
         }
     }
-    @Get('totalprice/:id')
+    @Get('totalprice')
     @UseGuards(AuthGuard)
-    getPriceTotal(@Param('id') Orderid: string){
+    getPriceTotal(@Query('id') Orderid: string){
         try {
             const detail = this.detailOrderService.totalPrice(Orderid);
             if(!detail) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
@@ -42,9 +42,9 @@ export class DetailOrderController {
         }
     }
 
-    @Delete('delete/:id')
+    @Delete('delete')
     @UseGuards(AuthGuard)
-    async deleteReview(@Param('id') id: string) {
+    async deleteReview(@Query('id') id: string) {
         try {
             await this.detailOrderService.deleteDetail(id);
             return { message: 'Xoá món thành công' };

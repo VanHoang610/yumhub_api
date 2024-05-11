@@ -41,9 +41,9 @@ export class CustomerController {
     }
 
     // lấy customer theo id
-    @Get(':id')
+    @Get('')
     @UseGuards(AuthGuard)
-    getCustomerByID(@Param('id') id: string) {
+    getCustomerByID(@Query('id') id: string) {
         return this.customerService.getCustomerById(id);
     }
 
@@ -56,31 +56,31 @@ export class CustomerController {
 
 
     // lấy SDT 
-    @Get('getPhoneNumber/:id')
+    @Get('getPhoneNumber')
     @UseGuards(AuthGuard)
-    getPhoneNumber(@Param('id') id: string) {
+    getPhoneNumber(@Query('id') id: string) {
         return this.customerService.getPhoneNumber(id);
     }
 
 
     // xóa customer
-    @Post('deleteCustomer/:id')
+    @Post('deleteCustomer')
     @UseGuards(AuthGuard)
-    deleteCustomer(@Param('id') id: string) {
+    deleteCustomer(@Query('id') id: string) {
         return this.customerService.deleteCustomer(id);
     }
     
     // sửa customer
-    @Patch('updateCustomer/:id')
+    @Patch('updateCustomer')
     @UseGuards(AuthGuard)
-    async updateCustomer(@Param('id') id: string, @Body(new ValidationPipe()) updateCustomer: UpdateCustomerDto) {
+    async updateCustomer(@Query('id') id: string, @Body(new ValidationPipe()) updateCustomer: UpdateCustomerDto) {
         return await this.customerService.updateCustomer(id, updateCustomer);
     }
 
     // lấy dánh sách lịch sử theo id
-    @Get('getHistoryCustomer/:id')
+    @Get('getHistoryCustomer')
     @UseGuards(AuthGuard)
-    getHistoryById(@Param('id') id: string) {
+    getHistoryById(@Query('id') id: string) {
         return this.customerService.getHistoryById(id);
     }
 

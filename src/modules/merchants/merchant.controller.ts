@@ -197,7 +197,7 @@ export class MerchantController {
     }
 
     // xóa tài khoản userMerchant
-    @Post('deleteUserMerchant/:id')
+    @Post('deleteUserMerchant')
     @UseGuards(AuthGuard)
     deleteUserMerchant(@Query('id') id: string) {
         return this.merchantService.deleteUserMerchant(id)
@@ -219,31 +219,31 @@ export class MerchantController {
     }
 
     // nạp tiền merchant
-    @Post('topUp/:id')
+    @Post('topUp')
     @UseGuards(AuthGuard)
-    topUpMerchant(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+    topUpMerchant(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
         return this.merchantService.topUpMerchant(id, topUp);
     }
 
     // rút tiền merchant
-    @Post('cashOut/:id')
+    @Post('cashOut')
     @UseGuards(AuthGuard)
-    cashOutMerchant(@Param('id') id: string, @Body() topUp: HistoryMerchantDto) {
+    cashOutMerchant(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
         return this.merchantService.cashOutMerchant(id, topUp);
     }
 
     // lịch sử nạp/rút tiền merchant
-    @Get('transactionHistory/:id')
+    @Get('transactionHistory')
     @UseGuards(AuthGuard)
-    transactionHistory(@Param('id') id: string) {
+    transactionHistory(@Query('id') id: string) {
         return this.merchantService.transactionHistory(id);
     }
 
 
     // lấy tất cả food đang bán của merchant
-    @Get('getFoodByMerchant/:id')
+    @Get('getFoodByMerchant')
     @UseGuards(AuthGuard)
-    getFoodByMerchant(@Param('id') id: string) {
+    getFoodByMerchant(@Query('id') id: string) {
         return this.merchantService.getFoodByMerchant(id)
     }
     @Get('rating')

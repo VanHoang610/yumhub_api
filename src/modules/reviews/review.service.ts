@@ -160,81 +160,9 @@ export class ReviewService {
             return { result: false, updateReview: error }
         }
     }
-
-
-    // tìm id user bị review
-    async findUserId(reviewID: string) {
-        const review = (await this.reviewModel.findById(reviewID));
-        const order = (await this.reviewModel.findById(reviewID)).orderID;
-        var userID: Object;
-        var user: Object;
-        const reviewType = await this.reviewType.findById(review.typeOfReview).exec();
-        var nameType = reviewType.name
-        if (nameType == "shipperToCustomer") { // người bị review là customer
-            userID = (await this.orderModel.findById(order)).customerID;
-            user = await this.customers.findById(userID)
-        } else if (nameType == "customerToMerchant") { // 2 là merchant
-            userID = (await this.orderModel.findById(order)).merchantID;
-            user = await this.merchants.findById(userID)
-        } else if (nameType == "customerToShipper") { // 3 là shipper
-            userID = (await this.orderModel.findById(order)).shipperID;
-            user = await this.shippers.findById(userID)  
-        }
-        return {userID: userID, user: user}
-    }
-
-    //tìm id user review 
-    async findUserIdReview(reviewID: string) {
-        const review = (await this.reviewModel.findById(reviewID));
-        const order = (await this.reviewModel.findById(reviewID)).orderID;
-        var userID: Object;
-        var user: Object;
-        const reviewType = await this.reviewType.findById(review.typeOfReview).exec();
-        var nameType = reviewType.name
-        if (nameType == "shipperToCustomer") { // người review là shipper
-            userID = (await this.orderModel.findById(order)).shipperID;
-            user = await this.shippers.findById(userID) 
-        } else if (nameType == "customerToMerchant") { // 2 là customer
-            userID = (await this.orderModel.findById(order)).customerID;
-            user = await this.customers.findById(userID) 
-        } else if (nameType == "customerToShipper"){ // 3 là customertoshipper thì cũng là customer
-            userID = (await this.orderModel.findById(order)).customerID;
-            user = await this.customers.findById(userID) 
-        }
-        
-        return {userID: userID, user: user}
-    }
-
-    async calculateAverageRating(userId: string) {
-        try {
-            let totalRating = 0;
-            let totalReviews = 0;
-
-            // Tìm tất cả các đánh giá liên quan đến người dùng từ bảng Review
-            const reviews = await this.reviewModel.find().exec();
-
-            // Duyệt qua từng đánh giá
-            for (const review of reviews) {
-                const user = (await this.findUserId(review._id.toString())).toString();
-                if (user === userId) {
-                    totalRating += review.rating; // Tổng điểm đánh giá
-                    console.log(totalRating);
-                    totalReviews++; // Tổng số lượng đánh giá
-                    console.log(totalReviews);
-                } else {
-                    continue;
-                }
-            }
-
-            // Tính điểm trung bình
-            const averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;return { result: true, averageRating: averageRating }
-        } catch (error) {
-            return { result: false, averageRating: error }
-        }
-
-    }
-
+   
     async DeleteReview(id: string){
+        
         return this.reviewModel.findByIdAndDelete(id)
     }
 

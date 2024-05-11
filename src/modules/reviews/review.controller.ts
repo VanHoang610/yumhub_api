@@ -51,7 +51,7 @@ export class ReviewController {
             this.reviewService.DeleteReview(id);
             return "đã xoá thành công";
         } catch (error) {
-            console.error(error)
+            return error
         }
     }
 
@@ -67,20 +67,7 @@ export class ReviewController {
         }
     }
 
-    // tính trung bình
-    @Get('averagerating/:id')
-    @UseGuards(AuthGuard)
-    async getAverageRating(@Param('id') id: string) {
-        // Gọi phương thức calculateAverageRating từ ReviewService và trả về kết quả
-        const averageRating = await this.reviewService.calculateAverageRating(id);
-        return averageRating;
-    }
-  
-    // nhập vào id review dể lấy id người bị review
-    @Get("getUser/:id")
-    @UseGuards(AuthGuard)
-    async getReview(@Param('id') id: string) {
-        return await this.reviewService.findUserId(id);
-    }
     
+  
+   
 }

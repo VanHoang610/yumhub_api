@@ -37,18 +37,18 @@ export class FoodController {
             return error
         }
     }
-    @Get('getFoodById/:id')
+    @Get('getFoodById')
     @UseGuards(AuthGuard)
-    getFoodById(@Param('id') id: string) {
+    getFoodById(@Query('id') id: string) {
         try {
             return this.foodService.getFoodById(id);
         } catch (error) {
             return error
         }
     }
-    @Get('getFoodByMerchant/:id')
+    @Get('getFoodByMerchant')
     @UseGuards(AuthGuard)
-    getFoodByMerchant(@Param('id') id: string) {
+    getFoodByMerchant(@Query('id') id: string) {
         try {
             return this.foodService.getFoodByMerchant(id);
         } catch (error) {
@@ -66,9 +66,9 @@ export class FoodController {
 
     // }
 
-    @Get("searchNameFood/:any")
+    @Get("searchNameFood")
     @UseGuards(AuthGuard)
-    searchFood(@Param("any") any: string) {
+    searchFood(@Query("any") any: string) {
         try {
 
             return this.foodService.searchFoodByName(any);
