@@ -13,6 +13,7 @@ import { ImageReview } from 'src/schemas/imageReview.schema';
 import { Customer } from 'src/schemas/customer.schemas';
 import { Merchant } from 'src/schemas/merchant.schema';
 import { Shipper } from 'src/schemas/shipper.schema';
+import { UpdateReviewDto } from 'src/dto/dto.updateReview';
 
 
 
@@ -142,9 +143,9 @@ export class ReviewService {
         }
     }
 
-    async updateReview(id: string, createReivew: ReviewDto) {
+    async updateReview(id: string, updateReivew: UpdateReviewDto) {
         try {
-            const updateReview = await this.reviewModel.findByIdAndUpdate(id, createReivew, { new: true });
+            const updateReview = await this.reviewModel.findByIdAndUpdate(id, updateReivew, { new: true });
             if (!updateReview) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
             return { result: true, updateReview: updateReview }
         } catch (error) {
