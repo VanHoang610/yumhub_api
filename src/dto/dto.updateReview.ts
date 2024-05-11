@@ -6,8 +6,4 @@ export class UpdateReviewDto {
     @IsOptional()
     description?: string
 
-    @IsString()
-    @IsNotEmpty()
-    userID?: string
-
 }
