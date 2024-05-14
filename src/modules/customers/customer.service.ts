@@ -101,6 +101,7 @@ export class CustomerServices {
             if (checkPhone) throw new HttpException("SDT đã được đăng ký", HttpStatus.NOT_FOUND);
             const checkEmail = await this.customers.findOne({ email: customer.email });
             if (checkEmail) throw new HttpException("Email đã được đăng ký", HttpStatus.NOT_FOUND);
+            const fullName =customer.fullName
             const phoneNumber = customer.phoneNumber
             const password = customer.password
             const email = customer.email
@@ -110,6 +111,7 @@ export class CustomerServices {
                 phoneNumber: phoneNumber,
                 password: hashPass,
                 email: email,
+                fullName: fullName
             });
             if (!createCustomer) throw new HttpException("Register Failed", HttpStatus.NOT_FOUND)
             await createCustomer.save();

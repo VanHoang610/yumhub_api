@@ -8,6 +8,10 @@ export class RegisterCustomerDto {
 
     @IsNotEmpty()
     @IsString()
+    fullName: string
+
+    @IsNotEmpty()
+    @IsString()
     email: string
 
     @IsNotEmpty()
