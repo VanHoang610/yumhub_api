@@ -19,10 +19,12 @@ export class DetailOrderService {
 
             // Tìm thông tin sản phẩm dựa trên id food
             const food = await this.foodModel.findById(foodID);
-
             if (!food) {
                 throw new HttpException('Food not found', HttpStatus.NOT_FOUND);
             }
+            const imgFood= await this.foodModel.findById(foodID).select('image');
+
+            
 
             // Tính toán giá của chi tiết sản phẩm
             const price = food.priceForSale * quantity;
@@ -39,7 +41,7 @@ export class DetailOrderService {
             // Lưu đối tượng vào cơ sở dữ liệu
             const createdDetailProduct = await newDetailProduct.save();
             // Trả về thông tin chi tiết sản phẩm đã tạo
-            return { result: true, detailProduct: createdDetailProduct };
+            return { result: true, detailProduct: createdDetailProduct, imgFood:imgFood };
         } catch (error) {
             return { result: false, error: error.message };
         }

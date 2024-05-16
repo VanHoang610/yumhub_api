@@ -11,12 +11,7 @@ export class DetailOrderController {
     @Post('createDetail')
     @UseGuards(AuthGuard)
     createDetail(@Body() DetailService: DetailOrderDto) {
-        try {
-            const detail = this.detailOrderService.createDetail(DetailService);
-            return {result: true, addFood:detail};
-        } catch (error) {
-            return {result: false, addFood:error};
-        }
+            return this.detailOrderService.createDetail(DetailService);
     }
 
     @Get('order')

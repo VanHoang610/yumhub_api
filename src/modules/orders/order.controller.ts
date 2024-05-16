@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, HttpException, HttpStatus, Param, ValidationPipe, UseGuards, Query } from '@nestjs/common'
+import { Body, Controller, Post, Get, HttpException, HttpStatus, Param, ValidationPipe, UseGuards, Query, Delete } from '@nestjs/common'
 import { OrderService } from './order.service';
 import { OrderDto } from 'src/dto/dto.order';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
@@ -136,6 +136,15 @@ export class OrderController {
     historyCustomerReview(@Query('id') id: string) {
         try {
             return this.orderServices.customerReview(id);
+        } catch (error) {
+            return error
+        }
+    }
+    @Post('deleteOrder')
+    @UseGuards(AuthGuard)
+    deleteOrder(@Query('id') id: string) {
+        try {
+            return this.orderServices.deleteOrder(id);
         } catch (error) {
             return error
         }

@@ -497,4 +497,16 @@ export class OrderService {
             return { result: false, error: error.message };
         }
     }
+    async deleteOrder(id: string) {
+        try {
+            const statusPending = new ObjectId("661760e3fc13ae3574ab8ddd")
+            const order= await this.orderModel.findOne({ _id: id, status: statusPending })
+            if (!order) throw new HttpException('Not found Order or Order is not pending', HttpStatus.NOT_FOUND);
+            const del = await this.orderModel.findOneAndDelete(order._id);
+            
+            return { result: true, order:"đã xoá" +order._id };
+        } catch (error) {
+            return { result: false, error: error.message };
+        }
+    }
 }

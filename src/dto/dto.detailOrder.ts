@@ -5,20 +5,15 @@ import { Order } from "src/schemas/order.schema"
 export class DetailOrderDto {
 
     @IsOptional()
-    orderID?: Order
+    orderID: Order
 
     @IsOptional()
-    foodID?: Food
+    foodID: Food
 
     @IsEmpty()
     @IsNumber()
     @IsInt()
     quantity: number
-
-    @IsEmpty()
-    @IsNumber()
-    @IsInt()
-    price: number
 
     @IsOptional()
     @IsString()

@@ -28,6 +28,7 @@ import { TypeOfReviewModule } from './modules/typeOfReview/typeOfReview.module';
 import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.module';
 import { foodStatusModule } from './modules/foodStatus/foodStatus.module';
 import { TypeOfFoodModule } from './modules/typeOfFood/typeOfFood.module';
+import { AdsModule } from './modules/ads/ads.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { TypeOfFoodModule } from './modules/typeOfFood/typeOfFood.module';
     TypeOfVoucherModule,
     TypeOfFoodModule,
     foodStatusModule,
+    AdsModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],
