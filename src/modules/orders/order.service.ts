@@ -129,19 +129,9 @@ export class OrderService {
             const merchants = await this.merchantModel.findById(merchantID);
             if (!merchants) throw new HttpException("Not Found Merchant", HttpStatus.NOT_FOUND);
 
-            const shipperID = orderDto.shipperID;
-            const shippers = await this.shipperModel.findById(shipperID);
-            if (!shippers) throw new HttpException("Not Found Shipper", HttpStatus.NOT_FOUND);
-
-            const voucherID = orderDto.voucherID; const vouchers = await this.voucherModel.findById(voucherID);
-            if (!vouchers) throw new HttpException("Not Found Voucher", HttpStatus.NOT_FOUND);
-
             const orders = new this.orderModel({
                 customerID: customers._id,
                 merchantID: merchants._id,
-                shipperID: shippers._id,
-                voucherID: vouchers._id,
-                timeBook: Date.now(),
                 status: "661760e3fc13ae3574ab8ddd", //pending
                 ...orderDto
             });
