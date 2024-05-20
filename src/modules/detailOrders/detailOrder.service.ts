@@ -23,7 +23,7 @@ export class DetailOrderService {
                 throw new HttpException('Food not found', HttpStatus.NOT_FOUND);
             }
             const imgFood= await this.foodModel.findById(foodID).select('image');
-
+            
             
 
             // Tính toán giá của chi tiết sản phẩm
@@ -66,10 +66,23 @@ export class DetailOrderService {
     }
 
     async deleteDetail(id: string) {
-        await this.detailOrderModel.findOneAndDelete({ _id: id }).exec();
+       return await this.detailOrderModel.findOneAndDelete({ _id: id }).exec();
     }
-    async showDetail(orderId:string){
-        return this.detailOrderModel.find({ orderID:orderId }).exec();
+    async showDetail(orderId: string) {
+        const order = [];
+        const details = await this.detailOrderModel.find({ orderID: orderId }).exec();
+    
+        const foodDetails = await Promise.all(details.map(async detail => {
+            const food = await this.foodModel.findById(detail.foodID).select('nameFood image');
+            if (!food) {
+                // Handle the case where the food item is not found
+                return { food: detail, image: null, name: 'Unknown' };
+            }
+            return { food: detail, image: food.image, name: food.nameFood };
+        }));
+    
+        order.push(...foodDetails);
+        return order;
     }
 
 }
