@@ -192,7 +192,7 @@ export class OrderService {
 
     async getOrderById(id: string) {
         try {
-            const orders = await this.orderModel.findById(id);
+            const orders = await this.orderModel.findById(id).populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID');
             if (!orders) return { Message: "Not found Order" }
             return { result: true, order: orders }
         } catch (error) {

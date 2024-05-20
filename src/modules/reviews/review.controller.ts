@@ -4,6 +4,7 @@ import { ReviewService } from './review.service';
 import { ReviewDto } from 'src/dto/dto.review';
 import { RegisterReviewDto } from 'src/dto/dto.registerReview';
 import { AuthGuard } from 'src/helper/auth.middleware';
+import { UpdateReviewDto } from 'src/dto/dto.updateReview';
 @Controller('reviews')
 export class ReviewController {
 
@@ -58,7 +59,7 @@ export class ReviewController {
     // sửa review
     @Patch('updateReview')
     @UseGuards(AuthGuard)
-    updateReview(@Query('id') id: string, @Body() updateReview: ReviewDto) {
+    updateReview(@Query('id') id: string, @Body() updateReview: UpdateReviewDto) {
         try {
             const review = this.reviewService.updateReview(id, updateReview);
             return review;
