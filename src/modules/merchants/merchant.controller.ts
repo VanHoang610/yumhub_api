@@ -92,8 +92,7 @@ export class MerchantController {
 
 
 
-    // // sắp xếp theo vị trí từ thấp đến cao
-    @Get()
+    @Get('getAllMerchant')
     @UseGuards(AuthGuard)
     getMerchant() {
         return this.merchantService.getMerchant();
@@ -205,7 +204,7 @@ export class MerchantController {
 
 
     // danh sách merchant cần duyệt
-    @Post('listMerchantApproval')
+    @Get('listMerchantApproval')
     @UseGuards(AuthGuard)
     listMerchantApproval() {
         return this.merchantService.listMerchantApproval();

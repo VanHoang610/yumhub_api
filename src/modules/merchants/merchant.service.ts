@@ -167,8 +167,14 @@ export class MerchantService {
     //     return this.merchants.findById(id);
     // }
 
-    getMerchant() {
-        return { result: true, merchants: this.merchants.find() }
+    async getMerchant() {
+        try {
+            const merchants = await this.merchants.find();
+            if(!merchants) throw new HttpException('Not found merchant', HttpStatus.UNAUTHORIZED);
+            return { result: true, merchants: merchants }
+        } catch (error) {
+              return { result: true, merchants: error }
+        }
     }
 
     async deleteMerchant(id: string) {
