@@ -22,7 +22,7 @@ export class VoucherController {
     }
     //tạo voucher
     @Post('createVoucher')
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     createVoucher(@Body() createVoucher: CreateVoucherDto) {
         try {
             const voucher = this.voucherService.createVoucher(createVoucher);
@@ -33,7 +33,7 @@ export class VoucherController {
     }
 
     @Get('allVoucher')
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     getAllVoucher(){
         try {
             const voucher = this.voucherService.getAllVoucher();
