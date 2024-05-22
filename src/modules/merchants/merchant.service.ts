@@ -24,6 +24,8 @@ import { type } from 'os';
 import { Food } from 'src/schemas/food.schema';
 import { JwtService } from '@nestjs/jwt';
 import { Review } from 'src/schemas/review.schema';
+import { DocumentMerchant } from 'src/schemas/documentMerchant.schema';
+import { PaymentMethodMerchant } from 'src/schemas/paymentMethodMerchant.schema';
 const { ObjectId } = require('mongodb');
 
 
@@ -41,6 +43,8 @@ export class MerchantService {
         @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
         @InjectModel(HistoryWalletMerchant.name) private historyMerchantModel: Model<HistoryWalletMerchant>,
         @InjectModel(TransactionTypeMerchant.name) private typeMerchantModel: Model<TransactionTypeMerchant>,
+        @InjectModel(DocumentMerchant.name) private documentMerchantModel: Model<DocumentMerchant>,
+        @InjectModel(PaymentMethodMerchant.name) private paymentMethodMerchantModel: Model<PaymentMethodMerchant>,
         @InjectModel(Review.name) private reviewModel: Model<Review>,) { }
 
     async addData() {
@@ -169,7 +173,8 @@ export class MerchantService {
 
     async getMerchant() {
         try {
-            const merchants = await this.merchants.find();
+            const merchants = await this.merchants.find({deleted: false});
+            await this.merchants.populate(merchants, { path: 'type' });
             if(!merchants) throw new HttpException('Not found merchant', HttpStatus.UNAUTHORIZED);
             return { result: true, merchants: merchants }
         } catch (error) {
@@ -539,13 +544,23 @@ export class MerchantService {
     async getMerchantById(id: string) {
         try {
             const detailMerchant = await this.merchants.findById(id);
-            return { result: true, detailMerchant: detailMerchant }
+            if (!detailMerchant) throw new HttpException("Not Found Merchant", HttpStatus.NOT_FOUND);
+            const document = await this.documentMerchantModel.findOne({ merchantID: id });
+            const paymentMethod = await this.paymentMethodMerchantModel.findOne({ merchantID: id });
+
+            await this.merchants.populate(detailMerchant, { path: 'type' });
+            const mergedDetailMerchant = {
+                ...detailMerchant.toJSON(), 
+                document: document,
+                paymentMethod: paymentMethod
+            };
+           
+    
+            return { result: true, detailMerchant: mergedDetailMerchant };
         } catch (error) {
-            return { result: false, error }
+            return { result: false, error };
         }
     }
-
-
 
     async topUpMerchant(id: string, topUp: HistoryMerchantDto) {
         try {

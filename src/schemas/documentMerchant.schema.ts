@@ -1,18 +1,17 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { Shipper } from "./shipper.schema";
 import { Merchant } from "./merchant.schema";
 
 
 @Schema()
-export class Document {
+export class DocumentMerchant {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Merchant'})
     merchantID?: Merchant
 
-    @Prop({required: true})
+    @Prop()
     image: string
 
 }
 
-export const DocumentSchema = SchemaFactory.createForClass(Document)
+export const DocumentMerchantSchema = SchemaFactory.createForClass(DocumentMerchant)
