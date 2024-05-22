@@ -14,6 +14,8 @@ import { Food, FoodSchema } from 'src/schemas/food.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '../auth/constants';
 import { Review, ReviewSchema } from 'src/schemas/review.schema';
+import { PaymentMethodMerchant, PaymentMethodMerchantSchema } from 'src/schemas/paymentMethodMerchant.schema';
+import { DocumentMerchant, DocumentMerchantSchema } from 'src/schemas/documentMerchant.schema';
 
 @Module({
     imports: [
@@ -57,6 +59,18 @@ import { Review, ReviewSchema } from 'src/schemas/review.schema';
            {
             name: Review.name,
             schema: ReviewSchema,
+           },
+           {
+            name: Food.name,
+            schema: FoodSchema,
+           },
+           {
+            name: DocumentMerchant.name,
+            schema: DocumentMerchantSchema,
+           },
+           {
+            name: PaymentMethodMerchant.name,
+            schema: PaymentMethodMerchantSchema,
            },
         ]),
         JwtModule.register({

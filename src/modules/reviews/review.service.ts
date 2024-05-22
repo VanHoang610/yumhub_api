@@ -100,6 +100,7 @@ export class ReviewService {
             const customerToMerchant = '6604e5a181084710d45efe9c';
             const customerToShipper = '6604e5a181084710d45efe9d';
             const shipperToCustomer = '6604e5a181084710d45efe9e';
+            const shipperToMerchant = '6604e5a181084710d45efe90';
 
             if (typeOfReviewID == 1) {
                 const reviewNew = new this.reviewModel({
@@ -119,12 +120,21 @@ export class ReviewService {
                 })
                 await reviewNew.save();
                 return { result: true, newReview: reviewNew }
-            } else {
+            }else if (typeOfReviewID == 3) {
                 const reviewNew = new this.reviewModel({
                     orderID: orderID,
                     description: description,
                     rating: rating,
                     typeOfReview: shipperToCustomer
+                })
+                await reviewNew.save();
+                return { result: true, newReview: reviewNew }
+            } else {
+                const reviewNew = new this.reviewModel({
+                    orderID: orderID,
+                    description: description,
+                    rating: rating,
+                    typeOfReview: shipperToMerchant
                 })
                 await reviewNew.save();
                 return { result: true, newReview: reviewNew }

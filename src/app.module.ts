@@ -5,9 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CustomerModule } from './modules/customers/customer.module';
 import { MerchantModule } from './modules/merchants/merchant.module';
 import { ShipperModule } from './modules/shippers/shipper.module';
-import { PaymentMethodModule } from './modules/paymentMethods/paymentMethod.module';
+import { PaymentMethodModule } from './modules/paymentMethodMerchant/paymentMethodMerchant.module';
 import { AddressModule } from './modules/address/address.module';
-import { DocumentModule } from './modules/documents/document.module';
+import { DocumentModule } from './modules/documentMerchant/document.module';
 import { OrderModule } from './modules/orders/order.module';
 import { UserMerchantModule } from './modules/userMerchant/merchant.module';
 import { DocumentTypeModule } from './modules/documentTypes/document.module';
@@ -29,6 +29,7 @@ import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.modul
 import { foodStatusModule } from './modules/foodStatus/foodStatus.module';
 import { TypeOfFoodModule } from './modules/typeOfFood/typeOfFood.module';
 import { AdsModule } from './modules/ads/ads.module';
+import { PaymentMethodMerchant } from './schemas/paymentMethodMerchant.schema';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { AdsModule } from './modules/ads/ads.module';
     TypeOfReviewModule,
     TypeOfVoucherModule,
     TypeOfFoodModule,
+    PaymentMethodMerchant,
     foodStatusModule,
     AdsModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
