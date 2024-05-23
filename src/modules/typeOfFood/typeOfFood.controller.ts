@@ -1,4 +1,4 @@
-import { Controller, Post } from "@nestjs/common";
+import { Controller, Post, Query } from "@nestjs/common";
 import { foodTypeService } from "./typeOfFood.service";
 
 @Controller('foodType')
@@ -10,5 +10,10 @@ export class FoodTypeController {
     @Post('addData')
     async addData() {
         return await this.foodTypeServices.addData();
+    }
+
+    @Post('food')
+    async typeFood(@Query('name') name: string) {
+        return await this.foodTypeServices.typeFood(name);
     }
 }
