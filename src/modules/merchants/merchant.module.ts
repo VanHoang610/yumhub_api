@@ -16,6 +16,9 @@ import { jwtConstants } from '../auth/constants';
 import { Review, ReviewSchema } from 'src/schemas/review.schema';
 import { PaymentMethodMerchant, PaymentMethodMerchantSchema } from 'src/schemas/paymentMethodMerchant.schema';
 import { DocumentMerchant, DocumentMerchantSchema } from 'src/schemas/documentMerchant.schema';
+import { TypeOfMerchant, TypeOfMerchantSchema } from 'src/schemas/typeOfMerchant.schema';
+import { Customer, CustomerSchema } from 'src/schemas/customer.schemas';
+import { Address, AddressSchema } from 'src/schemas/address.schema';
 
 @Module({
     imports: [
@@ -71,6 +74,18 @@ import { DocumentMerchant, DocumentMerchantSchema } from 'src/schemas/documentMe
            {
             name: PaymentMethodMerchant.name,
             schema: PaymentMethodMerchantSchema,
+           },
+           {
+            name: TypeOfMerchant.name,
+            schema: TypeOfMerchantSchema,
+           },
+           {
+            name: Customer.name,
+            schema: CustomerSchema,
+           },
+           {
+            name: Address.name,
+            schema: AddressSchema,
            },
         ]),
         JwtModule.register({

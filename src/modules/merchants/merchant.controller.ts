@@ -1,19 +1,25 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, UsePipes, ValidationPipe, NotFoundException, Query, UseGuards } from '@nestjs/common'
-
-
+import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, ValidationPipe, Query, UseGuards, Param } from '@nestjs/common'
 import { MerchantService } from './merchant.service';
-import { MerchantDto } from 'src/dto/dto.merchant';
-import mongoose from 'mongoose';
 import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
 import { LoginDto } from 'src/dto/dto.login';
 import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { AuthGuard } from 'src/helper/auth.middleware';
+import { MerchantDto } from 'src/dto/dto.merchant';
 
 @Controller('merchants')
 export class MerchantController {
     constructor(private readonly merchantService: MerchantService) { }
+
+
+    @Patch('updateMerchant')
+    @UseGuards(AuthGuard)
+    updateMerchant(@Query('id') id: string, @Body() update: MerchantDto) {
+        console.log(update);
+        return this.merchantService.updateMerchant(id, update);
+    }
+    
 
     @Post('RevenueWeek')
     @UseGuards(AuthGuard)
@@ -29,6 +35,7 @@ export class MerchantController {
             return error;
         }
     }
+
     @Post('RevenueMonth')
     @UseGuards(AuthGuard)
     getRevenueMonth(@Body() body: { ID: string, month: string }) {
@@ -43,6 +50,7 @@ export class MerchantController {
             return error;
         }
     }
+
     @Post('RevenueTTT')
     @UseGuards(AuthGuard)
     getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
@@ -55,11 +63,13 @@ export class MerchantController {
             return error
         }
     }
+
     @Get('newUser')
     @UseGuards(AuthGuard)
     newMerchant() {
         return this.merchantService.newMerchantInMonth();
     }
+    
     @Get('addData')
     addData() {
         try {
@@ -128,7 +138,6 @@ export class MerchantController {
         } catch (error) {
             return error
         }
-
     }
 
     //login
@@ -245,9 +254,22 @@ export class MerchantController {
     getFoodByMerchant(@Query('id') id: string) {
         return this.merchantService.getFoodByMerchant(id)
     }
+
     @Get('rating')
      @UseGuards(AuthGuard)
      rating(@Query('id') id: string) {
          return this.merchantService.getRating(id);
+     }
+
+     @Get('getAllTypeOfMerchant')
+     @UseGuards(AuthGuard)
+     getAllTypeOfMerchant() {
+         return this.merchantService.getAllTypeOfMerchant();
+     }
+
+     @Get('getNearMerchant')
+     @UseGuards(AuthGuard)
+     getNearMerchant(@Query('id') id: string) {
+         return this.merchantService.getNearMerchant(id);
      }
 }

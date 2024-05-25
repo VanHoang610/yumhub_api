@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Address, AddressSchema } from "src/schemas/address.schema";
+import { AddressController } from "./address.controller";
+import { AddressService } from "./address.service";
 
 @Module({
     imports: [
@@ -9,8 +11,10 @@ import { Address, AddressSchema } from "src/schemas/address.schema";
                 name: Address.name,
                 schema: AddressSchema,
             }
-        ])
-    ]
+        ]),
+    ],
+    controllers: [AddressController],
+    providers: [AddressService]
 })
 
 export class AddressModule { };
