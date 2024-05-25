@@ -90,7 +90,7 @@ export class AdminService {
                 await this.resetPassModel.deleteOne({ email: email });
             }, 120000);
 
-            return { result: true, message: "Hãy kiểm tra email của bạn!" }
+            return { result: true, message: "Hãy kiểm tra email của bạn!"}
 
         } catch (error) {
             return { result: false, message: "Gửi OTP thất bại" }
@@ -108,14 +108,16 @@ export class AdminService {
         }
     }
 
-    async resetPass(id: string, password: string) {
+    async resetPass(email: string, password: string) {
         try {
-            const user = await this.adminModel.findById(id);
-            if (!user) throw new HttpException("Not Find Account", HttpStatus.NOT_FOUND);
+            const user = await this.adminModel.findOne({email: email});
+            const idUser = user._id;
+            const findUser = await this.adminModel.findById(idUser);
+            if (!findUser) throw new HttpException("Not Find Account", HttpStatus.NOT_FOUND);
             const passwordNew = await bcrypt.hash(password, 10);
-            user.password = passwordNew
-            user.save();
-            return { result: true, data: user }
+            findUser.password = passwordNew
+            findUser.save();
+            return { result: true, data: findUser }
         } catch (error) {
             return { result: false, data: error }
         }

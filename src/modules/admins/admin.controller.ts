@@ -35,10 +35,10 @@ export class AdminController {
     }
 
     //cập nhật mật khẩu
-    @Post('resetPass/:id')
-    resetPass(@Param('id') id: string, @Body() body: { password: string }) {
-        const { password } = body;
-        return this.adminService.resetPass(id, password);
+    @Post('resetPass')
+    resetPass(@Body() body: { email: string, password: string }) {
+        const { email, password } = body;
+        return this.adminService.resetPass(email, password);
     }
 
 

@@ -1,4 +1,5 @@
 import { IsEmpty, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
+import { TypeOfMerchant } from "src/schemas/typeOfMerchant.schema";
 
 export class MerchantDto {
 
@@ -16,7 +17,7 @@ export class MerchantDto {
 
     @IsOptional()
     @IsNumber()
-    type?: number
+    type?: TypeOfMerchant
 
     @IsOptional()
     @IsString()
@@ -40,4 +41,12 @@ export class MerchantDto {
     @IsNumber()
     latitude: number
 
+    @IsString()
+    phoneNumber: string
+
+    @IsString()
+    email: string
+
+    @IsString()
+    fullName: string
 }
