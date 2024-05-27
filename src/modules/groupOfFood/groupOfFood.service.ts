@@ -4,59 +4,42 @@ import { Model } from 'mongoose';
 import { Food } from 'src/schemas/food.schema';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
-export class foodTypeService {
+export class GroupOfFoodService {
     constructor(@InjectModel(GroupOfFood.name) private groupFoodModel: Model<GroupOfFood>,
     @InjectModel(Food.name) private foodModel: Model<Food>,) {};
-
-    async addData() {
-        try {
-            const createType = await this.groupFoodModel.create([
-                {
-                    
-                    "name": "Water",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-water-bottle-and-drink-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    
-                    "name": "Rice",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-rice-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    
-                    "name": "fried chicken",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-fried-chicken-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    "name": "vegetarian food",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-vegetarian-food-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    
-                    "name": "sweet soup",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-sweet-soup-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    
-                    "name": "Phở",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-pho-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    
-                    "name": "Bún bò",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-bun-flatart-icons-lineal-color-flatarticons.png"
-                },
-                {
-                    
-                    "name": "Hủ tiếu",
-                    "img": "https://img.icons8.com/external-flatart-icons-lineal-color-flatarticons/64/null/external-hot-dog-flatart-icons-lineal-color-flatarticons.png"
-                }
-            ])
-            return { result: true, newType: createType }
-        } catch (error) {
-            return { result: false, newType: error }
-        }
-    }
     
+    async createGroupOfFood(merchantID: string, name: string) {
+        const groupOfFood = new this.groupFoodModel({
+            merchantID: merchantID,
+            name: name
+        })
+
+        return await groupOfFood.save();
+    }
+
+    async updateGroupOfFood(id: string, name: string) {
+        const updatedGroupOfFood = await this.groupFoodModel.findByIdAndUpdate(
+            id,
+            { name: name },
+            { new: true }
+        );
+        
+        if (!updatedGroupOfFood) {
+            throw new NotFoundException(`GroupOfFood with id ${id} not found`);
+        }
+        
+        return updatedGroupOfFood;
+    }
+
+    async deleteGroupOfFood(id: string) {
+        await this.foodModel.findByIdAndUpdate({ groupOfFoodID: id }, { groupOfFoodID: null });
+        const deleteGroup= await this.groupFoodModel.findByIdAndDelete(id);
+        if (!deleteGroup) {
+            throw new NotFoundException(`GroupOfFood with id ${id} not found`);
+        }
+        return deleteGroup;
+    }
 }

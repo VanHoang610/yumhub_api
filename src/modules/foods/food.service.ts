@@ -22,14 +22,14 @@ export class FoodService {
             const merchantID = await this.merchantModel.findById(merchant);
             if (!merchantID) throw new HttpException("Not Found MerchantID", HttpStatus.NOT_FOUND);
 
-            const typeOfFood = createFood.group;
-            const typeOfFoodID = await this.GroupOfFoodModel.findById(typeOfFood);
-            if (!typeOfFoodID) throw new HttpException("Not Found typeOfFoodID", HttpStatus.NOT_FOUND);
-
-
+            if (!createFood.group) createFood.group = null;
+            else{const groupOfFood = createFood.group;
+                const groupOfFoodID = await this.GroupOfFoodModel.findById(groupOfFood);
+                if (!groupOfFoodID) throw new HttpException("Not Found GroupOfFoodID", HttpStatus.NOT_FOUND);}
+            
+           
             const food = new this.FoodModel({
                 merchantID: merchantID._id,
-                typeOfFood: typeOfFoodID._id,
                 status: "661f9962fc13ae6967a24534",
                 ...createFood
             });
@@ -164,32 +164,19 @@ export class FoodService {
         return this.FoodModel.find({ nameFood: { $regex: any, $options: 'i' } }).exec();
     }
     
-    async searchFoods(type: string, price: number, name: string) {
+    async searchFoods( price: number, name: string) {
         // Tạo một object để chứa các điều kiện lọc
         const query: any = {status: '661fb317ee3a326f69b55386'};// status onSale
-      
-        // Thêm điều kiện lọc theo loại
-        if (type) {
-          // Đầu tiên, bạn cần lấy ID của loại từ bảng phụ hoặc danh sách loại cố định
-          const typeDocument = await this.GroupOfFoodModel.findOne({ name: type });
-            
-          // Nếu tìm thấy loại, thêm điều kiện lọc vào query
-          if (typeDocument) {
-            query.typeOfFood = typeDocument._id;
-          }
-        }
       
         // Thêm điều kiện lọc theo giá
         if (price) {
           query.price = { $lte: price }; // Tìm các món ăn có giá nhỏ hơn hoặc bằng price
         }
-      
 
         // Thêm điều kiện lọc theo tên món ăn
         if (name) {
           query.nameFood = { $regex: name, $options: 'i' }; // Tìm các món ăn có tên chứa name
         }
-      
         // Thực hiện truy vấn MongoDB với các điều kiện lọc
         const foods= await this.FoodModel.find(query).exec();
         return {result: true, food:foods}

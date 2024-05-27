@@ -80,14 +80,13 @@ export class FoodController {
     @UseGuards(AuthGuard)
     async searchFoods(
         @Body() body: {
-            type: string,
             price: number,
             name: string
         }
     ) {
         try {
-            const { type, price, name } = body
-            return this.foodService.searchFoods(type, price, name);
+            const { price, name } = body
+            return this.foodService.searchFoods( price, name);
         } catch (error) {
             return error
         }
