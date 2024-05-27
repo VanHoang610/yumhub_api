@@ -6,6 +6,6 @@ export class TypeOfFood{
     name: string
 
     @Prop({required: true})
-    img: string
+    image: string
 }
 export const typeOfFoodSchema = SchemaFactory.createForClass(TypeOfFood)

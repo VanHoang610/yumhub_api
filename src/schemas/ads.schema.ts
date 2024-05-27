@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export class Ads {
     
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Merchant'})
-    merchantId: Merchant;
+    merchantID: Merchant;
 
     @Prop({required: true})
     image: string;
