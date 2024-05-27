@@ -26,6 +26,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Review } from 'src/schemas/review.schema';
 import { DocumentMerchant } from 'src/schemas/documentMerchant.schema';
 import { PaymentMethodMerchant } from 'src/schemas/paymentMethodMerchant.schema';
+import { TypeOfMerchant } from 'src/schemas/typeOfMerchant.schema';
+import { Customer } from 'src/schemas/customer.schemas';
+import { Address } from 'src/schemas/address.schema';
 const { ObjectId } = require('mongodb');
 
 
@@ -36,6 +39,8 @@ export class MerchantService {
         private jwtService: JwtService,
         @InjectModel(Food.name) private foodModel: Model<Food>,
         @InjectModel(Merchant.name) private merchants: Model<Merchant>,
+        @InjectModel(Customer.name) private customerModol: Model<Customer>,
+        @InjectModel(Address.name) private addressModol: Model<Address>,
         @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
         @InjectModel(ResetPassword.name) private resetPasswordModel: Model<ResetPassword>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
@@ -43,6 +48,7 @@ export class MerchantService {
         @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
         @InjectModel(HistoryWalletMerchant.name) private historyMerchantModel: Model<HistoryWalletMerchant>,
         @InjectModel(TransactionTypeMerchant.name) private typeMerchantModel: Model<TransactionTypeMerchant>,
+        @InjectModel(TypeOfMerchant.name) private typeOfMerchantModel: Model<TypeOfMerchant>,
         @InjectModel(DocumentMerchant.name) private documentMerchantModel: Model<DocumentMerchant>,
         @InjectModel(PaymentMethodMerchant.name) private paymentMethodMerchantModel: Model<PaymentMethodMerchant>,
         @InjectModel(Review.name) private reviewModel: Model<Review>,) { }
@@ -200,7 +206,17 @@ export class MerchantService {
     async updateMerchant(id: string, updateMerchant: MerchantDto) {
         try {
             const merchantNew = await this.merchants.findByIdAndUpdate(id, updateMerchant, { new: true });
-            return { MerchantNew: merchantNew }
+
+            const userMerchant = await this.userMerchantModel.findOne({merchantID: id});
+            const idUserMerchant = userMerchant._id;
+            const userMerchantUpdate = {
+                email: updateMerchant.email,
+                phoneNumber: updateMerchant.phoneNumber,
+                fullName: updateMerchant.fullName,
+              };
+              
+              const userMerchantNew = await this.userMerchantModel.findByIdAndUpdate(idUserMerchant, userMerchantUpdate, { new: true });
+            return { result: true, merchantNew: merchantNew, userMerchantNew }
         } catch (error) {
             console.error('Error updating merchant:', error);
             throw error;
@@ -533,6 +549,7 @@ export class MerchantService {
     async listMerchantApproval() {
         try {
             const listMerchant = await this.merchants.find({ status: 1 });
+            await this.merchants.populate(listMerchant, { path: 'type' });
             return { result: true, listMerchantApproval: listMerchant }
         } catch (error) {
             console.log(error);
@@ -545,6 +562,7 @@ export class MerchantService {
         try {
             const detailMerchant = await this.merchants.findById(id);
             if (!detailMerchant) throw new HttpException("Not Found Merchant", HttpStatus.NOT_FOUND);
+            const user = await this.userMerchantModel.findOne({ merchantID: id });
             const document = await this.documentMerchantModel.findOne({ merchantID: id });
             const paymentMethod = await this.paymentMethodMerchantModel.findOne({ merchantID: id });
 
@@ -552,7 +570,8 @@ export class MerchantService {
             const mergedDetailMerchant = {
                 ...detailMerchant.toJSON(), 
                 document: document,
-                paymentMethod: paymentMethod
+                paymentMethod: paymentMethod,
+                user: user
             };
            
     
@@ -681,6 +700,35 @@ export class MerchantService {
         }
         const rating = numberOfReview>0? totalPointReview/numberOfReview: 0
         return {result: true, rating:rating}
+    }
+
+    async getAllTypeOfMerchant() {
+        try {
+            const types = await this.typeOfMerchantModel.find().exec();
+            if(!types) throw new HttpException("Not Found TypeMerchant", HttpStatus.NOT_FOUND)
+            return {result: true, types: types}
+        } catch (error) {
+            return {result: false, types: error}
+        }
+    }
+
+    async getNearMerchant(id: string) {
+        try {
+            const addressCustomer = await this.addressModol.findOne({customerID: id});
+            const merchants = await this.merchants.find({status: 3}).exec();
+
+             //tính quãng đường
+             const sortMerchant = merchants.map(merchant => {
+                const distance = Math.sqrt(Math.pow(merchant.longitude - addressCustomer.longitude, 2) + Math.pow(merchant.latitude - addressCustomer.latitude, 2));
+                return { ...merchant.toObject(), distance };
+            });
+            
+            sortMerchant.sort((a, b) => a.distance - b.distance);
+            // const nearestCustomer = sortMerchant.slice(0, 5);
+            return { result: true, nearestCustomer: sortMerchant }
+        } catch (error) {
+            return { result: false, nearestCustomer: error }
+        }
     }
    
 }
