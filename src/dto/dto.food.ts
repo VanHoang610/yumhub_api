@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { FoodStatus } from "src/schemas/foodStatus.schema";
+import { GroupOfFood } from "src/schemas/groupOfFood.schema";
 import { Merchant } from "src/schemas/merchant.schema";
-import { TypeOfFood } from "src/schemas/typeOfFood.schema";
+
 
 
 export class FoodDto {
@@ -10,7 +11,7 @@ export class FoodDto {
     merchantID?: Merchant
 
     @IsOptional()
-    type?: TypeOfFood
+    group?: GroupOfFood
 
     @IsOptional()
     foodStatus?: FoodStatus

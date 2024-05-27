@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { Merchant } from "./merchant.schema";
 import { FoodStatus } from "./foodStatus.schema";
-import { TypeOfFood } from "./typeOfFood.schema";
+import { GroupOfFood } from "./groupOfFood.schema";
 
 
 @Schema()
@@ -14,7 +14,7 @@ export class Food {
     status: FoodStatus
     
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TypeOfFood'})  
-    typeOfFood: TypeOfFood
+    GroupOfFood: GroupOfFood
 
     @Prop({required: false})
     image?: string
