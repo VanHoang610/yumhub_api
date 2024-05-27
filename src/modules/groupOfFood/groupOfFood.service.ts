@@ -3,16 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Food } from 'src/schemas/food.schema';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
-import { TypeOfFood } from 'src/schemas/typeOfFood.schema';
+import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
 
 @Injectable()
 export class foodTypeService {
-    constructor(@InjectModel(TypeOfFood.name) private typeFoodModel: Model<TypeOfFood>,
+    constructor(@InjectModel(GroupOfFood.name) private groupFoodModel: Model<GroupOfFood>,
     @InjectModel(Food.name) private foodModel: Model<Food>,) {};
 
     async addData() {
         try {
-            const createType = await this.typeFoodModel.create([
+            const createType = await this.groupFoodModel.create([
                 {
                     
                     "name": "Water",
@@ -58,14 +58,5 @@ export class foodTypeService {
             return { result: false, newType: error }
         }
     }
-    async typeFood(name: string){
-        try {
-            const typeFood = await this.typeFoodModel.findOne({name: name});
-            const food = await this.foodModel.find({typeOfFood:typeFood._id}).exec();
-            
-            return { result: true, food: food }
-        } catch (error) {
-            return { result: false, typeFood: error }
-        }
-    }
+    
 }

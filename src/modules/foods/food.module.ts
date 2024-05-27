@@ -5,8 +5,8 @@ import { Food, FoodSchema } from 'src/schemas/food.schema';
 import { FoodController } from './food.controller';
 import { FoodService } from './food.service';
 import { Merchant, MerchantSchema } from 'src/schemas/merchant.schema';
-import { TypeOfFood, typeOfFoodSchema } from 'src/schemas/typeOfFood.schema';
 import { FoodStatus, FoodStatusSchemas } from 'src/schemas/foodStatus.schema';
+import { GroupOfFood, groupOfFoodSchema } from 'src/schemas/groupOfFood.schema';
 
 @Module({
     imports: [
@@ -20,8 +20,8 @@ import { FoodStatus, FoodStatusSchemas } from 'src/schemas/foodStatus.schema';
                 schema: MerchantSchema
             },
             {
-                name: TypeOfFood.name,
-                schema: typeOfFoodSchema
+                name: GroupOfFood.name,
+                schema: groupOfFoodSchema
             },
             {
                 name: FoodStatus.name,

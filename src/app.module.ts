@@ -27,9 +27,9 @@ import { TypeOfMerchantModule } from './modules/typeOfMerchant/typeOfMerchant.mo
 import { TypeOfReviewModule } from './modules/typeOfReview/typeOfReview.module';
 import { TypeOfVoucherModule } from './modules/typeOfVoucher/typeOfVoucher.module';
 import { foodStatusModule } from './modules/foodStatus/foodStatus.module';
-import { TypeOfFoodModule } from './modules/typeOfFood/typeOfFood.module';
 import { AdsModule } from './modules/ads/ads.module';
 import { PaymentMethodMerchant } from './schemas/paymentMethodMerchant.schema';
+import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
 
 @Module({
   imports: [
@@ -59,7 +59,7 @@ import { PaymentMethodMerchant } from './schemas/paymentMethodMerchant.schema';
     TypeOfMerchantModule,
     TypeOfReviewModule,
     TypeOfVoucherModule,
-    TypeOfFoodModule,
+    GroupOfFoodModule,
     PaymentMethodMerchant,
     foodStatusModule,
     AdsModule,

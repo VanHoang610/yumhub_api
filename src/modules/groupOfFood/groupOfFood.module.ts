@@ -1,16 +1,16 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { TypeOfFood, typeOfFoodSchema } from "src/schemas/typeOfFood.schema";
-import { FoodTypeController } from "./typeOfFood.controller";
-import { foodTypeService } from "./typeOfFood.service";
+import { GroupOfFood, groupOfFoodSchema } from "src/schemas/groupOfFood.schema";
+import { FoodTypeController } from "./groupOfFood.controller";
+import { foodTypeService } from "./groupOfFood.service";
 import { Food, FoodSchema } from "src/schemas/food.schema";
 
 @Module({
     imports: [
         MongooseModule.forFeature([
             {
-                name: TypeOfFood.name,
-                schema: typeOfFoodSchema
+                name: GroupOfFood.name,
+                schema: groupOfFoodSchema
             },
             {
                 name: Food.name,
@@ -21,4 +21,4 @@ import { Food, FoodSchema } from "src/schemas/food.schema";
     controllers: [FoodTypeController],
     providers: [foodTypeService]
 })
-export class TypeOfFoodModule { };
+export class GroupOfFoodModule { };

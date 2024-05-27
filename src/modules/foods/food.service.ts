@@ -5,14 +5,15 @@ import { Model } from 'mongoose';
 import { FoodDto } from 'src/dto/dto.food';
 import { Food } from 'src/schemas/food.schema';
 import { FoodStatus } from 'src/schemas/foodStatus.schema';
+import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
 import { Merchant } from 'src/schemas/merchant.schema';
-import { TypeOfFood } from 'src/schemas/typeOfFood.schema';
+
 
 @Injectable()
 export class FoodService {
     constructor(@InjectModel(Food.name) private FoodModel: Model<Food>,
         @InjectModel(Merchant.name) private merchantModel: Model<Merchant>,
-        @InjectModel(TypeOfFood.name) private TypeOfFoodModel: Model<TypeOfFood>,
+        @InjectModel(GroupOfFood.name) private GroupOfFoodModel: Model<GroupOfFood>,
         @InjectModel(FoodStatus.name) private foodStatusModel: Model<FoodStatus>,) { }
 
     async createFood(createFood: FoodDto) {
@@ -21,8 +22,8 @@ export class FoodService {
             const merchantID = await this.merchantModel.findById(merchant);
             if (!merchantID) throw new HttpException("Not Found MerchantID", HttpStatus.NOT_FOUND);
 
-            const typeOfFood = createFood.type;
-            const typeOfFoodID = await this.TypeOfFoodModel.findById(typeOfFood);
+            const typeOfFood = createFood.group;
+            const typeOfFoodID = await this.GroupOfFoodModel.findById(typeOfFood);
             if (!typeOfFoodID) throw new HttpException("Not Found typeOfFoodID", HttpStatus.NOT_FOUND);
 
 
@@ -170,7 +171,7 @@ export class FoodService {
         // Thêm điều kiện lọc theo loại
         if (type) {
           // Đầu tiên, bạn cần lấy ID của loại từ bảng phụ hoặc danh sách loại cố định
-          const typeDocument = await this.TypeOfFoodModel.findOne({ name: type });
+          const typeDocument = await this.GroupOfFoodModel.findOne({ name: type });
             
           // Nếu tìm thấy loại, thêm điều kiện lọc vào query
           if (typeDocument) {
