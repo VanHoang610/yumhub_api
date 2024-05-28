@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common'
 import { AdminService } from './admin.service';
 import { LoginDto } from 'src/dto/dto.login';
 import { LoginAdminDto } from 'src/dto/dto.loginAdmin';
@@ -43,9 +43,9 @@ export class AdminController {
 
 
     //đổi mật khẩu
-    @Post('changePass/:id')
+    @Post('changePass')
     @UseGuards(AuthGuard)
-    changePassword(@Param('id') id: string, @Body() body: { passOld: string, passNew: string }) {
+    changePassword(@Query('id') id: string, @Body() body: { passOld: string, passNew: string }) {
         const { passOld, passNew } = body;
         return this.adminService.changePass(id, passOld, passNew);
         
