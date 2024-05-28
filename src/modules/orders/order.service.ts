@@ -281,6 +281,84 @@ export class OrderService {
 
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
+            
+            const status = await this.statusModel.findById(updateOrder.status);
+            if (!status) {
+                let idStatus: object;
+                const Statuss = await this.statusModel.find().exec();
+                switch (updateOrder.status) {
+                    case 1:
+                        for (const status of Statuss) {
+                            if (status.name === "pending") {
+                                updateOrder.status = status._id
+                                break;
+                            }
+                        }
+                        break;
+                    case 2:
+                        for (const status of Statuss) {
+                            if (status.name === "processing") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+
+                        break;
+                    case 3:
+                        for (const status of Statuss) {
+                            if (status.name === "arrivedEatery") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+                        break;
+                    case 4:
+                        for (const status of Statuss) {
+                            if (status.name === "shipped") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+                        break;
+                    case 5:
+                        for (const status of Statuss) {
+                            if (status.name === "delivered") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+                        break;
+                    case 6:
+                        for (const status of Statuss) {
+                            if (status.name === "cancel") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+                        break;
+                    case 7:
+                        for (const status of Statuss) {
+                            if (status.name === "onHold") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+                        break;
+                    case 8:
+                        for (const status of Statuss) {
+                            if (status.name === "backordered") {
+                                updateOrder.status = status._id
+                                break
+                            }
+                        }
+                        break;
+                    default:
+
+                        return "nhập 1-8";
+
+                }
+            }
+
             const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, { new: true });
             if (!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
             return { result: true, updateOrder: update }
@@ -347,12 +425,12 @@ export class OrderService {
                 const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId });
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
-                    var imageReviews=[];
+                    var imageReviews = [];
                     for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
+                        if ((image.reviewID).toString() === (review._id).toString()) {
                             imageReviews.push(image.image)
                         }
-                    } 
+                    }
                     const customer = await this.customerModel.findById(shipper.customerID);
                     history.push({ user: customer, review: review, image: imageReviews });
                 }
@@ -370,15 +448,15 @@ export class OrderService {
             var history = [];
             const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");
             await Promise.all(shippers.map(async (shipper) => {
-                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId }).exec();       
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId }).exec();
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
-                    var imageReviews=[];
+                    var imageReviews = [];
                     for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
+                        if ((image.reviewID).toString() === (review._id).toString()) {
                             imageReviews.push(image.image)
                         }
-                    } 
+                    }
                     const customer = await this.customerModel.findById(shipper.customerID);
                     history.push({ user: customer, review: review, image: imageReviews });
                 }
@@ -394,18 +472,18 @@ export class OrderService {
         try {
             const merchants = await this.orderModel.find({ merchantID: id }).exec();
             var history = [];
-            
+
             const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9c");
             await Promise.all(merchants.map(async (merchant) => {
                 const reviews = await this.reviewModel.find({ orderID: merchant._id, typeOfReview: typeOfReviewObjectId });
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
-                    var imageReviews=[];
+                    var imageReviews = [];
                     for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
+                        if ((image.reviewID).toString() === (review._id).toString()) {
                             imageReviews.push(image.image)
                         }
-                    } 
+                    }
                     const customer = await this.customerModel.findById(merchant.customerID);
                     history.push({ user: customer, review: review, image: imageReviews });
                 }
@@ -421,18 +499,18 @@ export class OrderService {
         try {
             const customers = await this.orderModel.find({ customerID: id }).exec();
             var history = [];
-            
+
             const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");
             await Promise.all(customers.map(async (customer) => {
                 const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId });
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
-                    var imageReviews=[];
+                    var imageReviews = [];
                     for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
+                        if ((image.reviewID).toString() === (review._id).toString()) {
                             imageReviews.push(image.image)
                         }
-                    } 
+                    }
                     const shipper = await this.shipperModel.findById(customer.shipperID);
                     history.push({ user: shipper, review: review, image: imageReviews });
                 }
@@ -448,18 +526,18 @@ export class OrderService {
         try {
             const customers = await this.orderModel.find({ customerID: id }).exec();
             var historyToShipper = [];
-            
+
             const typeOfReviewObjectId1 = new ObjectId("6604e5a181084710d45efe9d");
             await Promise.all(customers.map(async (customer) => {
                 const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId1 });
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
-                    var imageReviews=[];
+                    var imageReviews = [];
                     for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
+                        if ((image.reviewID).toString() === (review._id).toString()) {
                             imageReviews.push(image.image)
                         }
-                    } 
+                    }
                     const shipper = await this.shipperModel.findById(customer.shipperID);
                     historyToShipper.push({ user: shipper, review: review, image: imageReviews });
                 }
@@ -471,17 +549,17 @@ export class OrderService {
                 const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId2 });
                 for (const review of reviews) {
                     const images = await this.ImgReviewModel.find().exec();
-                    var imageReviews=[];
+                    var imageReviews = [];
                     for (const image of images) {
-                        if((image.reviewID).toString() === (review._id).toString()){
+                        if ((image.reviewID).toString() === (review._id).toString()) {
                             imageReviews.push(image.image)
                         }
-                    } 
+                    }
                     const merchant = await this.merchantModel.findById(customer.merchantID);
                     historyToMerchant.push({ user: merchant, review: review, image: imageReviews });
                 }
             }));
-            return { result: true, historyToShipper: historyToShipper, historyToMerchant:historyToMerchant};
+            return { result: true, historyToShipper: historyToShipper, historyToMerchant: historyToMerchant };
         } catch (error) {
             console.error(error);
             return { result: false, error: error.message };
@@ -490,11 +568,11 @@ export class OrderService {
     async deleteOrder(id: string) {
         try {
             const statusPending = new ObjectId("661760e3fc13ae3574ab8ddd")
-            const order= await this.orderModel.findOne({ _id: id, status: statusPending })
+            const order = await this.orderModel.findOne({ _id: id, status: statusPending })
             if (!order) throw new HttpException('Not found Order or Order is not pending', HttpStatus.NOT_FOUND);
             const del = await this.orderModel.findOneAndDelete(order._id);
-            
-            return { result: true, order:"đã xoá" +order._id };
+
+            return { result: true, order: "đã xoá" + order._id };
         } catch (error) {
             return { result: false, error: error.message };
         }

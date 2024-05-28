@@ -1,7 +1,6 @@
-import { MinLength, IsNotEmpty, IsNumber, IsInt, isString, IsString, IsOptional, IsEmpty } from "class-validator"; // kiểm tra validate
+import { IsOptional } from "class-validator"; // kiểm tra validate
 import { Customer } from "src/schemas/customer.schemas";
 import { Merchant } from "src/schemas/merchant.schema";
-import { OrderStatus } from "src/schemas/orderStatus.schema";
 import { Shipper } from "src/schemas/shipper.schema";
 import { Voucher } from "src/schemas/voucher.schema";
 export class UpdateOrderDto {
@@ -43,7 +42,7 @@ export class UpdateOrderDto {
     totalDistance?: string
 
     @IsOptional()
-    status: OrderStatus
+    status: any
 
     @IsOptional()
     imageGetFood?: string
