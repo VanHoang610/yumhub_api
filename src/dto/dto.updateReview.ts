@@ -6,4 +6,7 @@ export class UpdateReviewDto {
     @IsOptional()
     description?: string
 
+    @IsString()
+    @IsOptional()
+    image?: string
 }

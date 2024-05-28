@@ -24,7 +24,7 @@ export class ReviewService {
     constructor(@InjectModel(Review.name) private reviewModel: Model<Review>,
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(TypeOfReview.name) private reviewType: Model<TypeOfReview>,
-        @InjectModel(ImageReview.name) private imageReivewModel: Model<ImageReview>,
+        @InjectModel(ImageReview.name) private imageReviewModel: Model<ImageReview>,
         @InjectModel(Customer.name) private customers: Model<Customer>,
         @InjectModel(Shipper.name) private shippers: Model<Shipper>,
         @InjectModel(Merchant.name) private merchants: Model<Merchant>,
@@ -153,10 +153,20 @@ export class ReviewService {
         }
     }
 
-    async updateReview(id: string, updateReivew: UpdateReviewDto) {
+    async updateReview(id: string, description: string, image: string) {
         try {
-            const updateReview = await this.reviewModel.findByIdAndUpdate(id, updateReivew, { new: true });
+            const updateReview = await this.reviewModel.findByIdAndUpdate(
+                id, 
+                { description }, 
+                { new: true });
             if (!updateReview) throw new HttpException("Not Found ReviewID", HttpStatus.NOT_FOUND);
+
+            const updatedImage = await this.imageReviewModel.findOneAndUpdate(
+                { reviewID: id }, 
+                { image },      
+                { new: true }     
+            );
+            if (!updatedImage) throw new HttpException("Not Found ImageReview", HttpStatus.NOT_FOUND);
             return { result: true, updateReview: updateReview }
         } catch (error) {
             return { result: false, updateReview: error }
