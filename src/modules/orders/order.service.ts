@@ -281,89 +281,45 @@ export class OrderService {
 
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
-            
-            const status = await this.statusModel.findById(updateOrder.status);
-            if (!status) {
-                let idStatus: object;
-                const Statuss = await this.statusModel.find().exec();
-                switch (updateOrder.status) {
-                    case 1:
-                        for (const status of Statuss) {
-                            if (status.name === "pending") {
-                                updateOrder.status = status._id
-                                break;
-                            }
-                        }
-                        break;
-                    case 2:
-                        for (const status of Statuss) {
-                            if (status.name === "processing") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-
-                        break;
-                    case 3:
-                        for (const status of Statuss) {
-                            if (status.name === "arrivedEatery") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-                        break;
-                    case 4:
-                        for (const status of Statuss) {
-                            if (status.name === "shipped") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-                        break;
-                    case 5:
-                        for (const status of Statuss) {
-                            if (status.name === "delivered") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-                        break;
-                    case 6:
-                        for (const status of Statuss) {
-                            if (status.name === "cancel") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-                        break;
-                    case 7:
-                        for (const status of Statuss) {
-                            if (status.name === "onHold") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-                        break;
-                    case 8:
-                        for (const status of Statuss) {
-                            if (status.name === "backordered") {
-                                updateOrder.status = status._id
-                                break
-                            }
-                        }
-                        break;
-                    default:
-
-                        return "nhập 1-8";
-
+            // Mapping số nguyên sang tên trạng thái
+            const statusMap = {
+                1: "pending",
+                2: "processing",
+                3: "arrivedEatery",
+                4: "shipped",
+                5: "delivered",
+                6: "cancel",
+                7: "onHold",
+                8: "backordered",
+            };
+    
+            // Kiểm tra nếu updateOrder.status là số
+            if (typeof updateOrder.status === 'number') {
+                const statusName = statusMap[updateOrder.status];
+                if (statusName) {
+                    // Tìm kiếm trạng thái theo tên
+                    const statusDoc = await this.statusModel.findOne({ name: statusName }).exec();
+                    if (!statusDoc) {
+                        return { result: false, message: `Status name '${statusName}' not found` };
+                    }
+                    updateOrder.status = statusDoc._id;
+                } else {
+                    return { result: false, message: "Nhập giá trị status từ 1-8" };
+                }
+            } else {
+                // Kiểm tra nếu updateOrder.status là _id hợp lệ
+                const status = await this.statusModel.findById(updateOrder.status);
+                if (!status) {
+                    return { result: false, message: "Invalid status ID" };
                 }
             }
-
+    
+            // Cập nhật đơn hàng
             const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, { new: true });
             if (!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
-            return { result: true, updateOrder: update }
+            return { result: true, updateOrder: update };
         } catch (error) {
-            return { result: false, updateOrder: error }
+            return { result: false, updateOrder: error };
         }
     }
     // doanh thu
