@@ -220,6 +220,7 @@ export class ShipperController {
      transactionHistory(@Query('id') id: string) {
          return this.shipperService.transactionHistory(id);
      }
+     
      @Get('rating')
      @UseGuards(AuthGuard)
      rating(@Query('id') id: string) {

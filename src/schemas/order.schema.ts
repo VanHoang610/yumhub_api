@@ -29,10 +29,10 @@ export class Order {
     @Prop({required: true}) 
     deliveryAddress: string
 
-    @Prop({required: true}) 
+    @Prop({required: true, default: 0}) 
     priceFood: number
 
-    @Prop({required: true}) 
+    @Prop({required: true, default: 0}) 
     deliveryCost: number
 
     @Prop({required: true})
@@ -58,6 +58,12 @@ export class Order {
 
     @Prop({required: false})
     imageGiveFood?: string
+
+    @Prop({required: false})
+    revenueMerchant?: number
+
+    @Prop({required: false})
+    revenueDelivery?: number
 
 }
 

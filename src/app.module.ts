@@ -30,6 +30,7 @@ import { foodStatusModule } from './modules/foodStatus/foodStatus.module';
 import { AdsModule } from './modules/ads/ads.module';
 import { PaymentMethodMerchant } from './schemas/paymentMethodMerchant.schema';
 import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
+import { FeeModule } from './modules/fee/fee.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
     PaymentMethodMerchant,
     foodStatusModule,
     AdsModule,
+    FeeModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],

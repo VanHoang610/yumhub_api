@@ -11,6 +11,7 @@ import { OrderStatus, OrderStatusSchemas } from 'src/schemas/orderStatus.schema'
 import { DetailOrder, DetailOrderSchema } from 'src/schemas/detailOrder.schema';
 import { Review, ReviewSchema } from 'src/schemas/review.schema';
 import { ImageReview, ImageReviewSchema } from 'src/schemas/imageReview.schema';
+import { Fee, FeeSchema } from 'src/schemas/fee.schema';
 
 @Module({
     imports:[
@@ -46,7 +47,11 @@ import { ImageReview, ImageReviewSchema } from 'src/schemas/imageReview.schema';
             {
                 name: ImageReview.name,
                 schema: ImageReviewSchema
-            }
+            },
+            {
+                name: Fee.name,
+                schema: FeeSchema
+            },
         ])
     ],
     providers: [OrderService],
