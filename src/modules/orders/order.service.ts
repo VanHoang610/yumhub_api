@@ -12,6 +12,7 @@ import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 import { Review } from 'src/schemas/review.schema';
 import { ImageReview } from 'src/schemas/imageReview.schema';
+import { Fee } from 'src/schemas/fee.schema';
 const { ObjectId } = require('mongodb');
 
 
@@ -19,6 +20,7 @@ const { ObjectId } = require('mongodb');
 export class OrderService {
 
     constructor(@InjectModel(Order.name) private orderModel: Model<Order>,
+        @InjectModel(Fee.name) private feeModel: Model<Fee>,
         @InjectModel(Customer.name) private customerModel: Model<Customer>,
         @InjectModel(Merchant.name) private merchantModel: Model<Merchant>,
         @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
@@ -281,6 +283,12 @@ export class OrderService {
 
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
+            const fee = await this.feeModel.findOne();
+            const order = await this.orderModel.findById(id);
+            const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
+            const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
+
+
             // Mapping số nguyên sang tên trạng thái
             const statusMap = {
                 1: "pending",
@@ -315,13 +323,23 @@ export class OrderService {
             }
     
             // Cập nhật đơn hàng
-            const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, { new: true });
+            const update = await this.orderModel.findByIdAndUpdate(
+                id,
+                {
+                  ...updateOrder,
+                  revenueMerchant,
+                  revenueDelivery,
+                },
+                { new: true },
+              );
             if (!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
             return { result: true, updateOrder: update };
         } catch (error) {
             return { result: false, updateOrder: error };
         }
     }
+
+
     // doanh thu
     async revenueMonth(month: string) {
         try {
