@@ -1,18 +1,22 @@
-import { IsEmpty, IsNumber, IsOptional } from "class-validator";
+import { IsArray, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { Order } from "src/schemas/order.schema";
-import { TypeOfReview } from "src/schemas/typeOfReview.shema";
 
 export class RegisterReviewDto {
-    @IsEmpty()
+    @IsNotEmpty()
     orderID: Order;
 
     @IsOptional()
     description?: string
 
-    @IsEmpty()
+    @IsOptional()
     @IsNumber()
     rating: number
 
     @IsEmpty()
     typeOfReviewID: number
+
+    @IsOptional()
+    @IsArray() 
+    @IsString({ each: true }) // phần tử trong mảng là một chuổi 
+    images: string[];
 }

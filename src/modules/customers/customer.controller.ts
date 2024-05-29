@@ -120,6 +120,15 @@ export class CustomerController {
         const { passOld, passNew } = body;
         return this.customerService.changePass(id, passOld, passNew);
     }
+
+
+    // lấy order của customer
+    @Post('getOrderByStatus')
+    @UseGuards(AuthGuard)
+    getOrderByStatus(@Body() body: {customerID: string, status: number}) {
+        const { customerID, status } = body;
+        return this.customerService.getOrderByStatus(customerID, status);
+    }
     
 }
 
