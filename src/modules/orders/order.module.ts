@@ -12,6 +12,7 @@ import { DetailOrder, DetailOrderSchema } from 'src/schemas/detailOrder.schema';
 import { Review, ReviewSchema } from 'src/schemas/review.schema';
 import { ImageReview, ImageReviewSchema } from 'src/schemas/imageReview.schema';
 import { Fee, FeeSchema } from 'src/schemas/fee.schema';
+import { TypeOfVoucher, TypeOfVoucherSchema } from 'src/schemas/typeOfVoucher.schema';
 
 @Module({
     imports:[
@@ -51,6 +52,10 @@ import { Fee, FeeSchema } from 'src/schemas/fee.schema';
             {
                 name: Fee.name,
                 schema: FeeSchema
+            },
+            {
+                name: TypeOfVoucher.name,
+                schema: TypeOfVoucherSchema
             },
         ])
     ],

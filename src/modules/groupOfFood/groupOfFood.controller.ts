@@ -9,7 +9,7 @@ export class GroupOfFoodController {
 
     @Post('create')
     @UseGuards(AuthGuard)
-    async createGroupOfFood(@Query('merchantID') merchantID: string, @Query('name') name: string) {
+    async createGroupOfFood(@Query('id') merchantID: string, @Query('name') name: string) {
         return await this.groupFoodServices.createGroupOfFood(merchantID, name);
     }
 
