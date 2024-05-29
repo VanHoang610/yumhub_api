@@ -346,48 +346,99 @@ export class OrderService {
   }
   
   // doanh thu
-  async revenueMonth(month: string) {
-    try {
-      const DeliveredID = await this.statusModel.findOne({ name: 'delivered' });
-      // Tính tổng doanh thu
-      var totalRevenueFood = 0;
-      var totalRevenueShipper = 0;
-      var totalVoucher = 0;
+    async revenueMonth(month: string) {
+        try {
 
-      const [targetYear, targetMonth] = month
-        .split('-')
-        .map((part) => parseInt(part, 10));
-      const firstDateMonth = new Date(targetYear, targetMonth - 1, 1);
-      const firstDateNextMonth = new Date(targetYear, targetMonth, 1);
-      const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1);
+            const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
+            // Tính tổng doanh thu
+            var totalRevenueFood = 0;
+            var totalRevenueShipper = 0;
+            var totalVoucher = 0
 
-      const orders = await this.orderModel.find({
-        timeBook: { $gte: firstDateMonth, $lte: lastDateOfMonth },
-        status: DeliveredID?._id, // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
-      });
-      for (const order of orders) {
-        totalRevenueFood += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
-        totalRevenueShipper += order.deliveryCost;
-        if (order.voucherID) {
-          var voucherID = this.voucherModel.findById(order.voucherID);
-          totalVoucher += (await voucherID).discountAmount;
+            const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
+            const firstDateMonth = new Date(targetYear, targetMonth - 1, 1)
+            const firstDateNextMonth = new Date(targetYear, targetMonth, 1)
+            const lastDateOfMonth = new Date(firstDateNextMonth.getTime() - 1)
+
+
+            const orders = await this.orderModel.find({
+                timeBook: { $gte: firstDateMonth, $lte: lastDateOfMonth },
+                status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+            })
+            for (const order of orders) {
+                totalRevenueFood += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+                totalRevenueShipper += order.deliveryCost
+                if (order.voucherID) {
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    totalVoucher += (await voucherID).discountAmount
+                }
+            }
+            var totalRevenue = totalRevenueFood + totalRevenueShipper
+
+            var totalProfit = totalRevenue - totalVoucher
+            return { result: true, revenue: totalRevenue, revenueFood: totalRevenueFood, revenueShip: totalRevenueShipper, voucher: totalVoucher, Profit: totalProfit }
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+    }
+
+    async updateOrder(id: string, updateOrder: UpdateOrderDto) {
+        try {
+            const fee = await this.feeModel.findOne();
+            const order = await this.orderModel.findById(id);
+            const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
+            const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
+
+
+            // Mapping số nguyên sang tên trạng thái
+            const statusMap = {
+                1: "pending",
+                2: "processing",
+                3: "arrivedEatery",
+                4: "shipped",
+                5: "delivered",
+                6: "cancel",
+                7: "onHold",
+                8: "backordered",
+            };
+    
+            // Kiểm tra nếu updateOrder.status là số
+            if (typeof updateOrder.status === 'number') {
+                const statusName = statusMap[updateOrder.status];
+                if (statusName) {
+                    // Tìm kiếm trạng thái theo tên
+                    const statusDoc = await this.statusModel.findOne({ name: statusName }).exec();
+                    if (!statusDoc) {
+                        return { result: false, message: `Status name '${statusName}' not found` };
+                    }
+                    updateOrder.status = statusDoc._id;
+                } else {
+                    return { result: false, message: "Nhập giá trị status từ 1-8" };
+                }
+            } else {
+                // Kiểm tra nếu updateOrder.status là _id hợp lệ
+                const status = await this.statusModel.findById(updateOrder.status);
+                if (!status) {
+                    return { result: false, message: "Invalid status ID" };
+                }
+            }
+    
+            // Cập nhật đơn hàng
+            const update = await this.orderModel.findByIdAndUpdate(
+                id,
+                {
+                  ...updateOrder,
+                  revenueMerchant,
+                  revenueDelivery,
+                },
+                { new: true },
+              );
+            if (!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
+            return { result: true, updateOrder: update };
+        } catch (error) {
+            return { result: false, updateOrder: error };
         }
       }
-      var totalRevenue = totalRevenueFood + totalRevenueShipper;
-
-      var totalProfit = totalRevenue - totalVoucher;
-      return {
-        result: true,
-        revenue: totalRevenue,
-        revenueFood: totalRevenueFood,
-        revenueShip: totalRevenueShipper,
-        voucher: totalVoucher,
-        Profit: totalProfit,
-      };
-    } catch (error) {
-      return { result: false, revenue: error };
-    }
-  }
 
   async getOrderByShipperAndStatus(orderDto: OrderDto) {
     try {
@@ -406,240 +457,166 @@ export class OrderService {
   }
 
   async shipperBeReview(id: string) {
-    try {
-      const shippers = await this.orderModel.find({ shipperID: id }).exec();
-      var history = [];
-      const typeOfReviewObjectId = new ObjectId('6604e5a181084710d45efe9d');
-      await Promise.all(
-        shippers.map(async (shipper) => {
-          const reviews = await this.reviewModel.find({
-            orderID: shipper._id,
-            typeOfReview: typeOfReviewObjectId,
-          });
-          for (const review of reviews) {
-            const images = await this.ImgReviewModel.find().exec();
-            var imageReviews = [];
-            for (const image of images) {
-              if (image.reviewID.toString() === review._id.toString()) {
-                imageReviews.push(image.image);
-              }
-            }
-            const customer = await this.customerModel.findById(
-              shipper.customerID,
-            );
-            history.push({
-              user: customer,
-              review: review,
-              image: imageReviews,
-            });
-          }
-        }),
-      );
+        try {
+            const shippers = await this.orderModel.find({ shipperID: id }).exec();
+            var history = [];
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9d");
+            await Promise.all(shippers.map(async (shipper) => {
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews = [];
+                    for (const image of images) {
+                        if ((image.reviewID).toString() === (review._id).toString()) {
+                            imageReviews.push(image.image)
+                        }
+                    }
+                    const customer = await this.customerModel.findById(shipper.customerID);
+                    history.push({ user: customer, review: review, image: imageReviews });
+                }
+            }));
 
-      return { result: true, history: history };
-    } catch (error) {
-      console.error(error);
-      return { result: false, error: error.message };
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
     }
-  }
-  async shipperReview(id: string) {
-    try {
-      const shippers = await this.orderModel.find({ shipperID: id }).exec();
-      var history = [];
-      const typeOfReviewObjectId = new ObjectId('6604e5a181084710d45efe9e');
-      await Promise.all(
-        shippers.map(async (shipper) => {
-          const reviews = await this.reviewModel
-            .find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId })
-            .exec();
-          for (const review of reviews) {
-            const images = await this.ImgReviewModel.find().exec();
-            var imageReviews = [];
-            for (const image of images) {
-              if (image.reviewID.toString() === review._id.toString()) {
-                imageReviews.push(image.image);
-              }
-            }
-            const customer = await this.customerModel.findById(
-              shipper.customerID,
-            );
-            history.push({
-              user: customer,
-              review: review,
-              image: imageReviews,
-            });
-          }
-        }),
-      );
+    async shipperReview(id: string) {
+        try {
+            const shippers = await this.orderModel.find({ shipperID: id }).exec();
+            var history = [];
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");
+            await Promise.all(shippers.map(async (shipper) => {
+                const reviews = await this.reviewModel.find({ orderID: shipper._id, typeOfReview: typeOfReviewObjectId }).exec();
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews = [];
+                    for (const image of images) {
+                        if ((image.reviewID).toString() === (review._id).toString()) {
+                            imageReviews.push(image.image)
+                        }
+                    }
+                    const customer = await this.customerModel.findById(shipper.customerID);
+                    history.push({ user: customer, review: review, image: imageReviews });
+                }
+            }));
 
-      return { result: true, history: history };
-    } catch (error) {
-      console.error(error);
-      return { result: false, error: error.message };
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
     }
-  }
-  async merchantBeReview(id: string) {
-    try {
-      const merchants = await this.orderModel.find({ merchantID: id }).exec();
-      var history = [];
+  
+    async merchantBeReview(id: string) {
+        try {
+            const merchants = await this.orderModel.find({ merchantID: id }).exec();
+            var history = [];
 
-      const typeOfReviewObjectId = new ObjectId('6604e5a181084710d45efe9c');
-      await Promise.all(
-        merchants.map(async (merchant) => {
-          const reviews = await this.reviewModel.find({
-            orderID: merchant._id,
-            typeOfReview: typeOfReviewObjectId,
-          });
-          for (const review of reviews) {
-            const images = await this.ImgReviewModel.find().exec();
-            var imageReviews = [];
-            for (const image of images) {
-              if (image.reviewID.toString() === review._id.toString()) {
-                imageReviews.push(image.image);
-              }
-            }
-            const customer = await this.customerModel.findById(
-              merchant.customerID,
-            );
-            history.push({
-              user: customer,
-              review: review,
-              image: imageReviews,
-            });
-          }
-        }),
-      );
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9c");
+            await Promise.all(merchants.map(async (merchant) => {
+                const reviews = await this.reviewModel.find({ orderID: merchant._id, typeOfReview: typeOfReviewObjectId });
+              for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews = [];
+                    for (const image of images) {
+                        if ((image.reviewID).toString() === (review._id).toString()) {
+                            imageReviews.push(image.image)
+                        }
+                    }
+                    const customer = await this.customerModel.findById(merchant.customerID);
+                    history.push({ user: customer, review: review, image: imageReviews });
+                }
+            }));
 
-      return { result: true, history: history };
-    } catch (error) {
-      console.error(error);
-      return { result: false, error: error.message };
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
     }
-  }
-  async customerBeReview(id: string) {
-    try {
-      const customers = await this.orderModel.find({ customerID: id }).exec();
-      var history = [];
+    async customerBeReview(id: string) {
+        try {
+            const customers = await this.orderModel.find({ customerID: id }).exec();
+            var history = [];
 
-      const typeOfReviewObjectId = new ObjectId('6604e5a181084710d45efe9e');
-      await Promise.all(
-        customers.map(async (customer) => {
-          const reviews = await this.reviewModel.find({
-            orderID: customer._id,
-            typeOfReview: typeOfReviewObjectId,
-          });
-          for (const review of reviews) {
-            const images = await this.ImgReviewModel.find().exec();
-            var imageReviews = [];
-            for (const image of images) {
-              if (image.reviewID.toString() === review._id.toString()) {
-                imageReviews.push(image.image);
-              }
-            }
-            const shipper = await this.shipperModel.findById(
-              customer.shipperID,
-            );
-            history.push({
-              user: shipper,
-              review: review,
-              image: imageReviews,
-            });
-          }
-        }),
-      );
+            const typeOfReviewObjectId = new ObjectId("6604e5a181084710d45efe9e");
+            await Promise.all(customers.map(async (customer) => {
+                const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews = [];
+                    for (const image of images) {
+                        if ((image.reviewID).toString() === (review._id).toString()) {
+                            imageReviews.push(image.image)
+                        }
+                    }
+                    const shipper = await this.shipperModel.findById(customer.shipperID);
+                    history.push({ user: shipper, review: review, image: imageReviews });
+                }
+            }));
 
-      return { result: true, history: history };
-    } catch (error) {
-      console.error(error);
-      return { result: false, error: error.message };
+            return { result: true, history: history };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
     }
-  }
-  async customerReview(id: string) {
-    try {
-      const customers = await this.orderModel.find({ customerID: id }).exec();
-      var historyToShipper = [];
+    async customerReview(id: string) {
+        try {
+            const customers = await this.orderModel.find({ customerID: id }).exec();
+            var historyToShipper = [];
 
-      const typeOfReviewObjectId1 = new ObjectId('6604e5a181084710d45efe9d');
-      await Promise.all(
-        customers.map(async (customer) => {
-          const reviews = await this.reviewModel.find({
-            orderID: customer._id,
-            typeOfReview: typeOfReviewObjectId1,
-          });
-          for (const review of reviews) {
-            const images = await this.ImgReviewModel.find().exec();
-            var imageReviews = [];
-            for (const image of images) {
-              if (image.reviewID.toString() === review._id.toString()) {
-                imageReviews.push(image.image);
-              }
-            }
-            const shipper = await this.shipperModel.findById(
-              customer.shipperID,
-            );
-            historyToShipper.push({
-              user: shipper,
-              review: review,
-              image: imageReviews,
-            });
-          }
-        }),
-      );
+            const typeOfReviewObjectId1 = new ObjectId("6604e5a181084710d45efe9d");
+            await Promise.all(customers.map(async (customer) => {
+                const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId1 });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews = [];
+                    for (const image of images) {
+                        if ((image.reviewID).toString() === (review._id).toString()) {
+                            imageReviews.push(image.image)
+                        }
+                    }
+                  const shipper = await this.shipperModel.findById(customer.shipperID);
+                    historyToShipper.push({ user: shipper, review: review, image: imageReviews });
+                }
+            }));
 
-      var historyToMerchant = [];
-      const typeOfReviewObjectId2 = new ObjectId('6604e5a181084710d45efe9c');
-      await Promise.all(
-        customers.map(async (customer) => {
-          const reviews = await this.reviewModel.find({
-            orderID: customer._id,
-            typeOfReview: typeOfReviewObjectId2,
-          });
-          for (const review of reviews) {
-            const images = await this.ImgReviewModel.find().exec();
-            var imageReviews = [];
-            for (const image of images) {
-              if (image.reviewID.toString() === review._id.toString()) {
-                imageReviews.push(image.image);
-              }
-            }
-            const merchant = await this.merchantModel.findById(
-              customer.merchantID,
-            );
-            historyToMerchant.push({
-              user: merchant,
-              review: review,
-              image: imageReviews,
-            });
-          }
-        }),
-      );
-      return {
-        result: true,
-        historyToShipper: historyToShipper,
-        historyToMerchant: historyToMerchant,
-      };
-    } catch (error) {
-      console.error(error);
-      return { result: false, error: error.message };
+            var historyToMerchant = [];
+            const typeOfReviewObjectId2 = new ObjectId("6604e5a181084710d45efe9c");
+            await Promise.all(customers.map(async (customer) => {
+                const reviews = await this.reviewModel.find({ orderID: customer._id, typeOfReview: typeOfReviewObjectId2 });
+                for (const review of reviews) {
+                    const images = await this.ImgReviewModel.find().exec();
+                    var imageReviews = [];
+                    for (const image of images) {
+                        if ((image.reviewID).toString() === (review._id).toString()) {
+                            imageReviews.push(image.image)
+                        }
+                    }
+                    const merchant = await this.merchantModel.findById(customer.merchantID);
+                    historyToMerchant.push({ user: merchant, review: review, image: imageReviews });
+                }
+            }));
+            return { result: true, historyToShipper: historyToShipper, historyToMerchant: historyToMerchant };
+        } catch (error) {
+            console.error(error);
+            return { result: false, error: error.message };
+        }
     }
-  }
-  async deleteOrder(id: string) {
-    try {
-      const statusPending = new ObjectId('661760e3fc13ae3574ab8ddd');
-      const order = await this.orderModel.findOne({
-        _id: id,
-        status: statusPending,
-      });
-      if (!order)
-        throw new HttpException(
-          'Not found Order or Order is not pending',
-          HttpStatus.NOT_FOUND,
-        );
-      const del = await this.orderModel.findOneAndDelete(order._id);
+  
+    async deleteOrder(id: string) {
+        try {
+            const statusPending = new ObjectId("661760e3fc13ae3574ab8ddd")
+            const order = await this.orderModel.findOne({ _id: id, status: statusPending })
+            if (!order) throw new HttpException('Not found Order or Order is not pending', HttpStatus.NOT_FOUND);
+            const del = await this.orderModel.findOneAndDelete(order._id);
 
-      return { result: true, order: 'đã xoá' + order._id };
-    } catch (error) {
-      return { result: false, error: error.message };
+            return { result: true, order: "đã xoá" + order._id };
+        } catch (error) {
+            return { result: false, error: error.message };
+        }
     }
-  }
 }
