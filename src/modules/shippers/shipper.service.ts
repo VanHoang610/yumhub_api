@@ -374,8 +374,8 @@ export class ShipperService {
     }
     async revenueShipperTimeTwoTime(id: string, dateStart: string, dateEnd: string) {
         try {
-            const start = new Date(dateStart).setHours(0, 0, 0, 0);;
-            const end = new Date(dateEnd).setHours(23, 59, 59, 999);;
+            const start = new Date(dateStart).setHours(0, 0, 0, 0);
+            const end = new Date(dateEnd).setHours(23, 59, 59, 999);
             const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
             const CancelID = await this.statusModel.findOne({ name: "cancel" });
             // Tính tổng doanh thu

@@ -12,6 +12,7 @@ import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 import { Review } from 'src/schemas/review.schema';
 import { ImageReview } from 'src/schemas/imageReview.schema';
+import { endOfMonth, set, startOfMonth, subMonths } from 'date-fns';
 const { ObjectId } = require('mongodb');
 
 
@@ -292,7 +293,7 @@ export class OrderService {
                 7: "onHold",
                 8: "backordered",
             };
-    
+
             // Kiểm tra nếu updateOrder.status là số
             if (typeof updateOrder.status === 'number') {
                 const statusName = statusMap[updateOrder.status];
@@ -313,7 +314,7 @@ export class OrderService {
                     return { result: false, message: "Invalid status ID" };
                 }
             }
-    
+
             // Cập nhật đơn hàng
             const update = await this.orderModel.findByIdAndUpdate(id, updateOrder, { new: true });
             if (!update) throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
@@ -358,6 +359,54 @@ export class OrderService {
             return { result: false, revenue: error }
         }
     }
+    // doanh thu truyền vào tháng lấy ra doanh thu tháng đó và 2 tháng trước
+    async revenueFoodAndDelivery(month: string) {
+        try {
+            const voucherType = new ObjectId("6656cfad8913d56206f64e06")
+            const date = new Date(month);
+            let totalRevenue = 0;
+            let totalVoucher = 0;
+            const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
+            const fakeOrderID = await this.statusModel.findOne({ name: "fakeOrder" });
+            const endOfMonthDate = endOfMonth(date);
+            const end = set(endOfMonthDate, { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
+            const twoMonthsAgo = subMonths(date, 2);
+            const start = startOfMonth(twoMonthsAgo);
+            const ordersuccess = (await this.orderModel.find({
+                timeBook: { $gte: start, $lte: end },
+                status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+            })).map(async (order) => {
+                totalRevenue += order.priceFood;
+                totalRevenue += order.deliveryCost;
+                if (order.voucherID) {
+                    const voucher = this.voucherModel.findById(order.voucherID)
+                    console.log('====================================');
+                    console.log(voucher);
+                    console.log('====================================');
+                    if (!voucher) throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
+                    totalVoucher += (await voucher).discountAmount
+                }
+            })
+            const fakeOrders = (await this.orderModel.find({
+                timeBook: { $gte: start, $lte: end },
+                status: fakeOrderID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
+            })).map(async (order) => {
+                totalRevenue += order.priceFood;
+                if (order.voucherID) {
+                    const voucher = this.voucherModel.findById(order.voucherID)
+                    if (!voucher) throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
+                    else if ((await voucher).typeOfVoucherID == voucherType) {
+                        totalVoucher += (await voucher).discountAmount
+                    }
+                }
+            })
+            return { result: true, totalRevenue: totalRevenue, totalVocher: totalVoucher }
+        } catch (error) {
+            return { result: false, revenue: error }
+        }
+    }
+
+
 
     async getOrderByShipperAndStatus(orderDto: OrderDto) {
         try {
