@@ -13,6 +13,7 @@ import { Merchant } from 'src/schemas/merchant.schema';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { Shipper } from 'src/schemas/shipper.schema';
 import { Voucher } from 'src/schemas/voucher.schema';
+
 export class UpdateOrderDto {
   @IsOptional()
   customerID: Customer;
@@ -51,7 +52,7 @@ export class UpdateOrderDto {
   totalDistance?: string;
 
   @IsOptional()
-  status: OrderStatus;
+  status: any
 
   @IsOptional()
   imageGetFood?: string;
