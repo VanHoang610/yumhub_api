@@ -25,7 +25,7 @@ export class ReviewController {
     @UseGuards(AuthGuard)
     createReview(@Body() createReview: RegisterReviewDto) {
         try {
-            const review = this.reviewService.createReivew(createReview);
+            const review = this.reviewService.createReview(createReview);
             return review;
         } catch (error) {
             console.error(error)
@@ -59,11 +59,11 @@ export class ReviewController {
     // sửa review
     @Patch('updateReview')
     @UseGuards(AuthGuard)
-    updateReview(@Query('id') id: string, @Body() body: { description: string, image: string }) {
+    updateReview(@Query('id') id: string, @Body() body: { description: string, images: string[] }) {
         try {
-            const { description, image } = body;
+            const { description, images } = body;
             // Assuming this.reviewService.updateReview takes three parameters
-            const review = this.reviewService.updateReview(id, description, image);
+            const review = this.reviewService.updateReview(id, description, images);
             return review;
         } catch (error) {
             console.error("Update review fail", error);
