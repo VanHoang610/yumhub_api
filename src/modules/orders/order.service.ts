@@ -14,6 +14,7 @@ import { Review } from 'src/schemas/review.schema';
 import { ImageReview } from 'src/schemas/imageReview.schema';
 import { endOfMonth, set, startOfMonth, subMonths } from 'date-fns';
 import { Fee } from 'src/schemas/fee.schema';
+import { TypeOfVoucher } from 'src/schemas/typeOfVoucher.schema';
 const { ObjectId } = require('mongodb');
 
 @Injectable()
@@ -28,6 +29,7 @@ export class OrderService {
         @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
         @InjectModel(Review.name) private reviewModel: Model<Review>,
         @InjectModel(ImageReview.name) private ImgReviewModel: Model<ImageReview>,
+        @InjectModel(TypeOfVoucher.name) private typeOfVoucherModel: Model<TypeOfVoucher>,
     ) { }
 
     async addData() {
@@ -356,52 +358,50 @@ export class OrderService {
     // doanh thu truyền vào tháng lấy ra doanh thu tháng đó và 2 tháng trước
     async revenueFoodAndDelivery(month: string) {
         try {
-            const voucherType = new ObjectId("6656cfad8913d56206f64e06")
+            const voucherType = new ObjectId("6656cfad8913d56206f64e06");
             const date = new Date(month);
             let totalRevenue = 0;
             let totalVoucher = 0;
             const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
             const fakeOrderID = await this.statusModel.findOne({ name: "fakeOrder" });
+    
+            if (!DeliveredID || !fakeOrderID) {
+                throw new Error("Status IDs not found");
+            }
+    
             const endOfMonthDate = endOfMonth(date);
             const end = set(endOfMonthDate, { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
             const twoMonthsAgo = subMonths(date, 2);
             const start = startOfMonth(twoMonthsAgo);
-            const ordersuccess = (await this.orderModel.find({
+    
+            const orders = await this.orderModel.find({
                 timeBook: { $gte: start, $lte: end },
-                status: DeliveredID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
-            })).map(async (order) => {
+                status: { $in: [DeliveredID._id, fakeOrderID._id] }
+            });
+    
+            const voucherPromises = orders.map(async (order) => {
                 totalRevenue += order.priceFood;
                 totalRevenue += order.deliveryCost;
+    
                 if (order.voucherID) {
-                    const voucher = this.voucherModel.findById(order.voucherID)
-                    console.log('====================================');
-                    console.log(voucher);
-                    console.log('====================================');
-                    if (!voucher) throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
-                    totalVoucher += (await voucher).discountAmount
-                }
-            })
-            const fakeOrders = (await this.orderModel.find({
-                timeBook: { $gte: start, $lte: end },
-                status: fakeOrderID?._id // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
-            })).map(async (order) => {
-                totalRevenue += order.priceFood;
-                if (order.voucherID) {
-                    const voucher = this.voucherModel.findById(order.voucherID)
-                    if (!voucher) throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
-                    else if ((await voucher).typeOfVoucherID == voucherType) {
-                        totalVoucher += (await voucher).discountAmount
+                    const voucher = await this.voucherModel.findById(order.voucherID).exec();
+                    if (!voucher) {
+                        throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
+                    } else if (voucher.typeOfVoucherID && new ObjectId(voucher.typeOfVoucherID).equals(voucherType)) {
+                        totalVoucher += voucher.discountAmount;
                     }
                 }
-            })
-            return { result: true, totalRevenue: totalRevenue, totalVocher: totalVoucher }
+            });
+    
+            await Promise.all(voucherPromises);
+    
+            return { result: true, totalRevenue: totalRevenue, totalVoucher: totalVoucher };
         } catch (error) {
-            return { result: false, revenue: error }
+            console.error(error);
+            return { result: false, revenue: error.message };
         }
     }
-
-
-
+    
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
             const fee = await this.feeModel.findOne();
