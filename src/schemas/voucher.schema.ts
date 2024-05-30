@@ -17,7 +17,7 @@ export class Voucher {
     @Prop({required: true}) //số lượng
     discountAmount: number
 
-    @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfVoucher'})  //total: 1, ship: 2, fee: 3
+    @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfVoucher'})  //food: 1, ship: 2
     typeOfVoucherID: TypeOfVoucher
 
     @Prop({required: true})
