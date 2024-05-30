@@ -29,7 +29,22 @@ export class AdsService {
         return { result: true, ads: createdAds };
     }
     async getAllAds() {
-        const ads = await this.adsModel.find();
-        return { result: true, ads: ads };
+        try {
+            // Lấy tất cả các quảng cáo từ cơ sở dữ liệu
+            const ads = await this.adsModel.find().lean().exec();
+    
+            // Sử dụng Promise.all để lấy thông tin thương gia cho tất cả quảng cáo song song
+            const adsWithMerchant = await Promise.all(
+                ads.map(async (ad) => {
+                    const merchant = await this.merchantModule.findById(ad.merchantID).lean().exec();
+                    return { ...ad, merchant }; // Không cần ._doc nếu sử dụng .lean()
+                })
+            );
+    
+            return { result: true, ads: adsWithMerchant };
+        } catch (error) {
+            console.error(error);
+            return { result: false, message: 'Failed to fetch ads' };
+        }
     }
 }
