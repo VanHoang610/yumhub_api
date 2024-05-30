@@ -25,9 +25,11 @@ export class CustomerServices {
     @InjectModel(Customer.name) private customers: Model<Customer>,
     @InjectModel(Address.name) private addressModel: Model<Address>,
     @InjectModel(Order.name) private orderModel: Model<Order>,
-    @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
+    @InjectModel(UserMerchant.name)
+    private userMerchantModel: Model<UserMerchant>,
     @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
-    @InjectModel(ResetPassword.name) private resetPassModel: Model<ResetPassword>,
+    @InjectModel(ResetPassword.name)
+    private resetPassModel: Model<ResetPassword>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
   ) {}
 
@@ -142,22 +144,26 @@ export class CustomerServices {
   async getCustomerById(id: string) {
     try {
       const customer = await this.customers.findById(id).select('-password');
-      if (!customer) throw new HttpException('Customer ID Not Found', HttpStatus.NOT_FOUND);
-  
+      if (!customer)
+        throw new HttpException('Customer ID Not Found', HttpStatus.NOT_FOUND);
+
       const address = await this.addressModel.find({ customerID: id });
-      if (!address) throw new HttpException('Address ID Not Found', HttpStatus.NOT_FOUND);
-  
+      if (!address)
+        throw new HttpException('Address ID Not Found', HttpStatus.NOT_FOUND);
+
       return { result: true, customer, address };
     } catch (error) {
       return { result: false, error: error.message };
     }
   }
-  
 
   async getCustmer() {
     try {
-      const customer = await this.customers.find().select('-password');
-      if (!customer) throw new HttpException('Not Find Customer', HttpStatus.NOT_FOUND);
+      const customer = await this.customers
+        .find({ deleted: false })
+        .select('-password');
+      if (!customer)
+        throw new HttpException('Not Find Customer', HttpStatus.NOT_FOUND);
 
       return { result: true, customer: customer };
     } catch (error) {
@@ -211,6 +217,9 @@ export class CustomerServices {
     try {
       const orders = await this.orderModel
         .find({ customerID: id })
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID')
         .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
@@ -430,6 +439,23 @@ export class CustomerServices {
       return { result: true, orderByCustomer: orderByCustomer };
     } catch (error) {
       return { result: false, orderByCustomer: error };
+    }
+  }
+
+  async getCustomersBySearch(keyword: string) {
+    try {
+      const customers = await this.customers.find({
+        $or: [
+          { fullName: new RegExp(keyword, 'i') }, // thường hay hoa đều được
+          { phoneNumber: new RegExp(keyword, 'i') },
+        ],
+      });
+      if (customers.length === 0) {
+        return { result: false, message: 'Not Found Customers', customers: [] };
+      }
+      return { result: true, customers: customers };
+    } catch (error) {
+      return { result: false, customers: error };
     }
   }
 }
