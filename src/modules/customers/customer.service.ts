@@ -15,6 +15,7 @@ import { UserMerchant } from 'src/schemas/userMerchant.schema';
 import { Shipper } from 'src/schemas/shipper.schema';
 import { JwtService } from '@nestjs/jwt';
 import { Review } from 'src/schemas/review.schema';
+import { Address } from 'src/schemas/address.schema';
 const { ObjectId } = require('mongodb');
 
 @Injectable()
@@ -22,12 +23,11 @@ export class CustomerServices {
   constructor(
     private jwtService: JwtService,
     @InjectModel(Customer.name) private customers: Model<Customer>,
+    @InjectModel(Address.name) private addressModel: Model<Address>,
     @InjectModel(Order.name) private orderModel: Model<Order>,
-    @InjectModel(UserMerchant.name)
-    private userMerchantModel: Model<UserMerchant>,
+    @InjectModel(UserMerchant.name) private userMerchantModel: Model<UserMerchant>,
     @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
-    @InjectModel(ResetPassword.name)
-    private resetPassModel: Model<ResetPassword>,
+    @InjectModel(ResetPassword.name) private resetPassModel: Model<ResetPassword>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
   ) {}
 
@@ -141,20 +141,24 @@ export class CustomerServices {
 
   async getCustomerById(id: string) {
     try {
-      const customer = await this.customers.findById(id);
-      if (!customer)
-        throw new HttpException('Not Find ID Customer', HttpStatus.NOT_FOUND);
-      return { result: true, customer: customer };
+      const customer = await this.customers.findById(id).select('-password');
+      if (!customer) throw new HttpException('Customer ID Not Found', HttpStatus.NOT_FOUND);
+  
+      const address = await this.addressModel.find({ customerID: id });
+      if (!address) throw new HttpException('Address ID Not Found', HttpStatus.NOT_FOUND);
+  
+      return { result: true, customer, address };
     } catch (error) {
-      return { result: false, customer: error };
+      return { result: false, error: error.message };
     }
   }
+  
 
   async getCustmer() {
     try {
-      const customer = await this.customers.find();
-      if (!customer)
-        throw new HttpException('Not Find Customer', HttpStatus.NOT_FOUND);
+      const customer = await this.customers.find().select('-password');
+      if (!customer) throw new HttpException('Not Find Customer', HttpStatus.NOT_FOUND);
+
       return { result: true, customer: customer };
     } catch (error) {
       return { result: false, customer: error };
