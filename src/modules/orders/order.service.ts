@@ -234,9 +234,9 @@ export class OrderService {
             return { result: false, order: error };
         }
     }
-    // lấy id của Đơn hàng đã được tạo nhưng chưa được xác nhận hoặc xử lý.
-
-    async setStatus(orderId: string, status: string | number) {
+  
+   // lấy id của Đơn hàng đã được tạo nhưng chưa được xác nhận hoặc xử lý.
+  async setStatus(orderId: string, status: string | number) {
         try {
             let idStatus: object;
             const parsedStatus = parseInt(status as string);
@@ -316,9 +316,11 @@ export class OrderService {
             );
             return 'Đã thay đổi trạng thái';
         } catch (error) {
-            return error;
+          return error;
         }
     }
+  
+  
     // doanh thu
     async revenueMonth(month: string) {
         try {
@@ -355,6 +357,7 @@ export class OrderService {
             return { result: false, revenue: error }
         }
     }
+
     // doanh thu truyền vào tháng lấy ra doanh thu tháng đó và 2 tháng trước
     async revenueFoodAndDelivery(month: string) {
         try {
@@ -408,8 +411,6 @@ export class OrderService {
             const order = await this.orderModel.findById(id);
             const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
             const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
-
-
             // Mapping số nguyên sang tên trạng thái
             const statusMap = {
                 1: "pending",

@@ -715,7 +715,10 @@ export class MerchantService {
     async getNearMerchant(id: string) {
         try {
             const addressCustomer = await this.addressModol.findOne({customerID: id});
+            if(!addressCustomer) throw new HttpException("Not Found Address", HttpStatus.NOT_FOUND)
             const merchants = await this.merchants.find({status: 3}).exec();
+            if(!merchants) throw new HttpException("Not Found Merchants", HttpStatus.NOT_FOUND)
+
 
              //tính quãng đường
              const sortMerchant = merchants.map(merchant => {
