@@ -53,4 +53,7 @@ export class OrderDto {
 
     @IsString()
     nameStatus?: string
+
+    @IsNumber()
+    paymentMethod?: number
 }
