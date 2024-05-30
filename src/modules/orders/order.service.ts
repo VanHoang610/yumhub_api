@@ -317,33 +317,6 @@ export class OrderService {
       return error;
     }
   }
-
-  async updateOrder(id: string, updateOrder: UpdateOrderDto) {
-    try {
-      const fee = await this.feeModel.findOne();
-      const order = await this.orderModel.findById(id);
-      const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
-      const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
-
-      const update = await this.orderModel.findByIdAndUpdate(
-        id,
-        {
-          ...updateOrder,
-          revenueMerchant,
-          revenueDelivery,
-        },
-        { new: true },
-      );
-
-      if (!update) {
-        throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
-      }
-
-      return { result: true, updateOrder: update };
-    } catch (error) {
-      return { result: false, updateOrder: error };
-    }
-  }
   
   // doanh thu
     async revenueMonth(month: string) {
@@ -388,8 +361,6 @@ export class OrderService {
             const order = await this.orderModel.findById(id);
             const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
             const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
-
-
             // Mapping số nguyên sang tên trạng thái
             const statusMap = {
                 1: "pending",
