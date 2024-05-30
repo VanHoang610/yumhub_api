@@ -28,4 +28,8 @@ export class AdsService {
         const createdAds = await newAds.save();
         return { result: true, ads: createdAds };
     }
+    async getAllAds() {
+        const ads = await this.adsModel.find();
+        return { result: true, ads: ads };
+    }
 }
