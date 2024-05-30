@@ -188,8 +188,9 @@ export class ShipperService {
 
     async getHistory(id: string) {
         try {
-            const orders = await this.orderModel.find({ shipperID: id }).sort({ timeBook: 1 });
+            const orders = await this.orderModel.find({ shipperID: id }).sort({ timeBook: 1 }).populate('customerID');
             if (!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
+            
             return { result: true, historyShipper: orders }
         } catch (error) {
             return { result: false, historyShipper: error }

@@ -105,7 +105,7 @@ export class ShipperController {
         try {
             const shipper = this.shipperService.getHistory(id);
             if (!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return { result: true, history: shipper };
+            return shipper;
         } catch (error) {
             return { result: false, error }
         }

@@ -65,6 +65,9 @@ export class Order {
     @Prop({required: false})
     revenueDelivery?: number
 
+    @Prop({required: false, default: 3}) // 1:banking, 2:zalopay, 3:cash
+    paymentMethod?: number
+
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order)

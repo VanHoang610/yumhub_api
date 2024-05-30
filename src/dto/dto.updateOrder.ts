@@ -56,4 +56,7 @@ export class UpdateOrderDto {
 
   @IsOptional()
   revenueDelivery?: string;
+
+  @IsOptional()
+  paymentMethod?: number;
 }
