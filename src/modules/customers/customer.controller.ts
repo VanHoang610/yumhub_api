@@ -48,7 +48,7 @@ export class CustomerController {
     }
 
     // lấy tất cả customer
-    @Get()
+    @Get('getAllCustomer')
     @UseGuards(AuthGuard)
     getCustomer() {
         return this.customerService.getCustmer();

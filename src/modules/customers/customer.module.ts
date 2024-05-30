@@ -10,6 +10,7 @@ import { Shipper, ShipperSchema } from "src/schemas/shipper.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "../auth/constants";
 import { Review, ReviewSchema } from "src/schemas/review.schema";
+import { Address, AddressSchema } from "src/schemas/address.schema";
 
 
 @Module({
@@ -38,6 +39,10 @@ import { Review, ReviewSchema } from "src/schemas/review.schema";
             {
                 name: Review.name,
                 schema: ReviewSchema
+            },
+            {
+                name: Address.name,
+                schema: AddressSchema
             }
         ]),
         JwtModule.register({

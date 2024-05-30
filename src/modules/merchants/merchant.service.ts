@@ -226,7 +226,7 @@ export class MerchantService {
     async getHistory(id: string) {
         try {
 
-            const orders = await this.orderModel.find({ merchantID: id }).sort({ timeBook: 1 });
+            const orders = await this.orderModel.find({ merchantID: id }).sort({ timeBook: 1 }).populate('customerID');
             if (!orders) throw new HttpException("Not Found", HttpStatus.NOT_FOUND);
             return { result: true, history: orders }
 
