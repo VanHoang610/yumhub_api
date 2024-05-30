@@ -14,4 +14,8 @@ export class TypeOfMerchantService {
         const category = await this.merchantModel.find({type:type._id}).exec();
         return { result: true, category: category};
     }
+    async getAllCategory() {
+        const category = await this.typeMerchantModel.find().exec();
+        return { result: true, category: category};
+    }
 }
