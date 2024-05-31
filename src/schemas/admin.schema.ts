@@ -44,6 +44,9 @@ export class Admin {
 
     @Prop({required: false})
     updatedBy: string
+
+    @Prop({required: false, default: false})
+    deleted: boolean
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin)
