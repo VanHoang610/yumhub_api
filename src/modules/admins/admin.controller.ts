@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common'
 import { AdminService } from './admin.service';
 import { LoginDto } from 'src/dto/dto.login';
 import { LoginAdminDto } from 'src/dto/dto.loginAdmin';
 import { AuthGuard } from '../../helper/auth.middleware';
+import { CreateAdminDto } from 'src/dto/dto.createAdmin';
+import { updateAdminDto } from 'src/dto/dto.updateAdmin';
+import { updateEmployeeDto } from 'src/dto/dto.updateEmployee';
 
 
 @Controller('admin')
@@ -55,5 +58,39 @@ export class AdminController {
     @UseGuards(AuthGuard)
     showAll() {
         return this.adminService.showAll();
+    }
+
+    @Post('createAdmin')
+    @UseGuards(AuthGuard)
+    createAdmin(@Body() admin: CreateAdminDto, @Req() req: Request) {
+        admin.createdBy = req['user']._id;
+        admin.createdAt = new Date();
+        return this.adminService.createAdmin(admin);
+    }
+
+    @Get('search')
+    @UseGuards(AuthGuard)
+    searchAdmin(@Query('search') search: string) {
+        return this.adminService.searchAdmin(search);
+    }
+    
+    @Post('deleteAdmin')
+    @UseGuards(AuthGuard)
+    deleteAdmin(@Query('id') id: string) {
+        return this.adminService.deleteAdmin(id);
+    }
+
+    @Post('updateAdmin')
+    @UseGuards(AuthGuard)
+    updateAdmin(@Query('id') id: string, @Body() admin: updateAdminDto) {
+        return this.adminService.updateAdmin(id, admin);
+    }
+
+    @Post('updateEmployee')
+    @UseGuards(AuthGuard)
+    updateEmployee(@Query('id') id: string, @Body() admin: updateEmployeeDto, @Req() req: Request) {
+        admin.updatedAt = new Date();
+        admin.updatedBy = req['user'].id;
+        return this.adminService.updateEmployee(id, admin);
     }
 }
