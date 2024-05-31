@@ -9,6 +9,9 @@ import { HttpStatus, HttpException } from '@nestjs/common';
 import { LoginAdminDto } from 'src/dto/dto.loginAdmin';
 import { ResetPassword } from 'src/schemas/resetPass.schema';
 import { Mailer } from 'src/helper/mailer';
+import { CreateAdminDto } from 'src/dto/dto.createAdmin';
+import { updateAdminDto } from 'src/dto/dto.updateAdmin';
+import { updateEmployeeDto } from 'src/dto/dto.updateEmployee';
 @Injectable()
 export class AdminService {
 
@@ -27,7 +30,7 @@ export class AdminService {
                     "userName": "admin",
                     "avatar": "adminNe.png",
                     "fullName": "Đoàn Thanh Hòa",
-                    "sex": "Nam",
+                    "gender": "Nam",
                     "password": hashedPassword,
                     "email": "hoangkun610@gmail.com"
                 },
@@ -36,7 +39,7 @@ export class AdminService {
                     "userName": "yumhub",
                     "avatar": "yumhubNe.png",
                     "fullName": "TeamWord",
-                    "sex": "Nam",
+                    "gender": "Nam",
                     "password": hashedPassword,
                     "email": "hoanglvps26283@fpt.edu.vn"
                 }
@@ -55,11 +58,10 @@ export class AdminService {
             if (!compare) throw new HttpException('Password wrong', HttpStatus.UNAUTHORIZED)
             // Tạo token
             const payload = {
+                _id: admin._id,
                 userName: admin.userName,
-                sex: admin.sex,
                 email: admin.email,
-                fullName: admin.fullName,
-                avatar: admin.avatar
+                fullName: admin.fullName
             };
             const token = await this.jwtService.signAsync(payload);
             admin.password = undefined;
@@ -90,7 +92,7 @@ export class AdminService {
                 await this.resetPassModel.deleteOne({ email: email });
             }, 120000);
 
-            return { result: true, message: "Hãy kiểm tra email của bạn!"}
+            return { result: true, message: "Hãy kiểm tra email của bạn!" }
 
         } catch (error) {
             return { result: false, message: "Gửi OTP thất bại" }
@@ -110,7 +112,7 @@ export class AdminService {
 
     async resetPass(email: string, password: string) {
         try {
-            const user = await this.adminModel.findOne({email: email});
+            const user = await this.adminModel.findOne({ email: email });
             const idUser = user._id;
             const findUser = await this.adminModel.findById(idUser);
             if (!findUser) throw new HttpException("Not Find Account", HttpStatus.NOT_FOUND);
@@ -139,6 +141,87 @@ export class AdminService {
         } catch (error) {
             console.error("Error in changePass:", error);
             return { result: false, data: error }
+        }
+    }
+    async showAll() {
+        try {
+            const admin = await this.adminModel.find();
+            return { result: true, data: admin };
+        } catch (error) {
+            return { result: false, data: error };
+        }
+    }
+
+    async createAdmin(admin: CreateAdminDto) {
+        try {
+            const checkEmail = await this.adminModel.findOne({ email: admin.email });
+            if (checkEmail) throw new HttpException("Email đã tồn tại", HttpStatus.BAD_REQUEST);
+            const checkPhone = await this.adminModel.findOne({ phoneNumber: admin.phoneNumber });
+            if (checkPhone) throw new HttpException("SDT đã tồn tại", HttpStatus.BAD_REQUEST);
+            const checkUsername = await this.adminModel.findOne({ userName: admin.userName });
+            if (checkUsername) throw new HttpException("Username đã tồn tại", HttpStatus.BAD_REQUEST);
+            const newAdmin = new this.adminModel(admin);
+            const saveAdmin = await newAdmin.save();
+            return { result: true, data: saveAdmin };
+        } catch (error) {
+            return { result: false, data: error };
+        }
+    }
+
+    async searchAdmin(search: string) {
+        try {
+          const regex = new RegExp(search, 'i');
+          
+          // Aggregation pipeline để chuyển đổi _id thành chuỗi và áp dụng $regex
+          const pipeline = [
+            {
+              $match: {
+                $or: [
+                  { fullName: regex },
+                  { userName: regex },
+                  { phoneNumber: regex },
+                  { _idStr: { $regex: regex } }
+                ]
+              }
+            },
+            {
+              $addFields: {
+                _idStr: { $toString: "$_id" }
+              }
+            }
+          ];
+          
+          const admin = await this.adminModel.aggregate(pipeline).exec();
+    
+          return { result: true, data: admin };
+        } catch (error) {
+          return { result: false, data: error };
+        }
+      }
+
+    async deleteAdmin(id: string) {
+        try {
+            const admin = await this.adminModel.findByIdAndUpdate(id, { deleted: true });
+            return { result: true, data: admin };
+        } catch (error) {
+            return { result: false, data: error };
+        }
+    }
+
+    async updateAdmin(id: string, admin: updateAdminDto) {
+        try {
+            const updateAdmin = await this.adminModel.findByIdAndUpdate(id, admin, { new: true });
+            return { result: true, data: updateAdmin };
+        } catch (error) {
+            return { result: false, data: error };
+        }
+    }
+    async updateEmployee(id: string, admin: updateEmployeeDto) {
+        try {
+            const updateAdmin = await this.adminModel.findByIdAndUpdate(id, admin, { new: true });
+            return { result: true, data: updateAdmin };
+        } catch (error) {
+            return { result: false, data: error };
         }
     }
 }

@@ -10,4 +10,9 @@ export class TypeOfMerchantController {
         const { name } = body
         return this.typeOfMerchantService.getCategory(name);
     }
+
+    @Get('all')
+    getAllCategory() {
+        return this.typeOfMerchantService.getAllCategory();
+    }
 }
