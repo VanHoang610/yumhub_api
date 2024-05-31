@@ -381,6 +381,9 @@ export class ShipperService {
             const CancelID = await this.statusModel.findOne({ name: "cancel" });
             // Tính tổng doanh thu
             var totalRevenue = 0;
+            var payByBanking=0;
+            var payByZalo=0;
+            var payByCash=0;
             const shipper = await this.shipperModel.findById(id);
             if (!shipper){
                 return {result:"nhập sai ID Shipper", revenue:0,  cancel:0}
@@ -400,13 +403,20 @@ export class ShipperService {
             var numberOfOrders =0
             for (const order of orders) {
                 numberOfOrders+=1
-                totalRevenue += order.deliveryCost; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+                totalRevenue += order.revenueDelivery; 
+                if (order.paymentMethod==1){
+                    payByBanking+=order.revenueDelivery
+                }else if (order.paymentMethod==2){
+                    payByZalo+=order.revenueDelivery
+                }else if (order.paymentMethod==3){
+                    payByCash+=order.revenueDelivery
+                }
             }
             var numberOfOrderCancel =0
             for (const order of orderCancel) {
                 numberOfOrderCancel+=1
             }
-            return { result: true, revenue: totalRevenue, success: numberOfOrders ,cancel: numberOfOrderCancel }
+            return { result: true, revenue: totalRevenue, success: numberOfOrders ,cancel: numberOfOrderCancel, payByBanking: payByBanking, payByZalo: payByZalo, payByCash: payByCash }
         } catch (error) {
             return { result: false, revenue: error, cancel:error }
         }
