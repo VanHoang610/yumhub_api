@@ -108,15 +108,17 @@ export class ReviewService {
       const savedReview = await reviewNew.save();
       console.log('Review saved:', savedReview);
 
-      const imageReviewPromises = images.map((image) => {
-        const imageReview = new this.imageReviewModel({
-          reviewID: savedReview._id,
-          image: image,
+      if (images && images.length > 0) {
+        const imageReviewPromises = images.map((image) => {
+          const imageReview = new this.imageReviewModel({
+            reviewID: savedReview._id,
+            image: image,
+          });
+          return imageReview.save();
         });
-        return imageReview.save();
-      });
 
-      await Promise.all(imageReviewPromises);
+        await Promise.all(imageReviewPromises);
+      }
 
       return { result: true, newReview: savedReview };
     } catch (error) {
