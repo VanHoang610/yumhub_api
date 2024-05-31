@@ -75,7 +75,7 @@ export class ShipperController {
 
     // tạo shipper
     @Post('createShipper')
-    createOrder(@Body() shippers: RegisterShipperDto) {
+    createShipper(@Body() shippers: RegisterShipperDto) {
         try {
             const shipper = this.shipperService.createShipper(shippers);
             return shipper;
@@ -180,9 +180,9 @@ export class ShipperController {
 
     //gửi email xác thực
     @Post('verifileShipper')
-    verifileMerchant(@Body() body: { email: string }) {
+    verifileShipper(@Body() body: { email: string }) {
         const { email } = body;
-        return this.shipperService.verifileMerchant(email);
+        return this.shipperService.verifileShipper(email);
     }
 
     // danh sách shipper cần duyệt
