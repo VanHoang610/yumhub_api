@@ -330,6 +330,7 @@ export class OrderService {
             var totalRevenueFood = 0;
             var totalRevenueShipper = 0;
             var totalVoucher = 0
+           
 
             const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
             const firstDateMonth = new Date(targetYear, targetMonth - 1, 1)
@@ -346,8 +347,9 @@ export class OrderService {
                 totalRevenueShipper += order.deliveryCost
                 if (order.voucherID) {
                     var voucherID = this.voucherModel.findById(order.voucherID)
-                    totalVoucher += (await voucherID).discountAmount
+                    totalVoucher += (await voucherID).discountAmount 
                 }
+                
             }
             var totalRevenue = totalRevenueFood + totalRevenueShipper
 
