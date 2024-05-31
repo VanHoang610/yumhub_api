@@ -306,6 +306,14 @@ export class OrderService {
                         }
                     }
                     break;
+                case 9:
+                    for (const status of Statuss) {
+                        if (status.name === 'fakeOrder') {
+                            idStatus = status._id;
+                            break;
+                        }
+                    }
+                    break;
                 default:
                     return 'nhập 1-8';
             }
@@ -330,7 +338,7 @@ export class OrderService {
             var totalRevenueFood = 0;
             var totalRevenueShipper = 0;
             var totalVoucher = 0
-           
+
 
             const [targetYear, targetMonth] = month.split('-').map(part => parseInt(part, 10));
             const firstDateMonth = new Date(targetYear, targetMonth - 1, 1)
@@ -347,9 +355,9 @@ export class OrderService {
                 totalRevenueShipper += order.deliveryCost
                 if (order.voucherID) {
                     var voucherID = this.voucherModel.findById(order.voucherID)
-                    totalVoucher += (await voucherID).discountAmount 
+                    totalVoucher += (await voucherID).discountAmount
                 }
-                
+
             }
             var totalRevenue = totalRevenueFood + totalRevenueShipper
 
@@ -392,8 +400,8 @@ export class OrderService {
 
             const voucherPromises1 = orderSuccess.map(async (order) => {
                 totalRevenue += order.totalPaid;
-                totalProfitShipper+= order.revenueDelivery;
-                totalProfitMerchant+= order.revenueMerchant;
+                totalProfitShipper += order.revenueDelivery;
+                totalProfitMerchant += order.revenueMerchant;
                 totalFood += order.priceFood;
                 totalShip += order.deliveryCost;
                 if (order.voucherID) {
@@ -410,7 +418,7 @@ export class OrderService {
                         throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
                     } else if (voucher.typeOfVoucherID && new ObjectId(voucher.typeOfVoucherID).equals(voucherType)) {
                         totalVoucher += voucher.discountAmount;
-                        totalProfitMerchant+= order.revenueMerchant;
+                        totalProfitMerchant += order.revenueMerchant;
                         totalFood += order.priceFood;
                     }
                 }
@@ -440,6 +448,7 @@ export class OrderService {
                 6: "cancel",
                 7: "onHold",
                 8: "backordered",
+                9: "fakeOrder",
             };
 
             // Kiểm tra nếu updateOrder.status là số

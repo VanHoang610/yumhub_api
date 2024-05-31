@@ -50,4 +50,10 @@ export class AdminController {
         return this.adminService.changePass(id, passOld, passNew);
         
     }
+
+    @Get('showAll')
+    @UseGuards(AuthGuard)
+    showAll() {
+        return this.adminService.showAll();
+    }
 }

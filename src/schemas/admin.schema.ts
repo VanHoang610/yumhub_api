@@ -16,10 +16,34 @@ export class Admin {
     avatar: string
 
     @Prop({required: false})
-    sex: string
+    address: string
 
-    @Prop({required: false, unique: true})
+    @Prop({required: false})
+    gender: string
+
+    @Prop({required: true, unique: true})
     email: string
+
+    @Prop({required: true, unique: true})
+    phoneNumber: string
+
+    @Prop({required: false})
+    dob: Date
+
+    @Prop({required: false, default: "employee"}) //employee Yumhub,  manager
+    position: string
+
+    @Prop({required: false})
+    createdAt: Date
+
+    @Prop({required: false})
+    updatedAt: Date
+
+    @Prop({required: false})
+    createdBy: string
+
+    @Prop({required: false})
+    updatedBy: string
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin)
