@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { AdsService } from "./ads.service";
 import { AdsDto } from "src/dto/dto.ads";
 
@@ -9,5 +9,9 @@ export class AdsController {
     async createAds(@Body() ads: AdsDto) {
         
         return await this.adsService.createAds(ads);
+    }
+    @Get("all")
+    async getAllAds() {
+        return await this.adsService.getAllAds();
     }
 }
