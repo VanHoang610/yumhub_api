@@ -27,7 +27,7 @@ export class AdminService {
                     "userName": "admin",
                     "avatar": "adminNe.png",
                     "fullName": "Đoàn Thanh Hòa",
-                    "sex": "Nam",
+                    "gender": "Nam",
                     "password": hashedPassword,
                     "email": "hoangkun610@gmail.com"
                 },
@@ -36,7 +36,7 @@ export class AdminService {
                     "userName": "yumhub",
                     "avatar": "yumhubNe.png",
                     "fullName": "TeamWord",
-                    "sex": "Nam",
+                    "gender": "Nam",
                     "password": hashedPassword,
                     "email": "hoanglvps26283@fpt.edu.vn"
                 }
@@ -56,7 +56,7 @@ export class AdminService {
             // Tạo token
             const payload = {
                 userName: admin.userName,
-                sex: admin.sex,
+                gender: admin.gender,
                 email: admin.email,
                 fullName: admin.fullName,
                 avatar: admin.avatar
@@ -139,6 +139,14 @@ export class AdminService {
         } catch (error) {
             console.error("Error in changePass:", error);
             return { result: false, data: error }
+        }
+    }
+    async showAll() {
+        try {
+            const admin = await this.adminModel.find();
+            return { result: true, data: admin };
+        } catch (error) {
+            return { result: false, data: error };
         }
     }
 }
