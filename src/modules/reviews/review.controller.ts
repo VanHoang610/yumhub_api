@@ -62,7 +62,6 @@ export class ReviewController {
     updateReview(@Query('id') id: string, @Body() body: { description: string, images: string[] }) {
         try {
             const { description, images } = body;
-            // Assuming this.reviewService.updateReview takes three parameters
             const review = this.reviewService.updateReview(id, description, images);
             return review;
         } catch (error) {
