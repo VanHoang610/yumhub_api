@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, ValidationPipe, Query, UseGuards, Param } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Patch,
+  Post,
+  ValidationPipe,
+  Query,
+  UseGuards,
+  Param,
+} from '@nestjs/common';
 import { MerchantService } from './merchant.service';
 import { RegisterMerchatDto } from 'src/dto/dto.registerMerchant';
 import { LoginDto } from 'src/dto/dto.login';
@@ -10,266 +22,287 @@ import { MerchantDto } from 'src/dto/dto.merchant';
 
 @Controller('merchants')
 export class MerchantController {
-    constructor(private readonly merchantService: MerchantService) { }
+  constructor(private readonly merchantService: MerchantService) {}
 
+  @Patch('updateMerchant')
+  @UseGuards(AuthGuard)
+  updateMerchant(@Query('id') id: string, @Body() update: MerchantDto) {
+    console.log(update);
+    return this.merchantService.updateMerchant(id, update);
+  }
 
-    @Patch('updateMerchant')
-    @UseGuards(AuthGuard)
-    updateMerchant(@Query('id') id: string, @Body() update: MerchantDto) {
-        console.log(update);
-        return this.merchantService.updateMerchant(id, update);
+  @Post('RevenueWeek')
+  @UseGuards(AuthGuard)
+  getRevenueWeek(@Body() body: { ID: string }) {
+    try {
+      const { ID } = body;
+      const totalRevenue = this.merchantService.getRevenueWeek(ID);
+      if (!totalRevenue) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      return totalRevenue;
+    } catch (error) {
+      return error;
     }
-    
+  }
 
-    @Post('RevenueWeek')
-    @UseGuards(AuthGuard)
-    getRevenueWeek(@Body() body: { ID: string }) {
-        try {
-            const { ID } = body
-            const totalRevenue = this.merchantService.getRevenueWeek(ID);
-            if (!totalRevenue) {
-                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            }
-            return totalRevenue;
-        } catch (error) {
-            return error;
-        }
+  @Post('RevenueMonth')
+  @UseGuards(AuthGuard)
+  getRevenueMonth(@Body() body: { ID: string; month: string }) {
+    try {
+      const { ID, month } = body;
+      const totalRevenue = this.merchantService.getRevenueMonth(ID, month);
+      if (!totalRevenue) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      return totalRevenue;
+    } catch (error) {
+      return error;
     }
+  }
 
-    @Post('RevenueMonth')
-    @UseGuards(AuthGuard)
-    getRevenueMonth(@Body() body: { ID: string, month: string }) {
-        try {
-            const { ID, month } = body
-            const totalRevenue = this.merchantService.getRevenueMonth(ID, month);
-            if (!totalRevenue) {
-                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            }
-            return totalRevenue;
-        } catch (error) {
-            return error;
-        }
+  @Post('RevenueTTT')
+  @UseGuards(AuthGuard)
+  getRevenueTime(
+    @Body() body: { ID: string; startDate: string; endDate: string },
+  ) {
+    try {
+      const { ID, startDate, endDate } = body;
+      const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(
+        ID,
+        startDate,
+        endDate,
+      );
+      if (!totalRevenue)
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return totalRevenue;
+    } catch (error) {
+      return error;
     }
+  }
 
-    @Post('RevenueTTT')
-    @UseGuards(AuthGuard)
-    getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
-        try {
-            const { ID, startDate, endDate } = body
-            const totalRevenue = this.merchantService.revenueMerchantTimeTwoTime(ID, startDate, endDate);
-            if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return totalRevenue;
-        } catch (error) {
-            return error
-        }
+  @Get('newUser')
+  @UseGuards(AuthGuard)
+  newMerchant() {
+    return this.merchantService.newMerchantInMonth();
+  }
+
+  @Get('addData')
+  addData() {
+    try {
+      const shipper = this.merchantService.addData();
+      return shipper;
+    } catch (error) {
+      console.error('Create Shipper Fail', error);
     }
+  }
 
-    @Get('newUser')
-    @UseGuards(AuthGuard)
-    newMerchant() {
-        return this.merchantService.newMerchantInMonth();
+  // sắp xếp vị trí người dùng với cửa hàng từ gần đến xa
+  @Post('sortLocation')
+  @UseGuards(AuthGuard)
+  getLocation(@Body() body: { longitude: number; latitude: number }) {
+    const { longitude, latitude } = body;
+    try {
+      const merchant = this.merchantService.sortLocation(longitude, latitude);
+      if (!merchant) throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return merchant;
+    } catch (error) {
+      return error;
     }
-    
-    @Get('addData')
-    addData() {
-        try {
-            const shipper = this.merchantService.addData();
-            return shipper;
-        } catch (error) {
-            console.error("Create Shipper Fail", error)
-        }
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  getMerchantByID(@Query('id') id: string) {
+    return this.merchantService.getMerchantById(id);
+  }
+
+  @Get('getAllMerchant')
+  @UseGuards(AuthGuard)
+  getMerchant() {
+    return this.merchantService.getMerchant();
+  }
+
+  @Post('deleteMerchant')
+  @UseGuards(AuthGuard)
+  deleteCustomer(@Query('id') id: string) {
+    return this.merchantService.deleteMerchant(id);
+  }
+
+  //lấy lịch sử merchant
+  @Get('getHistoryMerchant')
+  @UseGuards(AuthGuard)
+  getHistoryMerchant(@Query('id') id: string) {
+    try {
+      const merchant = this.merchantService.getHistoryMerchant(id);
+      if (!merchant) throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return merchant;
+    } catch (error) {
+      return error;
     }
+  }
 
-    // sắp xếp vị trí người dùng với cửa hàng từ gần đến xa
-    @Post('sortLocation')
-    @UseGuards(AuthGuard)
-    getLocation(@Body() body: { longitude: number, latitude: number }) {
-        const { longitude, latitude } = body;
-        try {
-            const merchant = this.merchantService.sortLocation(longitude, latitude);
-            if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return merchant;
-        } catch (error) {
-            return error
-        }
+  //lấy 5 shipper gần cửa hàng nhất
+  @Get('get5NearestShippers')
+  @UseGuards(AuthGuard)
+  get5NearestShippers(@Query('id') id: string) {
+    try {
+      const merchant = this.merchantService.get5NearestShippers(id);
+      if (!merchant) throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return merchant;
+    } catch (error) {
+      return error;
     }
+  }
 
-    @Get()
-    @UseGuards(AuthGuard)
-    getMerchantByID(@Query('id') id: string) {
-        return this.merchantService.getMerchantById(id);
-    }
+  //login
+  @Post('login')
+  login(@Body(new ValidationPipe()) users: LoginDto) {
+    return this.merchantService.login(users);
+  }
 
+  // tạo merchant
+  @Post('createMerchant')
+  createUser(@Body() registerDto: RegisterMerchatDto) {
+    return this.merchantService.createMerchant(registerDto);
+  }
 
+  //quên mật khẩu bằng Email
+  @Post('forgetPassByEmail')
+  forgetPasswordByEmail(@Body() body: { email: string }) {
+    const { email } = body;
 
-    @Get('getAllMerchant')
-    @UseGuards(AuthGuard)
-    getMerchant() {
-        return this.merchantService.getMerchant();
-    }
+    return this.merchantService.forgetPassByEmail(email);
+  }
 
-    @Post('deleteMerchant')
-    @UseGuards(AuthGuard)
-    deleteCustomer(@Query('id') id: string) {
-        return this.merchantService.deleteMerchant(id);
-    }
+  //kiểm tra OTP
+  @Post('checkOTP')
+  checkOTP(@Body() body: { email: string; otp: string }) {
+    const { email, otp } = body;
+    return this.merchantService.checkOTP(email, otp);
+  }
 
-    //lấy lịch sử merchant
-    @Get('getHistoryOrder')
-    @UseGuards(AuthGuard)
-    getHistoryShipper(@Query('id') id: string) {
-        try {
-            const merchant = this.merchantService.getHistory(id);
-            if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return merchant;
-        } catch (error) {
-            return error
-        }
-    }
+  //cập nhật mật khẩu
+  @Post('resetPass')
+  resetPass(@Query('id') id: string, @Body() body: { password: string }) {
+    const { password } = body;
+    return this.merchantService.resetPass(id, password);
+  }
 
-    //lấy 5 shipper gần cửa hàng nhất
-    @Get('get5NearestShippers')
-    @UseGuards(AuthGuard)
-    get5NearestShippers(@Query('id') id: string) {
-        try {
-            const merchant = this.merchantService.get5NearestShippers(id);
-            if (!merchant) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return merchant;
-        } catch (error) {
-            return error
-        }
-    }
+  //đổi mật khẩu
+  @Post('changePass')
+  @UseGuards(AuthGuard)
+  changePassword(
+    @Query('id') id: string,
+    @Body() body: { passOld: string; passNew: string },
+  ) {
+    const { passOld, passNew } = body;
+    return this.merchantService.changePass(id, passOld, passNew);
+  }
 
-    //login
-    @Post('login')
-    login(@Body(new ValidationPipe()) users: LoginDto) {
-        return this.merchantService.login(users);
-    }
+  //gửi email xác thực
+  @Post('verifileMerchant')
+  verifileMerchant(@Body() body: { email: string }) {
+    const { email } = body;
+    return this.merchantService.verifileMerchant(email);
+  }
 
-    // tạo merchant
-    @Post('createMerchant')
-    createUser(@Body() registerDto: RegisterMerchatDto) {
-        return this.merchantService.createMerchant(registerDto)
-    }
+  // tạo tài khoản cho employee
+  @Post('createEmployee')
+  createEmployee(@Body() registerDto: RegisterEmployeeDto) {
+    return this.merchantService.createEmployee(registerDto);
+  }
 
-    //quên mật khẩu bằng Email
-    @Post('forgetPassByEmail')
-    forgetPasswordByEmail(@Body() body: { email: string }) {
-        const { email } = body;
+  // sửa tài khoản userMerchant
+  @Patch('updateUserMerchant')
+  @UseGuards(AuthGuard)
+  updateUserMerchant(
+    @Query('id') id: string,
+    @Body() update: UpdateUserMerchantDto,
+  ) {
+    return this.merchantService.updateUserMerchant(id, update);
+  }
 
-        return this.merchantService.forgetPassByEmail(email);
-    }
+  // xóa tài khoản userMerchant
+  @Post('deleteUserMerchant')
+  @UseGuards(AuthGuard)
+  deleteUserMerchant(@Query('id') id: string) {
+    return this.merchantService.deleteUserMerchant(id);
+  }
 
-    //kiểm tra OTP
-    @Post('checkOTP')
-    checkOTP(@Body() body: { email: string, otp: string }) {
-        const { email, otp } = body;
-        return this.merchantService.checkOTP(email, otp);
-    }
+  // danh sách merchant cần duyệt
+  @Get('listMerchantApproval')
+  @UseGuards(AuthGuard)
+  listMerchantApproval() {
+    return this.merchantService.listMerchantApproval();
+  }
 
-    //cập nhật mật khẩu
-    @Post('resetPass')
-    resetPass(@Query('id') id: string, @Body() body: { password: string }) {
-        const { password } = body;
-        return this.merchantService.resetPass(id, password);
-    }
+  // chi tiết tài khoản merchant
+  @Get('getMerchantById')
+  @UseGuards(AuthGuard)
+  getMerchantById(@Query('id') id: string) {
+    return this.merchantService.getMerchantById(id);
+  }
 
+  // nạp tiền merchant
+  @Post('topUp')
+  @UseGuards(AuthGuard)
+  topUpMerchant(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
+    return this.merchantService.topUpMerchant(id, topUp);
+  }
 
-    //đổi mật khẩu
-    @Post('changePass')
-    @UseGuards(AuthGuard)
-    changePassword(@Query('id') id: string, @Body() body: { passOld: string, passNew: string }) {
-        const { passOld, passNew } = body;
-        return this.merchantService.changePass(id, passOld, passNew);
-    }
+  // rút tiền merchant
+  @Post('cashOut')
+  @UseGuards(AuthGuard)
+  cashOutMerchant(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
+    return this.merchantService.cashOutMerchant(id, topUp);
+  }
 
-    //gửi email xác thực
-    @Post('verifileMerchant')
-    verifileMerchant(@Body() body: { email: string }) {
-        const { email } = body;
-        return this.merchantService.verifileMerchant(email);
-    }
+  // lịch sử nạp/rút tiền merchant
+  @Get('transactionHistory')
+  @UseGuards(AuthGuard)
+  transactionHistory(@Query('id') id: string) {
+    return this.merchantService.transactionHistory(id);
+  }
 
-    // tạo tài khoản cho employee
-    @Post('createEmployee')
-    createEmployee(@Body() registerDto: RegisterEmployeeDto) {
-        return this.merchantService.createEmployee(registerDto)
-    }
+  // lấy tất cả food đang bán của merchant
+  @Get('getFoodByMerchant')
+  @UseGuards(AuthGuard)
+  getFoodByMerchant(@Query('id') id: string) {
+    return this.merchantService.getFoodByMerchant(id);
+  }
 
+  @Get('rating')
+  @UseGuards(AuthGuard)
+  rating(@Query('id') id: string) {
+    return this.merchantService.getRating(id);
+  }
 
-    // sửa tài khoản userMerchant
-    @Patch('updateUserMerchant')
-    @UseGuards(AuthGuard)
-    updateUserMerchant(@Query('id') id: string, @Body() update: UpdateUserMerchantDto) {
-        return this.merchantService.updateUserMerchant(id, update);
-    }
+  @Get('getAllTypeOfMerchant')
+  @UseGuards(AuthGuard)
+  getAllTypeOfMerchant() {
+    return this.merchantService.getAllTypeOfMerchant();
+  }
 
-    // xóa tài khoản userMerchant
-    @Post('deleteUserMerchant')
-    @UseGuards(AuthGuard)
-    deleteUserMerchant(@Query('id') id: string) {
-        return this.merchantService.deleteUserMerchant(id)
-    }
+  @Get('getNearMerchant')
+  @UseGuards(AuthGuard)
+  getNearMerchant(@Query('id') id: string) {
+    return this.merchantService.getNearMerchant(id);
+  }
 
+  //tìm kiếm merchant
+  @Post('findMerchant')
+  @UseGuards(AuthGuard)
+  findMerchant(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.merchantService.findMerchant(keyword);
+  }
 
-    // danh sách merchant cần duyệt
-    @Get('listMerchantApproval')
-    @UseGuards(AuthGuard)
-    listMerchantApproval() {
-        return this.merchantService.listMerchantApproval();
-    }
-
-    // chi tiết tài khoản merchant
-    @Get('getMerchantById')
-    @UseGuards(AuthGuard)
-    getMerchantById(@Query('id') id: string) {
-        return this.merchantService.getMerchantById(id);
-    }
-
-    // nạp tiền merchant
-    @Post('topUp')
-    @UseGuards(AuthGuard)
-    topUpMerchant(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
-        return this.merchantService.topUpMerchant(id, topUp);
-    }
-
-    // rút tiền merchant
-    @Post('cashOut')
-    @UseGuards(AuthGuard)
-    cashOutMerchant(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
-        return this.merchantService.cashOutMerchant(id, topUp);
-    }
-
-    // lịch sử nạp/rút tiền merchant
-    @Get('transactionHistory')
-    @UseGuards(AuthGuard)
-    transactionHistory(@Query('id') id: string) {
-        return this.merchantService.transactionHistory(id);
-    }
-
-
-    // lấy tất cả food đang bán của merchant
-    @Get('getFoodByMerchant')
-    @UseGuards(AuthGuard)
-    getFoodByMerchant(@Query('id') id: string) {
-        return this.merchantService.getFoodByMerchant(id)
-    }
-
-    @Get('rating')
-     @UseGuards(AuthGuard)
-     rating(@Query('id') id: string) {
-         return this.merchantService.getRating(id);
-     }
-
-     @Get('getAllTypeOfMerchant')
-     @UseGuards(AuthGuard)
-     getAllTypeOfMerchant() {
-         return this.merchantService.getAllTypeOfMerchant();
-     }
-
-     @Get('getNearMerchant')
-     @UseGuards(AuthGuard)
-     getNearMerchant(@Query('id') id: string) {
-         return this.merchantService.getNearMerchant(id);
-     }
+  //tìm kiếm merchant đang phê duyệt
+  @Post('findApproveMerchant')
+  @UseGuards(AuthGuard)
+  findApproveMerchant(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.merchantService.findApproveMerchant(keyword);
+  }
 }

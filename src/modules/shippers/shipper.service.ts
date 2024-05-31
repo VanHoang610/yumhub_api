@@ -341,7 +341,7 @@ export class ShipperService {
         }
     }
 
-    async verifileMerchant(email: string) {
+    async verifileShipper(email: string) {
         try {
             const user = await this.shipperModel.findOne({ email: email });
             if (!user) throw new HttpException("Email chưa đăng ký", HttpStatus.NOT_FOUND);
