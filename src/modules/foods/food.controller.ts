@@ -27,7 +27,7 @@ export class FoodController {
         }
     }
 
-    @Get('getFoodByStatus')
+    @Post('getFoodByStatus')
     @UseGuards(AuthGuard)
     getFoodByStatus(@Body() body: { status: number }) {
         try {
@@ -37,6 +37,7 @@ export class FoodController {
             return error
         }
     }
+    
     @Get('getFoodById')
     @UseGuards(AuthGuard)
     getFoodById(@Query('id') id: string) {
@@ -55,6 +56,15 @@ export class FoodController {
             return error
         }
     }
+
+    //tìm kiếm food đang phê duyệt
+  @Post('findApproveFood')
+  @UseGuards(AuthGuard)
+  findApproveFood(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.foodService.findApproveFood(keyword);
+  }
+
     // @Patch("updateImg/:id")
     // async updateImg(@Param('id') id: string, @Body() body: { img: string }) {
     //     try {
@@ -90,6 +100,5 @@ export class FoodController {
         } catch (error) {
             return error
         }
-
     }
 }
