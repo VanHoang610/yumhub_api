@@ -59,10 +59,10 @@ export class ReviewController {
     // sửa review
     @Patch('updateReview')
     @UseGuards(AuthGuard)
-    updateReview(@Query('id') id: string, @Body() body: { description: string, images: string[] }) {
+    updateReview(@Query('id') id: string, @Body() body: { description: string, rating: number, images: string[] }) {
         try {
-            const { description, images } = body;
-            const review = this.reviewService.updateReview(id, description, images);
+            const { description, images, rating } = body;
+            const review = this.reviewService.updateReview(id, description, images, rating);
             return review;
         } catch (error) {
             console.error("Update review fail", error);
