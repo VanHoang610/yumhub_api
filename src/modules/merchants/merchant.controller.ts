@@ -216,10 +216,7 @@ export class MerchantController {
   // sửa tài khoản userMerchant
   @Patch('updateUserMerchant')
   @UseGuards(AuthGuard)
-  updateUserMerchant(
-    @Query('id') id: string,
-    @Body() update: UpdateUserMerchantDto,
-  ) {
+  updateUserMerchant(@Query('id') id: string, @Body() update: UpdateUserMerchantDto) {
     return this.merchantService.updateUserMerchant(id, update);
   }
 

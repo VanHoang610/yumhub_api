@@ -193,7 +193,7 @@ export class MerchantService {
 
   async getMerchant() {
     try {
-      const merchants = await this.merchants.find({ deleted: false });
+      const merchants = await this.merchants.find({ deleted: false, status: 3 });
       await this.merchants.populate(merchants, { path: 'type' });
       if (!merchants)
         throw new HttpException('Not found merchant', HttpStatus.UNAUTHORIZED);
@@ -229,10 +229,16 @@ export class MerchantService {
         updateMerchant,
         { new: true },
       );
+      if (!merchantNew) {
+        throw new Error(`Không tìm thấy merchantID: ${id}`);
+      }
 
       const userMerchant = await this.userMerchantModel.findOne({
         merchantID: id,
       });
+      if (!userMerchant) {
+        throw new Error(`Không tìm thấy userMerchant ${id}`);
+      }
       const idUserMerchant = userMerchant._id;
       const userMerchantUpdate = {
         email: updateMerchant.email,
@@ -257,7 +263,9 @@ export class MerchantService {
       const orders = await this.orderModel
         .find({ merchantID: id })
         .sort({ timeBook: 1 })
-        .populate('customerID').populate('merchantID').populate('shipperID');
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID');
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
     } catch (error) {

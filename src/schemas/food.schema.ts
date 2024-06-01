@@ -13,8 +13,8 @@ export class Food {
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'FoodStatus'})  
     status: FoodStatus
     
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'TypeOfFood'})  
-    GroupOfFood: GroupOfFood
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'GroupOfFood'})  
+    groupOfFood: GroupOfFood
 
     @Prop({required: false})
     image?: string
@@ -27,7 +27,6 @@ export class Food {
 
     @Prop({required: false}) // giá bán
     priceForSale?: number
-
    
 }   
 

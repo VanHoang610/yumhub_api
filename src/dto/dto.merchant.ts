@@ -32,6 +32,10 @@ export class MerchantDto {
     rating?: number
 
     @IsOptional()
+    @IsNumber()
+    status?: number
+
+    @IsOptional()
     @IsString()
     businessLicense?: string
 
