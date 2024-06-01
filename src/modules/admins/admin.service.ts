@@ -145,7 +145,7 @@ export class AdminService {
     }
     async showAll() {
         try {
-            const admin = await this.adminModel.find();
+            const admin = await this.adminModel.find({ deleted: false });
             return { result: true, data: admin };
         } catch (error) {
             return { result: false, data: error };
@@ -201,7 +201,7 @@ export class AdminService {
 
     async deleteAdmin(id: string) {
         try {
-            const admin = await this.adminModel.findByIdAndUpdate(id, { deleted: true });
+            const admin = await this.adminModel.findByIdAndUpdate(id, { deleted: true }, { new: true });
             return { result: true, data: admin };
         } catch (error) {
             return { result: false, data: error };

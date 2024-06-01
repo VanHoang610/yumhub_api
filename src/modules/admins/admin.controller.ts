@@ -90,7 +90,7 @@ export class AdminController {
     @UseGuards(AuthGuard)
     updateEmployee(@Query('id') id: string, @Body() admin: updateEmployeeDto, @Req() req: Request) {
         admin.updatedAt = new Date();
-        admin.updatedBy = req['user'].id;
+        admin.updatedBy = req['user']._id;
         return this.adminService.updateEmployee(id, admin);
     }
 }
