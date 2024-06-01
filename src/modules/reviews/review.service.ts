@@ -136,11 +136,11 @@ export class ReviewService {
     }
   }
 
-  async updateReview(id: string, description: string, images: string[]) {
+  async updateReview(id: string, description: string, images: string[], rating: number,) {
     try {
       const updateReview = await this.reviewModel.findByIdAndUpdate(
         id,
-        { description },
+        { description, rating },
         { new: true },
       );
 
