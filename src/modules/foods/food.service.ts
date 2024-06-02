@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators/core';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { FoodDto } from 'src/dto/dto.food';
 import { Food } from 'src/schemas/food.schema';
 import { FoodStatus } from 'src/schemas/foodStatus.schema';
 import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
 import { Merchant } from 'src/schemas/merchant.schema';
+const { ObjectId } = require('mongodb');
 
 @Injectable()
 export class FoodService {
@@ -103,9 +104,9 @@ export class FoodService {
         { status: idStatus },
         { new: true },
       );
-      return {result: true, update: "Đã thay đổi trạng thái"}
+      return { result: true, update: 'Đã thay đổi trạng thái' };
     } catch (error) {
-      return {result: false, update: error}
+      return { result: false, update: error };
     }
   }
 
@@ -203,24 +204,48 @@ export class FoodService {
   }
 
   async findApproveFood(keyword: string) {
-    try {
-      const foods = await this.FoodModel.find({
-        $and: [
-          {
-            $or: [
-              { nameFood: new RegExp(keyword, 'i') },
-            ],
-          },
-          { status: "661f9962fc13ae6967a24534" },
-        ],
-      });
-      if (foods.length === 0) {
-        return { result: false, message: 'Not Found Foods', foods: [] };
-      }
-      return { result: true, foods: foods };
-    } catch (error) {
-      return { result: false, foods: error };
-    }
+    const statusObjectId = new ObjectId('661f9962fc13ae6967a24534');
+    const regex = new RegExp(keyword, 'i');
+    const pipeline = [
+      {
+        $lookup: { // nối bảng
+          from: 'merchants', // Tên bảng merchants
+          localField: 'merchantID', // Trường kết nối từ bảng foods
+          foreignField: '_id', // Trường kết nối từ bảng merchants
+          as: 'merchant', // Tên alias cho bảng kết hợp
+        },
+      },
+      {
+        $unwind: {
+          path: '$merchant',
+          preserveNullAndEmptyArrays: true, // Đảm bảo tài liệu không có merchant vẫn được giữ lại
+        },
+      },
+      {
+        $addFields: {
+          _idStr: { $toString: '$_id' },
+          nameMerchant: '$merchant.name', // Truy cập tên merchant sau khi unwind
+        },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                { nameFood: regex },
+                { price: regex },
+                { nameMerchant: regex }, // Thêm điều kiện tìm kiếm theo tên merchant
+              ],
+            },
+            { status: statusObjectId }, 
+          ],
+        },
+      },
+    ];
+
+    const foods = await this.FoodModel.aggregate(pipeline).exec();
+
+    return { result: true, foods: foods };
   }
 
   // async updateImg(foodId:string, img: string){
