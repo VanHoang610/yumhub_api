@@ -178,7 +178,7 @@ export class ShipperService {
 
     async getAllShipper() {
         try {
-            const shippers = await this.shipperModel.find();
+            const shippers = await this.shipperModel.find({deleted: false});
             if (!shippers) return { Message: "Not found shipper" }
             return { result: true, AllShipper: shippers }
         } catch (error) {
@@ -584,5 +584,10 @@ export class ShipperService {
         }
         const rating = numberOfReview>0? totalPointReview/numberOfReview: 0
         return {result: true, rating:rating}
+    }
+    
+    async getShipperIsDeleted(){
+        const deletedShipper = await this.shipperModel.find({deleted: true})
+        return {result: true, deletedShipper: deletedShipper}
     }
 }
