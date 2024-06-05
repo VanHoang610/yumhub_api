@@ -302,4 +302,19 @@ export class MerchantController {
     const { keyword } = body;
     return this.merchantService.findApproveMerchant(keyword);
   }
+
+  //lấy tất cả merchant đã xóa
+  @Get('getAllDeletedMerchant')
+  @UseGuards(AuthGuard)
+  getAllDeletedMerchant() {
+    return this.merchantService.getAllDeletedMerchant();
+  }
+
+  //tìm kiếm merchant đã xóa
+  @Post('findDeletedMerchant')
+  @UseGuards(AuthGuard)
+  findDeletedMerchant(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.merchantService.findDeletedMerchant(keyword);
+  }
 }
