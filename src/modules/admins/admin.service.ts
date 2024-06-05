@@ -197,7 +197,7 @@ export class AdminService {
         } catch (error) {
           return { result: false, data: error };
         }
-      }
+    }
 
     async deleteAdmin(id: string) {
         try {

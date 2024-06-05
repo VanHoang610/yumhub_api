@@ -373,62 +373,144 @@ export class OrderService {
         try {
             const voucherType = new ObjectId("6656cfad8913d56206f64e06");// giảm theo food
             const date = new Date(month);
-            let totalRevenue = 0;
-            let totalVoucher = 0;
-            let totalProfitShipper = 0;
-            let totalProfitMerchant = 0;
-            let totalFood = 0;
-            let totalShip = 0;
+            let totalRevenue1 = 0;
+            let totalRevenue2 = 0;
+            let totalRevenue3 = 0;
+            let totalVoucher1 = 0;
+            let totalVoucher2 = 0;
+            let totalVoucher3 = 0;
+            let totalProfitShipper1 = 0;
+            let totalProfitShipper2 = 0;
+            let totalProfitShipper3 = 0;
+            let totalProfitMerchant1 = 0;
+            let totalProfitMerchant2 = 0;
+            let totalProfitMerchant3 = 0;
+            let totalFood1 = 0;
+            let totalFood2 = 0;
+            let totalFood3 = 0;
+            let totalShip1 = 0;
+            let totalShip2 = 0;
+            let totalShip3 = 0;
 
             const DeliveredID = await this.statusModel.findOne({ name: "delivered" });
             const fakeOrderID = await this.statusModel.findOne({ name: "fakeOrder" });
-
             const endOfMonthDate = endOfMonth(date);
-            const end = set(endOfMonthDate, { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
+            const end3 = set(endOfMonthDate, { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
+            const start3 = startOfMonth(date);
+            const oneMonthsAgo = subMonths(date, 1);
+            const end2 = set(endOfMonth(oneMonthsAgo), { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
+            const start2 = startOfMonth(oneMonthsAgo);
             const twoMonthsAgo = subMonths(date, 2);
-            const start = startOfMonth(twoMonthsAgo);
-            //order thành công
+            const end1 = set(endOfMonth(twoMonthsAgo), { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
+            const start1 = startOfMonth(twoMonthsAgo);
+
+            // tháng 1
             const orderSuccess = await this.orderModel.find({
-                timeBook: { $gte: start, $lte: end },
+                timeBook: { $gte: start1, $lte: end1 },
                 status: DeliveredID?._id
             });
-
             const orderFake = await this.orderModel.find({
-                timeBook: { $gte: start, $lte: end },
+                timeBook: { $gte: start1, $lte: end1 },
                 status: fakeOrderID?._id
             });
-
-            const voucherPromises1 = orderSuccess.map(async (order) => {
-                totalRevenue += order.totalPaid;
-                totalProfitShipper += order.revenueDelivery;
-                totalProfitMerchant += order.revenueMerchant;
-                totalFood += order.priceFood;
-                totalShip += order.deliveryCost;
+            // đơn thành công lấy hết
+            for (const order of orderSuccess) {
+                totalRevenue1 += order.totalPaid;
+                totalFood1 += order.priceFood;
+                totalShip1 += order.deliveryCost;
+                totalProfitMerchant1 += order.revenueMerchant;
+                totalProfitShipper1 += order.revenueDelivery;
                 if (order.voucherID) {
-                    const voucher = await this.voucherModel.findById(order.voucherID);
-                    totalVoucher += voucher.discountAmount;
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    totalVoucher1 += (await voucherID).discountAmount
                 }
-            });
-            const voucherPromises2 = orderFake.map(async (order) => {
-                totalRevenue += order.priceFood;
-
+            }
+            // đơn không thành công
+            for (const order of orderFake) {
+                totalRevenue1 += order.priceFood;
+                totalFood1 += order.priceFood;
+                totalShip1 += 0;
+                totalProfitMerchant1 += order.revenueMerchant;
+                totalProfitShipper1 += 0;
                 if (order.voucherID) {
-                    const voucher = await this.voucherModel.findById(order.voucherID);
-                    if (!voucher) {
-                        throw new HttpException('Voucher not found', HttpStatus.NOT_FOUND);
-                    } else if (voucher.typeOfVoucherID && new ObjectId(voucher.typeOfVoucherID).equals(voucherType)) {
-                        totalVoucher += voucher.discountAmount;
-                        totalProfitMerchant += order.revenueMerchant;
-                        totalFood += order.priceFood;
-                    }
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher1 += (await voucherID).discountAmount
                 }
+            }
+            let month1 = [totalRevenue1, totalFood1, totalShip1, totalProfitMerchant1, totalProfitShipper1, totalVoucher1]
+
+            // tháng 2
+            const orderSuccess2 = await this.orderModel.find({
+                timeBook: { $gte: start2, $lte: end2 },
+                status: DeliveredID?._id
             });
+            const orderFake2 = await this.orderModel.find({
+                timeBook: { $gte: start2, $lte: end2 },
+                status: fakeOrderID?._id
+            });
+            // đơn thành công lấy hết
+            for (const order of orderSuccess2) {
+                totalRevenue2 += order.totalPaid;
+                totalFood2 += order.priceFood;
+                totalShip2 += order.deliveryCost;
+                totalProfitMerchant2 += order.revenueMerchant;
+                totalProfitShipper2 += order.revenueDelivery;
+                if (order.voucherID) {
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    totalVoucher2 += (await voucherID).discountAmount
+                }
+            }
+            // đơn không thành công
+            for (const order of orderFake2) {
+                totalRevenue2 += order.priceFood;
+                totalFood2 += order.priceFood;
+                totalShip2 += 0;
+                totalProfitMerchant2 += order.revenueMerchant;
+                totalProfitShipper2 += 0;
+                if (order.voucherID) {
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher2 += (await voucherID).discountAmount
+                }
+            }
+            let month2 = [totalRevenue2, totalFood2, totalShip2, totalProfitMerchant2, totalProfitShipper2, totalVoucher2]
 
-
-            return { result: true, totalRevenue: totalRevenue, totalVoucher: totalVoucher, totalProfitShipper: totalProfitShipper, totalProfitMerchant: totalProfitMerchant, totalFood: totalFood, totalShip: totalShip };
+            // tháng 3
+            const orderSuccess3 = await this.orderModel.find({
+                timeBook: { $gte: start3, $lte: end3 },
+                status: DeliveredID?._id
+            });
+            const orderFake3 = await this.orderModel.find({
+                timeBook: { $gte: start3, $lte: end3 },
+                status: fakeOrderID?._id
+            });
+            // đơn thành công lấy hết
+            for (const order of orderSuccess3) {
+                totalRevenue3 += order.totalPaid;
+                totalFood3 += order.priceFood;
+                totalShip3 += order.deliveryCost;
+                totalProfitMerchant3 += order.revenueMerchant;
+                totalProfitShipper3 += order.revenueDelivery;
+                if (order.voucherID) {
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    totalVoucher3 += (await voucherID).discountAmount
+                }
+            }
+            // đơn không thành công
+            for (const order of orderFake3) {
+                totalRevenue3 += order.priceFood;
+                totalFood3 += order.priceFood;
+                totalShip3 += 0;
+                totalProfitMerchant3 += order.revenueMerchant;
+                totalProfitShipper3 += 0;
+                if (order.voucherID) {
+                    var voucherID = this.voucherModel.findById(order.voucherID)
+                    if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher3 += (await voucherID).discountAmount
+                }
+            }
+            let month3 = [totalRevenue3, totalFood3, totalShip3, totalProfitMerchant3, totalProfitShipper3, totalVoucher3]
+            return { result: true, month1, month2, month3 };
         } catch (error) {
-            console.error(error);
-            return { result: false, revenue: error.message };
+
         }
     }
 
@@ -531,7 +613,7 @@ export class OrderService {
             return { result: false, error: error.message };
         }
     }
-    
+
     async shipperReview(id: string) {
         try {
             const shippers = await this.orderModel.find({ shipperID: id }).exec();

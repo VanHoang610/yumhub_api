@@ -72,6 +72,8 @@ export class VoucherService {
 
     async createVoucher(voucherDto: CreateVoucherDto) {
         try {
+            const code = await this.voucherModel.findOne({ code: voucherDto.code });
+            if (code) return "Mã đã tồn tại";
             const newVoucher = new this.voucherModel(voucherDto)
             await newVoucher.save();
             return "thêm mới thành công";
