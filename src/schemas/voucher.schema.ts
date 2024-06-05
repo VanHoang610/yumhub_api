@@ -20,7 +20,7 @@ export class Voucher {
     @Prop({type: mongoose.Types.ObjectId, ref: 'TypeOfVoucher'})  //food: 1, ship: 2
     typeOfVoucherID: TypeOfVoucher
 
-    @Prop({required: true})
+    @Prop({required: true, unique: true})
     code: string
 
     @Prop({required: false}) //điều kiện áp dụng
