@@ -216,6 +216,7 @@ export class AdminService {
             return { result: false, data: error };
         }
     }
+    
     async updateEmployee(id: string, admin: updateEmployeeDto) {
         try {
             const updateAdmin = await this.adminModel.findByIdAndUpdate(id, admin, { new: true });

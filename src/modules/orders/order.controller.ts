@@ -159,4 +159,14 @@ export class OrderController {
             return error
         }
     }
+
+    @Get('getAllOrderStatus')
+    @UseGuards(AuthGuard)
+    getAllOrderStatus() {
+        try {
+            return this.orderServices.getAllOrderStatus();
+        } catch (error) {
+            return error
+        }
+    }
 }

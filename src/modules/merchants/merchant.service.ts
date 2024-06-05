@@ -193,7 +193,10 @@ export class MerchantService {
 
   async getMerchant() {
     try {
-      const merchants = await this.merchants.find({ deleted: false, status: 3 });
+      const merchants = await this.merchants.find({
+        deleted: false,
+        status: 3,
+      });
       await this.merchants.populate(merchants, { path: 'type' });
       if (!merchants)
         throw new HttpException('Not found merchant', HttpStatus.UNAUTHORIZED);
@@ -326,9 +329,9 @@ export class MerchantService {
   }
 
   async get5NearestShippers(id: string) {
-    try {
+    try { 
       const merchant = await this.merchants.findById(id).exec();
-      const shipper = await this.shipperModel.find({ status: 3 }).exec();
+      const shipper = await this.shipperModel.find({ status: 7 }).exec();
 
       //tính quãng đường
       const sortShipper = shipper.map((shipper) => {
@@ -340,8 +343,7 @@ export class MerchantService {
       });
 
       sortShipper.sort((a, b) => a.distance - b.distance);
-      const nearestShippers = sortShipper.slice(0, 5);
-      return { result: true, get5NearestShippers: nearestShippers };
+      return { result: true, get5NearestShippers: sortShipper };
     } catch (error) {
       return { result: false, get5NearestShippers: error };
     }
@@ -893,6 +895,42 @@ export class MerchantService {
             ],
           },
           { status: { $in: [1, 2] } },
+        ],
+      });
+      if (merchants.length === 0) {
+        return { result: false, message: 'Not Found Customers', merchants: [] };
+      }
+      return { result: true, merchants: merchants };
+    } catch (error) {
+      return { result: false, merchants: error };
+    }
+  }
+
+  async getAllDeletedMerchant() {
+    try {
+      const merchants = await this.merchants.find({ status: 4 });
+      if (!merchants)
+        throw new HttpException(
+          'Not Found Deleted Merchants',
+          HttpStatus.NOT_FOUND,
+        );
+      return { result: true, merchants: merchants };
+    } catch (error) {
+      return { result: false, merchants: error };
+    }
+  }
+
+  async findDeletedMerchant(keyword: string) {
+    try {
+      const merchants = await this.merchants.find({
+        $and: [
+          {
+            $or: [
+              { name: new RegExp(keyword, 'i') },
+              { address: new RegExp(keyword, 'i') },
+            ],
+          },
+          { status: { $in: [4] } },
         ],
       });
       if (merchants.length === 0) {

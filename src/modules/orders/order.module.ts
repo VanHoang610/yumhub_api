@@ -57,6 +57,10 @@ import { TypeOfVoucher, TypeOfVoucherSchema } from 'src/schemas/typeOfVoucher.sc
                 name: TypeOfVoucher.name,
                 schema: TypeOfVoucherSchema
             },
+            {
+                name: OrderStatus.name,
+                schema: OrderStatusSchemas
+            },
         ])
     ],
     providers: [OrderService],

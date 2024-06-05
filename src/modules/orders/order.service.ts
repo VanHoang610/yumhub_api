@@ -21,6 +21,7 @@ const { ObjectId } = require('mongodb');
 export class OrderService {
     constructor(
         @InjectModel(Order.name) private orderModel: Model<Order>,
+        @InjectModel(OrderStatus.name) private orderStatusModal: Model<OrderStatus>,
         @InjectModel(Fee.name) private feeModel: Model<Fee>,
         @InjectModel(Customer.name) private customerModel: Model<Customer>,
         @InjectModel(Merchant.name) private merchantModel: Model<Merchant>,
@@ -669,4 +670,16 @@ export class OrderService {
             return { result: false, error: error.message };
         }
     }
+
+    async getAllOrderStatus() {
+        try {
+            const orderStatus = await this.orderStatusModal.find();
+            if (!orderStatus) throw new HttpException('Not found orderStatus', HttpStatus.NOT_FOUND);
+            return { result: true, orderStatus: orderStatus };
+        } catch (error) {
+            return { result: false, error: error.message };
+        }
+    }
+
+    
 }
