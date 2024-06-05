@@ -3,9 +3,6 @@ import { OrderService } from './order.service';
 import { OrderDto } from 'src/dto/dto.order';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 import { AuthGuard } from 'src/helper/auth.middleware';
-import { retry } from 'rxjs';
-import { log } from 'console';
-import { query } from 'express';
 
 @Controller('orders')
 export class OrderController {
