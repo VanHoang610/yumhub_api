@@ -509,7 +509,7 @@ export class OrderService {
                 }
             }
             let month3 = [totalRevenue3, totalFood3, totalShip3, totalProfitMerchant3, totalProfitShipper3, totalVoucher3]
-            return { result: true, month1, month2, month3 };
+            return { result: true, twoMonthsAgo: month1, lastMonth: month2, thisMonth: month3 };
         } catch (error) {
 
         }
