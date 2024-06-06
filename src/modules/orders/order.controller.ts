@@ -166,4 +166,13 @@ export class OrderController {
             return error
         }
     }
+    @Get("searchOrder")
+    @UseGuards(AuthGuard)
+    searchOrder(@Query('key') key: string) {
+        try {   
+            return this.orderServices.searchOrder(key);
+        } catch (error) {
+            return error
+        }
+    }
 }
