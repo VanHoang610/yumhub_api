@@ -857,15 +857,14 @@ export class ShipperService {
     }
   }
 
-  async getAllShipper() {
-    try {
-      const shippers = await this.shipperModel.find();
-      if (!shippers) return { Message: 'Not found shipper' };
-      return { result: true, AllShipper: shippers };
-    } catch (error) {
-      return { result: false, AllShipper: error };
-    }
-  }
+   async getAllShipper() {
+      try {
+          const shippers = await this.shipperModel.find({deleted: false});
+          if (!shippers) return { Message: "Not found shipper" }
+          return { result: true, AllShipper: shippers }
+      } catch (error) {
+          return { result: false, AllShipper: error }
+      }
 
   async getHistory(id: string) {
     try {
@@ -1327,4 +1326,9 @@ export class ShipperService {
     const rating = numberOfReview > 0 ? totalPointReview / numberOfReview : 0;
     return { result: true, rating: rating };
   }
+    
+  async getShipperIsDeleted(){
+     const deletedShipper = await this.shipperModel.find({deleted: true})
+     return {result: true, deletedShipper: deletedShipper}
+    }
 }

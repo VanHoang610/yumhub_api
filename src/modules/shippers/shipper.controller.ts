@@ -226,4 +226,11 @@ export class ShipperController {
      rating(@Query('id') id: string) {
          return this.shipperService.getRating(id);
      }
+
+     // lấy toàn bộ shipper đã xoá
+     @Get('listShipperIsDeleted')
+     @UseGuards(AuthGuard)
+     listShipperIsDeleted() {
+         return this.shipperService.getShipperIsDeleted();
+     }
 }

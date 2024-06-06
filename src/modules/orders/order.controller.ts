@@ -3,9 +3,6 @@ import { OrderService } from './order.service';
 import { OrderDto } from 'src/dto/dto.order';
 import { UpdateOrderDto } from 'src/dto/dto.updateOrder';
 import { AuthGuard } from 'src/helper/auth.middleware';
-import { retry } from 'rxjs';
-import { log } from 'console';
-import { query } from 'express';
 
 @Controller('orders')
 export class OrderController {
@@ -165,6 +162,15 @@ export class OrderController {
     getAllOrderStatus() {
         try {
             return this.orderServices.getAllOrderStatus();
+        } catch (error) {
+            return error
+        }
+    }
+    @Get("searchOrder")
+    @UseGuards(AuthGuard)
+    searchOrder(@Query('key') key: string) {
+        try {   
+            return this.orderServices.searchOrder(key);
         } catch (error) {
             return error
         }
