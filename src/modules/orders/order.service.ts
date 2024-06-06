@@ -439,7 +439,7 @@ export class OrderService {
                     if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher1 += (await voucherID).discountAmount
                 }
             }
-            let month1 = {totalRevenue:totalRevenue1, totalFood:totalFood1, totalShip:totalShip1,totalMerchant: totalProfitMerchant1, totalShipper:totalProfitShipper1, totalVocher:totalVoucher1}
+            let month1 = { totalRevenue: totalRevenue1, totalFood: totalFood1, totalShip: totalShip1, totalMerchant: totalProfitMerchant1, totalShipper: totalProfitShipper1, totalVocher: totalVoucher1 }
 
             // tháng 2
             const orderSuccess2 = await this.orderModel.find({
@@ -474,7 +474,7 @@ export class OrderService {
                     if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher2 += (await voucherID).discountAmount
                 }
             }
-            let month2 = {totalRevenue:totalRevenue2, totalFood:totalFood2, totalShip:totalShip2,totalMerchant: totalProfitMerchant2, totalShipper:totalProfitShipper2, totalVocher:totalVoucher2}
+            let month2 = { totalRevenue: totalRevenue2, totalFood: totalFood2, totalShip: totalShip2, totalMerchant: totalProfitMerchant2, totalShipper: totalProfitShipper2, totalVocher: totalVoucher2 }
 
             // tháng 3
             const orderSuccess3 = await this.orderModel.find({
@@ -509,12 +509,15 @@ export class OrderService {
                     if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher3 += (await voucherID).discountAmount
                 }
             }
-            let month3 = {totalRevenue:totalRevenue3, totalFood:totalFood3, totalShip:totalShip3,totalMerchant: totalProfitMerchant3, totalShipper:totalProfitShipper3, totalVocher:totalVoucher3}
-            return { result: true, month1, month2, month3 };
-        } catch (error) {
+            let month3 = { totalRevenue: totalRevenue3, totalFood: totalFood3, totalShip: totalShip3, totalMerchant: totalProfitMerchant3, totalShipper: totalProfitShipper3, totalVocher: totalVoucher3 }
+            return { result: true, twoMonthAgos: month1, lastMonth: month2, thisMonth: month3 };
 
+
+        } catch (error) {
+            return { result: false };
         }
     }
+
 
     async updateOrder(id: string, updateOrder: UpdateOrderDto) {
         try {
@@ -848,12 +851,12 @@ export class OrderService {
                     }
                 }
             ];
-    
+
             const orders = await this.orderModel.aggregate(pipeline).exec();
             return { result: true, orders: orders };
         } catch (error) {
             return { result: false, error: error.message };
         }
     }
-    
+
 }
