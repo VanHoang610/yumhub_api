@@ -1,17 +1,17 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { Shipper } from "./shipper.schema";
-import { DocumentType } from "./documentTypeShipper.schema";
+import { DocumentTypeShipper } from "./documentTypeShipper.schema";
 
 
 @Schema()
-export class Document {
+export class DocumentShipper {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipper'})
     shipperID?: Shipper
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType'})
-    documentTypeID: DocumentType
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentTypeShipper'})
+    documentTypeID: DocumentTypeShipper
 
     @Prop({required: false})
     description?: string
@@ -22,12 +22,12 @@ export class Document {
     @Prop({required: true})
     imageBackSide: string
 
-    @Prop({required: true})
+    @Prop({required: false})
     dateOfIssue: string
 
-    @Prop({required: true})
+    @Prop({required: false})
     exprirationDate: string
 
 }
 
-export const DocumentSchema = SchemaFactory.createForClass(Document)
+export const DocumentShipperSchema = SchemaFactory.createForClass(DocumentShipper)

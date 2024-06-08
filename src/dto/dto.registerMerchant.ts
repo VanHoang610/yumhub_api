@@ -48,4 +48,8 @@ export class RegisterMerchatDto {
     @IsString()
     email: string
 
+    @IsNotEmpty()
+    @IsString()
+    imageDocuments: string[];
+
 }

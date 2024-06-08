@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional } from "class-validator";
+import { DocumentTypeShipper } from "src/schemas/documentTypeShipper.schema";
 
 export class RegisterShipperDto {
 
@@ -41,4 +42,22 @@ export class RegisterShipperDto {
     @IsString()
     idBike: string
 
+    @IsOptional()
+    @IsString()
+    idCardFontSide?: string
+
+    @IsOptional()
+    @IsString()
+    idCardBackSide?: string
+
+    @IsOptional()
+    @IsString()
+    driverLicenseFontSide?: string
+
+    @IsOptional()
+    @IsString()
+    driverLicenseBackSide?: string
+
+    @IsNotEmpty()
+    documentType?: DocumentTypeShipper
 }

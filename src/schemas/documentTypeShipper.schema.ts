@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 @Schema()
-export class DocumentType {
+export class DocumentTypeShipper {
 
     @Prop({required: true})
     name: string
 }
 
-export const DocumentTypeSchema = SchemaFactory.createForClass(DocumentType)
+export const DocumentTypeShipperSchema = SchemaFactory.createForClass(DocumentTypeShipper)
