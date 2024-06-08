@@ -910,14 +910,14 @@ export class ShipperService {
     }
   }
 
-  async getAllShipper() {
-    try {
-      const shippers = await this.shipperModel.find();
-      if (!shippers) return { Message: 'Not found shipper' };
-      return { result: true, AllShipper: shippers };
-    } catch (error) {
-      return { result: false, AllShipper: error };
-    }
+   async getAllShipper() {
+      try {
+          const shippers = await this.shipperModel.find({deleted: false});
+          if (!shippers) return { Message: "Not found shipper" }
+          return { result: true, AllShipper: shippers }
+      } catch (error) {
+          return { result: false, AllShipper: error }
+      }
   }
 
   async getHistory(id: string) {
@@ -1424,4 +1424,9 @@ export class ShipperService {
       return { success: false, message: 'Do not ID card' };
     }
   }
+    
+  async getShipperIsDeleted(){
+     const deletedShipper = await this.shipperModel.find({deleted: true})
+     return {result: true, deletedShipper: deletedShipper}
+    }
 }

@@ -4,16 +4,10 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Param,
   Patch,
   Post,
   Query,
-  Req,
-  Res,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
-  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ShipperService } from './shipper.service';
