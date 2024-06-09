@@ -317,4 +317,20 @@ export class MerchantController {
     const { keyword } = body;
     return this.merchantService.findDeletedMerchant(keyword);
   }
+
+  //check giấy tờ merchant
+  @Post('checkIDCardDocument')
+  @UseGuards(AuthGuard)
+  checkIDCardDocument(@Body() body: { image: string }) {
+    const { image } = body;
+    return this.merchantService.checkIDCardDocument(image);
+  }
+
+
+  //lấy ra tất cả nhân viên của merchant
+  @Get('listEmployeeMerchant')
+  @UseGuards(AuthGuard)
+  listEmployeeMerchant(@Query('id') id: string) {
+    return this.merchantService.listEmployeeMerchant(id);
+  }
 }

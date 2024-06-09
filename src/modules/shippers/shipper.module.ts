@@ -12,6 +12,7 @@ import { TransactionTypeShipper, TransactionTypeShipperSchema } from "src/schema
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "../auth/constants";
 import { Review, ReviewSchema } from "src/schemas/review.schema";
+import { DocumentShipper, DocumentShipperSchema } from "src/schemas/document.schemaShipper";
 
 
 
@@ -49,6 +50,10 @@ import { Review, ReviewSchema } from "src/schemas/review.schema";
                 name: Review.name,
                 schema: ReviewSchema,
             },
+            {
+                name: DocumentShipper.name,
+                schema: DocumentShipperSchema
+            }
         ]),
         JwtModule.register({
             global: true,

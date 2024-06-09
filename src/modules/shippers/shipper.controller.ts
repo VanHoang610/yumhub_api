@@ -1,236 +1,264 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ShipperService } from './shipper.service';
 import { ShipperDto } from 'src/dto/dto.shipper';
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
 import { LoginDto } from 'src/dto/dto.login';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { AuthGuard } from 'src/helper/auth.middleware';
 
-
 @Controller('shippers')
 export class ShipperController {
+  constructor(private readonly shipperService: ShipperService) {}
 
+  @Get('newUser')
+  @UseGuards(AuthGuard)
+  newShipper() {
+    return this.shipperService.newShipperInMonth();
+  }
 
-    constructor(private readonly shipperService: ShipperService) {}
-
-    @Get('newUser')
-    @UseGuards(AuthGuard)
-    newShipper() 
-    {
-        return this.shipperService.newShipperInMonth();
+  @Post('RevenueWeek')
+  @UseGuards(AuthGuard)
+  getRevenueWeek(@Body() body: { ID: string }) {
+    try {
+      const { ID } = body;
+      const totalRevenue = this.shipperService.getRevenueWeek(ID);
+      if (!totalRevenue) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      return totalRevenue;
+    } catch (error) {
+      return error;
     }
-    
-    @Post('RevenueWeek')
-    @UseGuards(AuthGuard)
-    getRevenueWeek(@Body() body: { ID: string }) {
-        try {
-            const { ID } = body
-            const totalRevenue = this.shipperService.getRevenueWeek(ID);
-            if (!totalRevenue) {
-                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            }
-            return totalRevenue;
-        } catch (error) {
-            return error;
-        }
+  }
+  @Post('RevenueMonth')
+  @UseGuards(AuthGuard)
+  getRevenueMonth(@Body() body: { ID: string; month: string }) {
+    try {
+      const { ID, month } = body;
+      const totalRevenue = this.shipperService.getRevenueMonth(ID, month);
+      if (!totalRevenue) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      return totalRevenue;
+    } catch (error) {
+      return error;
     }
-    @Post('RevenueMonth')
-    @UseGuards(AuthGuard)
-    getRevenueMonth(@Body() body: { ID: string, month: string }) {
-        try {
-            const { ID, month } = body
-            const totalRevenue = this.shipperService.getRevenueMonth(ID, month);
-            if (!totalRevenue) {
-                throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            }
-            return totalRevenue;
-        } catch (error) {
-            return error;
-        }
+  }
+  @Post('RevenueTTT')
+  @UseGuards(AuthGuard)
+  getRevenueTime(
+    @Body() body: { ID: string; startDate: string; endDate: string },
+  ) {
+    try {
+      const { ID, startDate, endDate } = body;
+      const totalRevenue = this.shipperService.revenueShipperTimeTwoTime(
+        ID,
+        startDate,
+        endDate,
+      );
+      if (!totalRevenue)
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return totalRevenue;
+    } catch (error) {
+      return error;
     }
-    @Post('RevenueTTT')
-    @UseGuards(AuthGuard)
-    getRevenueTime(@Body() body: { ID: string, startDate: string, endDate: string }) {
-        try {
-            const { ID, startDate, endDate } = body
-            const totalRevenue = this.shipperService.revenueShipperTimeTwoTime(ID, startDate, endDate);
-            if (!totalRevenue) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return totalRevenue;
-        } catch (error) {
-            return error
-        }
+  }
+
+  // add Data
+  @Get('addData')
+  addData() {
+    try {
+      const shipper = this.shipperService.addData();
+      return shipper;
+    } catch (error) {
+      console.error('Create Shipper Fail', error);
     }
+  }
 
-    // add Data
-    @Get('addData')
-    addData() {
-        try {
-            const shipper = this.shipperService.addData();
-            return shipper;
-        } catch (error) {
-            console.error("Create Shipper Fail", error)
-        }
+  // tạo shipper
+  @Post('createShipper')
+  createShipper(@Body() shippers: RegisterShipperDto) {
+    try {
+      const shipper = this.shipperService.createShipper(shippers);
+      return shipper;
+    } catch (error) {
+      console.error('Create Shipper Fail', error);
     }
+  }
 
-    // tạo shipper
-    @Post('createShipper')
-    createShipper(@Body() shippers: RegisterShipperDto) {
-        try {
-            const shipper = this.shipperService.createShipper(shippers);
-            return shipper;
-        } catch (error) {
-            console.error("Create Shipper Fail", error)
-        }
+  //lấy tất cả shipper
+  @Get('getAllShipper')
+  @UseGuards(AuthGuard)
+  getAllShipper() {
+    try {
+      const shipper = this.shipperService.getAllShipper();
+      if (!shipper) throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return shipper;
+    } catch (error) {
+      return error;
     }
+  }
 
-    //lấy tất cả shipper
-    @Get('getAllShipper')
-    @UseGuards(AuthGuard)
-    getAllShipper() {
-        try {
-            const shipper = this.shipperService.getAllShipper();
-            if (!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return shipper;
-        } catch (error) {
-            return error
-        }
+  //lấy lịch sử shipper
+  @Get('getHistoryOrder')
+  @UseGuards(AuthGuard)
+  getHistoryShipper(@Query('id') id: string) {
+    try {
+      const shipper = this.shipperService.getHistory(id);
+      if (!shipper) throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return shipper;
+    } catch (error) {
+      return { result: false, error };
     }
+  }
 
-
-    //lấy lịch sử shipper
-    @Get('getHistoryOrder')
-    @UseGuards(AuthGuard)
-    getHistoryShipper(@Query('id') id: string) {
-        try {
-            const shipper = this.shipperService.getHistory(id);
-            if (!shipper) throw new HttpException("Not found", HttpStatus.NOT_FOUND);
-            return shipper;
-        } catch (error) {
-            return { result: false, error }
-        }
+  // sửa location của shipper
+  @Patch('updateLocation')
+  @UseGuards(AuthGuard)
+  updateLocation(
+    @Query('id') id: string,
+    @Body() body: { longitude: number; latitude: number },
+  ) {
+    try {
+      const { longitude, latitude } = body;
+      const review = this.shipperService.updateLocation(
+        id,
+        longitude,
+        latitude,
+      );
+      return review;
+    } catch (error) {
+      console.error('Update location fail', error);
     }
+  }
 
-    // sửa location của shipper
-    @Patch('updateLocation')
-    @UseGuards(AuthGuard)
-    updateLocation(@Query('id') id: string, @Body() body: { longitude: number, latitude: number }) {
-        try {
-            const { longitude, latitude } = body;
-            const review = this.shipperService.updateLocation(id, longitude, latitude);
-            return review;
-        } catch (error) {
-            console.error("Update location fail", error)
-        }
-    }
+  // @Get('getPhoneNumberShipper/:id')
+  // getPhoneNumberShipper(@Param('id') id: string){
+  //     return this.shipperService.getPhoneNumberShipper(id);
+  // }
 
-    // @Get('getPhoneNumberShipper/:id')
-    // getPhoneNumberShipper(@Param('id') id: string){
-    //     return this.shipperService.getPhoneNumberShipper(id);
-    // }
+  @Post('deleteShipper')
+  @UseGuards(AuthGuard)
+  deleteShipper(@Query('id') id: string) {
+    return this.shipperService.deleteShipper(id);
+  }
 
-    @Post('deleteShipper')
-    @UseGuards(AuthGuard)
-    deleteShipper(@Query('id') id: string) {
-        return this.shipperService.deleteShipper(id);
-    }
+  @Patch('updateShipper')
+  @UseGuards(AuthGuard)
+  async updateShipper(
+    @Query('id') id: string,
+    @Body(new ValidationPipe()) updateShipper: ShipperDto,
+  ) {
+    return await this.shipperService.updateShipper(id, updateShipper);
+  }
 
-    @Patch('updateShipper')
-    @UseGuards(AuthGuard)
-    async updateShipper(@Query('id') id: string, @Body(new ValidationPipe()) updateShipper: ShipperDto) {
-        return await this.shipperService.updateShipper(id, updateShipper);
-    }
+  //login
+  @Post('login')
+  login(@Body(new ValidationPipe()) login: LoginDto) {
+    return this.shipperService.login(login);
+  }
 
-    //login
-    @Post('login')
-    login(@Body(new ValidationPipe()) login: LoginDto) {
-        return this.shipperService.login(login);
-    }
+  //quên mật khẩu bằng Email
+  @Post('forgetPassByEmail')
+  forgetPasswordByEmail(@Body() body: { email: string }) {
+    const { email } = body;
 
-    //quên mật khẩu bằng Email
-    @Post('forgetPassByEmail')
-    forgetPasswordByEmail(@Body() body: { email: string }) {
-        const { email } = body;
+    return this.shipperService.forgetPassByEmail(email);
+  }
 
-        return this.shipperService.forgetPassByEmail(email);
-    }
+  //kiểm tra OTP
+  @Post('checkOTP')
+  checkOTP(@Body() body: { email: string; otp: string }) {
+    const { email, otp } = body;
+    return this.shipperService.checkOTP(email, otp);
+  }
 
-    //kiểm tra OTP
-    @Post('checkOTP')
-    checkOTP(@Body() body: { email: string, otp: string }) {
-        const { email, otp } = body;
-        return this.shipperService.checkOTP(email, otp);
-    }
+  //cập nhật mật khẩu
+  @Post('resetPass')
+  resetPass(@Query('id') id: string, @Body() body: { password: string }) {
+    const { password } = body;
+    return this.shipperService.resetPass(id, password);
+  }
 
-    //cập nhật mật khẩu
-    @Post('resetPass')
-    resetPass(@Query('id') id: string, @Body() body: { password: string }) {
-        const { password } = body;
-        return this.shipperService.resetPass(id, password);
-    }
+  //đổi mật khẩu
+  @Post('changePass')
+  @UseGuards(AuthGuard)
+  changePassword(
+    @Query('id') id: string,
+    @Body() body: { passOld: string; passNew: string },
+  ) {
+    const { passOld, passNew } = body;
+    return this.shipperService.changePass(id, passOld, passNew);
+  }
 
+  //gửi email xác thực
+  @Post('verifileShipper')
+  verifileShipper(@Body() body: { email: string }) {
+    const { email } = body;
+    return this.shipperService.verifileShipper(email);
+  }
 
-    //đổi mật khẩu
-    @Post('changePass')
-    @UseGuards(AuthGuard)
-    changePassword(@Query('id') id: string, @Body() body: { passOld: string, passNew: string }) {
-        const { passOld, passNew } = body;
-        return this.shipperService.changePass(id, passOld, passNew);
-    }
+  // danh sách shipper cần duyệt
+  @Get('listShipperApproval')
+  @UseGuards(AuthGuard)
+  listShipperApproval() {
+    return this.shipperService.listShipperApproval();
+  }
 
-    //gửi email xác thực
-    @Post('verifileShipper')
-    verifileShipper(@Body() body: { email: string }) {
-        const { email } = body;
-        return this.shipperService.verifileShipper(email);
-    }
+  // chi tiết tài khoản merchant
+  @Get('getShipperById')
+  @UseGuards(AuthGuard)
+  getShipperById(@Query('id') id: string) {
+    return this.shipperService.getShipperById(id);
+  }
 
-    // danh sách shipper cần duyệt
-    @Get('listShipperApproval')
-    @UseGuards(AuthGuard)
-    listShipperApproval() {
-        return this.shipperService.listShipperApproval();
-    }
+  // nạp tiền shipper
+  @Post('topUp')
+  @UseGuards(AuthGuard)
+  topUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
+    return this.shipperService.topUptopUpShipper(id, topUp);
+  }
 
-    // chi tiết tài khoản merchant
-    @Get('getShipperById')
-    @UseGuards(AuthGuard)
-    getShipperById(@Query('id') id: string) {
-        return this.shipperService.getShipperById(id);
-    }
+  // rút tiền shipper
+  @Post('cashOut')
+  @UseGuards(AuthGuard)
+  cashOutMtopUpShipper(
+    @Query('id') id: string,
+    @Body() topUp: HistoryMerchantDto,
+  ) {
+    return this.shipperService.cashOutShipper(id, topUp);
+  }
 
+  // lịch sử nạp/rút tiền shipper
+  @Get('transactionHistory')
+  @UseGuards(AuthGuard)
+  transactionHistory(@Query('id') id: string) {
+    return this.shipperService.transactionHistory(id);
+  }
 
-    // nạp tiền shipper
-    @Post('topUp')
-    @UseGuards(AuthGuard)
-    topUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
-        return this.shipperService.topUptopUpShipper(id, topUp);
-    }
+  @Get('rating')
+  @UseGuards(AuthGuard)
+  rating(@Query('id') id: string) {
+    return this.shipperService.getRating(id);
+  }
 
-     // rút tiền shipper
-     @Post('cashOut')
-     @UseGuards(AuthGuard)
-     cashOutMtopUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
-         return this.shipperService.cashOutShipper(id, topUp);
-     }
-
-     // lịch sử nạp/rút tiền shipper
-     @Get('transactionHistory')
-     @UseGuards(AuthGuard)
-     transactionHistory(@Query('id') id: string) {
-         return this.shipperService.transactionHistory(id);
-     }
-     
-     @Get('rating')
-     @UseGuards(AuthGuard)
-     rating(@Query('id') id: string) {
-         return this.shipperService.getRating(id);
-     }
-
-     // lấy toàn bộ shipper đã xoá
-     @Get('listShipperIsDeleted')
-     @UseGuards(AuthGuard)
-     listShipperIsDeleted() {
-         return this.shipperService.getShipperIsDeleted();
-     }
+  //check giấy tờ merchant
+  @Post('checkDriverLicenseDocument')
+  @UseGuards(AuthGuard)
+  checkDriverLicenseDocument(@Body() body: { image: string }) {
+    const { image } = body;
+    return this.shipperService.checkDriverLicenseDocument(image);
+  }
 }

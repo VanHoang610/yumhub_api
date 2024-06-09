@@ -15,7 +15,6 @@ import { Mailer } from 'src/helper/mailer';
 import { RegisterEmployeeDto } from 'src/dto/dto.registerEmployee';
 import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
-import { log } from 'console';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { HistoryWalletMerchant } from 'src/schemas/historyWalletMerchant.schema';
 import { TransactionTypeMerchant } from 'src/schemas/transactionTypeMerchant.schema';
@@ -31,6 +30,12 @@ import { Customer } from 'src/schemas/customer.schemas';
 import { Address } from 'src/schemas/address.schema';
 const { ObjectId } = require('mongodb');
 
+//check document
+import axios from 'axios';
+import * as FormData from 'form-data';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 @Injectable()
 export class MerchantService {
   constructor(
@@ -151,6 +156,25 @@ export class MerchantService {
 
   async createMerchant(merchant: RegisterMerchatDto) {
     try {
+      const existingMerchant = await this.merchants.findOne({
+        email: merchant.email,
+      });
+      if (existingMerchant) {
+        throw new HttpException('Merchant already exists', HttpStatus.CONFLICT);
+      }
+
+      const existingUserMerchant = await this.userMerchantModel.findOne({
+        email: merchant.email,
+      });
+      
+      if (existingUserMerchant) {
+        throw new HttpException(
+          'User merchant already exists',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      // Tạo mới merchant
       const newMerchant = new this.merchants({
         name: merchant.name,
         address: merchant.address,
@@ -161,10 +185,10 @@ export class MerchantService {
         status: 1,
         creatAt: Date.now(),
       });
-      if (!newMerchant)
-        throw new HttpException('Register Failed', HttpStatus.NOT_FOUND);
       await newMerchant.save();
-      const idMerchant = await newMerchant._id;
+
+      // Tạo mới userMerchant
+      const idMerchant = newMerchant._id;
       const newUserMerchant = new this.userMerchantModel({
         merchantID: idMerchant,
         phoneNumber: merchant.phoneNumber,
@@ -173,13 +197,24 @@ export class MerchantService {
         avatar: merchant.avatar,
         email: merchant.email,
       });
-      if (!newUserMerchant)
-        throw new HttpException('Register Failed', HttpStatus.NOT_FOUND);
       await newUserMerchant.save();
+
+      // Tạo mới các documents nếu có
+      if (merchant.imageDocuments && merchant.imageDocuments.length > 0) {
+        var documentMerchant = merchant.imageDocuments.map(async (image) => {
+          const imageDocument = new this.documentMerchantModel({
+            merchantID: idMerchant,
+            image: image,
+          });
+          return await imageDocument.save();
+        });
+      }
+      const createdDocuments = await Promise.all(documentMerchant);
       return {
         result: true,
         newMerchant: newMerchant,
         newUserMerchant: newUserMerchant,
+        documents: createdDocuments,
       };
     } catch (error) {
       console.log(error);
@@ -329,7 +364,7 @@ export class MerchantService {
   }
 
   async get5NearestShippers(id: string) {
-    try { 
+    try {
       const merchant = await this.merchants.findById(id).exec();
       const shipper = await this.shipperModel.find({ status: 7 }).exec();
 
@@ -939,6 +974,62 @@ export class MerchantService {
       return { result: true, merchants: merchants };
     } catch (error) {
       return { result: false, merchants: error };
+    }
+  }
+
+  async checkIDCardDocument(image: string): Promise<any> {
+    try {
+      const apiKey = 'UMOgvTvHyHifeXjCSz8EBoyoZsYvLiIn';
+      const apiUrl = 'https://api.fpt.ai/vision/idr/vnm';
+
+      // Tải hình ảnh từ URL và lưu vào một tệp tạm thời
+      const response = await axios({
+        url: image,
+        method: 'GET',
+        responseType: 'stream',
+      });
+
+      const tempFilePath = path.join(os.tmpdir(), path.basename(image));
+      const writer = fs.createWriteStream(tempFilePath);
+
+      response.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+
+      // Gửi tệp tạm thời đến API của FPT.AI
+      const form = new FormData();
+      form.append('image', fs.createReadStream(tempFilePath));
+
+      const headers = {
+        ...form.getHeaders(),
+        api_key: apiKey,
+      };
+
+      const apiResponse = await axios.post(apiUrl, form, { headers });
+
+      // Xóa tệp tạm thời sau khi sử dụng
+      fs.unlinkSync(tempFilePath);
+
+      return apiResponse.data;
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error('Đã xảy ra lỗi khi gửi yêu cầu:', error);
+      return { success: false, message: 'Do not ID card' };
+    }
+  }
+
+  async listEmployeeMerchant(id: string) {
+    try {
+      const employee = await this.userMerchantModel.find({ merchantID: id });
+      if (!employee)
+        throw new HttpException('Not find userMerchant', HttpStatus.NOT_FOUND);
+
+      return { result: true, employee: employee };
+    } catch (error) {
+      return { result: false, employee: error };
     }
   }
 }

@@ -19,11 +19,20 @@ import { JwtService } from '@nestjs/jwt';
 import { Review } from 'src/schemas/review.schema';
 const { ObjectId } = require('mongodb');
 
+//check document
+import axios from 'axios';
+import * as FormData from 'form-data';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+import { DocumentShipper } from 'src/schemas/document.schemaShipper';
+
 @Injectable()
 export class ShipperService {
   constructor(
     private jwtService: JwtService,
     @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
+    @InjectModel(DocumentShipper.name) private documentShipperModal: Model<DocumentShipper>,
     @InjectModel(Order.name) private orderModel: Model<Order>,
     @InjectModel(ResetPassword.name)
     private resetPasswordModel: Model<ResetPassword>,
@@ -39,100 +48,114 @@ export class ShipperService {
     try {
       const shippers = await this.shipperModel.create([
         {
-            _id: "6604e1ec5a6c5ad8711aebf9",
-            phoneNumber: "0776616818",
-            fullName: "Lilllie",
-            avatar: "http://dummyimage.com/143x100.png/cc0000/ffffff",
-            sex: "Female",
-            birthDay: "6/25/2023",
-            address: "61 Schurz Point",
-            rating: 4,
-            email: "lkillingsworth0@webmd.com",
-            password: "$2a$04$Dsy.uYNPE9BwplGCe7jHVO26VyZmgBNfwiQuFmlxYdJ0UMxGFZOou",
-            brandBike: "0527-1537",
-            modeCode: "Purple",
-            idBike: "$2a$04$qUdzkcwnmTJRu/yf7ctpwuRbBDebzPQDUFtAIQ0JyuT2XgTdQzRpu",
-            active: false,
-            longitude: 112.5766579,
-            latitude: -6.9852949,
-            joinDay: "11/23/2023",
-            balance: 50000,
-        }, {
-            _id: "6604e1ec5a6c5ad8711aebfa",
-            phoneNumber: "07766168182",
-            fullName: "Greg",
-            avatar: "http://dummyimage.com/144x100.png/ff4444/ffffff",
-            sex: "Male",
-            birthDay: "5/13/2023",
-            address: "98 Namekagon Hill",
-            rating: 5,
-            email: "giorns1@buzzfeed.com",
-            password: "$2a$04$UafAK9VpiE/nDrz5DRsdRuXtJXmi5vetagD.VWIgb3zuc7vbFt6vy",
-            brandBike: "36987-2308",
-            modeCode: "Yellow",
-            idBike: "$2a$04$Y9WIWV2Du0NeGtxM/zJ1ZOar/UWF7xgVuGMDZMh/GeyzAZyaplZ2a",
-            active: false,
-            longitude: 95.8601611,
-            latitude: 20.8765931,
-            joinDay: "11/23/2023",
-            balance: 50000,
-        }, {
-            _id: "6604e1ec5a6c5ad8711aebfb",
-            phoneNumber: "0776216818",
-            fullName: "Wright",
-            avatar: "http://dummyimage.com/198x100.png/dddddd/000000",
-            sex: "Male",
-            birthDay: "1/15/2024",
-            address: "51417 La Follette Avenue",
-            rating: 5,
-            email: "wgoodship2@wired.com",
-            password: "$2a$04$W9yagCFueutFvqabUHgL9.SIKARf8zsHA6VclJKTDEQ2k4eyLkLfS",
-            brandBike: "0409-1171",
-            modeCode: "Violet",
-            idBike: "$2a$04$/zOzvhL8ZQhwhzbmwC.Gg.eUJxfl0UD2tsrv9.8zDmOcWgBPiOU/q",
-            active: false,
-            longitude: -104.86783,
-            latitude: 50.65009,
-            joinDay: "11/23/2023",
-            balance: 50000,
-        }, {
-            _id: "6604e1ec5a6c5ad8711aebfc",
-            phoneNumber: "0776616811",
-            fullName: "Lynnell",
-            avatar: "http://dummyimage.com/220x100.png/5fa2dd/ffffff",
-            sex: "Female",
-            birthDay: "6/1/2023",
-            address: "5 Ilene Parkway",
-            rating: 4,
-            email: "lrideout3@de.vu",
-            password: "$2a$04$Y4aHyp1FpYiq/MLFAsc.pOrx15NS8aE1nTVldG3VL8ehqrCiFM5xi",
-            brandBike: "62175-312",
-            modeCode: "Red",
-            idBike: "$2a$04$2STPCuPNZ2fcPB7HbjSjdefI0g3..w6Q7UGIDLUZUygqfZWyw7QBa",
-            active: true,
-            longitude: 11.2533509,
-            latitude: 58.695946,
-            joinDay: "11/23/2023",
-            balance: 50000,
-        }, {
-            _id: "6604e1ec5a6c5ad8711aebfd",
-            phoneNumber: "0776616815",
-            fullName: "Tristam",
-            avatar: "http://dummyimage.com/103x100.png/ff4444/ffffff",
-            sex: "Male",
-            birthDay: "6/9/2023",
-            address: "97637 Springview Center",
-            rating: 2,
-            email: "twestmacott4@census.gov",
-            password: "$2a$04$EIjH7l0A6Na8Ws5S2QXH8.h/u2T/ppdJrK.ivjKUJGDspix9J2uZi",
-            brandBike: "49643-373",
-            modeCode: "Violet",
-            idBike: "$2a$04$ONJxx1ONd3XgiHR0oMziyOrOSuYnKfdusIFgzxqGc8p1ieayGug0q",
-            active: true,
-            longitude: -75.2435307,
-            latitude: 20.5800358,
-            joinDay: "11/23/2023",
-            balance: 50000,
+          _id: '6604e1ec5a6c5ad8711aebf9',
+          phoneNumber: '0776616818',
+          fullName: 'Lilllie',
+          avatar: 'http://dummyimage.com/143x100.png/cc0000/ffffff',
+          sex: 'Female',
+          birthDay: '6/25/2023',
+          address: '61 Schurz Point',
+          rating: 4,
+          email: 'lkillingsworth0@webmd.com',
+          password:
+            '$2a$04$Dsy.uYNPE9BwplGCe7jHVO26VyZmgBNfwiQuFmlxYdJ0UMxGFZOou',
+          brandBike: '0527-1537',
+          modeCode: 'Purple',
+          idBike:
+            '$2a$04$qUdzkcwnmTJRu/yf7ctpwuRbBDebzPQDUFtAIQ0JyuT2XgTdQzRpu',
+          active: false,
+          longitude: 112.5766579,
+          latitude: -6.9852949,
+          joinDay: '11/23/2023',
+          balance: 50000,
+        },
+        {
+          _id: '6604e1ec5a6c5ad8711aebfa',
+          phoneNumber: '07766168182',
+          fullName: 'Greg',
+          avatar: 'http://dummyimage.com/144x100.png/ff4444/ffffff',
+          sex: 'Male',
+          birthDay: '5/13/2023',
+          address: '98 Namekagon Hill',
+          rating: 5,
+          email: 'giorns1@buzzfeed.com',
+          password:
+            '$2a$04$UafAK9VpiE/nDrz5DRsdRuXtJXmi5vetagD.VWIgb3zuc7vbFt6vy',
+          brandBike: '36987-2308',
+          modeCode: 'Yellow',
+          idBike:
+            '$2a$04$Y9WIWV2Du0NeGtxM/zJ1ZOar/UWF7xgVuGMDZMh/GeyzAZyaplZ2a',
+          active: false,
+          longitude: 95.8601611,
+          latitude: 20.8765931,
+          joinDay: '11/23/2023',
+          balance: 50000,
+        },
+        {
+          _id: '6604e1ec5a6c5ad8711aebfb',
+          phoneNumber: '0776216818',
+          fullName: 'Wright',
+          avatar: 'http://dummyimage.com/198x100.png/dddddd/000000',
+          sex: 'Male',
+          birthDay: '1/15/2024',
+          address: '51417 La Follette Avenue',
+          rating: 5,
+          email: 'wgoodship2@wired.com',
+          password:
+            '$2a$04$W9yagCFueutFvqabUHgL9.SIKARf8zsHA6VclJKTDEQ2k4eyLkLfS',
+          brandBike: '0409-1171',
+          modeCode: 'Violet',
+          idBike:
+            '$2a$04$/zOzvhL8ZQhwhzbmwC.Gg.eUJxfl0UD2tsrv9.8zDmOcWgBPiOU/q',
+          active: false,
+          longitude: -104.86783,
+          latitude: 50.65009,
+          joinDay: '11/23/2023',
+          balance: 50000,
+        },
+        {
+          _id: '6604e1ec5a6c5ad8711aebfc',
+          phoneNumber: '0776616811',
+          fullName: 'Lynnell',
+          avatar: 'http://dummyimage.com/220x100.png/5fa2dd/ffffff',
+          sex: 'Female',
+          birthDay: '6/1/2023',
+          address: '5 Ilene Parkway',
+          rating: 4,
+          email: 'lrideout3@de.vu',
+          password:
+            '$2a$04$Y4aHyp1FpYiq/MLFAsc.pOrx15NS8aE1nTVldG3VL8ehqrCiFM5xi',
+          brandBike: '62175-312',
+          modeCode: 'Red',
+          idBike:
+            '$2a$04$2STPCuPNZ2fcPB7HbjSjdefI0g3..w6Q7UGIDLUZUygqfZWyw7QBa',
+          active: true,
+          longitude: 11.2533509,
+          latitude: 58.695946,
+          joinDay: '11/23/2023',
+          balance: 50000,
+        },
+        {
+          _id: '6604e1ec5a6c5ad8711aebfd',
+          phoneNumber: '0776616815',
+          fullName: 'Tristam',
+          avatar: 'http://dummyimage.com/103x100.png/ff4444/ffffff',
+          sex: 'Male',
+          birthDay: '6/9/2023',
+          address: '97637 Springview Center',
+          rating: 2,
+          email: 'twestmacott4@census.gov',
+          password:
+            '$2a$04$EIjH7l0A6Na8Ws5S2QXH8.h/u2T/ppdJrK.ivjKUJGDspix9J2uZi',
+          brandBike: '49643-373',
+          modeCode: 'Violet',
+          idBike:
+            '$2a$04$ONJxx1ONd3XgiHR0oMziyOrOSuYnKfdusIFgzxqGc8p1ieayGug0q',
+          active: true,
+          longitude: -75.2435307,
+          latitude: 20.5800358,
+          joinDay: '11/23/2023',
+          balance: 50000,
         },
         {
           _id: '666143d9fc13ae29ddb09c2d',
@@ -823,37 +846,67 @@ export class ShipperService {
 
   async createShipper(shipperDto: RegisterShipperDto) {
     try {
-      const phoneNumber = shipperDto.phoneNumber;
-      const email = shipperDto.email;
-      const avatar = shipperDto.avatar;
-      const fullName = shipperDto.fullName;
-      const sex = shipperDto.sex;
-      const birthDay = shipperDto.birthDay;
-      const address = shipperDto.address;
-      const brandBike = shipperDto.brandBike;
-      const modeCode = shipperDto.modeCode;
-      const idBike = shipperDto.idBike;
-
+      const existingShipper = await this.shipperModel.findOne({
+        email: shipperDto.email,
+      });
+      if (existingShipper) {
+        throw new HttpException('Shipper already exists', HttpStatus.CONFLICT);
+      }
+  
+      const {
+        phoneNumber, email, avatar, fullName, sex, birthDay,
+        address, brandBike, modeCode, idBike,
+        idCardBackSide, idCardFontSide, driverLicenseBackSide, driverLicenseFontSide
+      } = shipperDto;
+  
+      if (!idCardBackSide || !idCardFontSide || !driverLicenseBackSide || !driverLicenseFontSide) {
+        throw new HttpException('ID card and driver license images are required', HttpStatus.BAD_REQUEST);
+      }
+  
       const newShipper = new this.shipperModel({
-        phoneNumber: phoneNumber,
-        email: email,
-        avatar: avatar,
-        fullName: fullName,
-        sex: sex,
-        birthDay: birthDay,
-        address: address,
-        brandBike: brandBike,
-        modeCode: modeCode,
-        idBike: idBike,
+        phoneNumber,
+        email,
+        avatar,
+        fullName,
+        sex,
+        birthDay,
+        address,
+        brandBike,
+        modeCode,
+        idBike,
         status: 1,
         joinDay: Date.now(),
       });
-      if (!newShipper)
-        throw new HttpException('Create Failed', HttpStatus.NOT_FOUND);
+  
       await newShipper.save();
-      return { result: true, createShipper: newShipper };
+      const idShipper = newShipper._id;
+  
+      const typeIDCard = new ObjectId('66642316fc13ae0853b09bb7');
+      const documentShipperTypeIDCard = new this.documentShipperModal({
+        shipperID: idShipper,
+        type: typeIDCard,
+        imageBackSide: idCardBackSide,
+        imageFontSide: idCardFontSide,
+      });
+      await documentShipperTypeIDCard.save();
+  
+      const typeDriverLicense = new ObjectId('66642316fc13ae0853b09bb8');
+      const documentShipperTypeDriver = new this.documentShipperModal({
+        shipperID: idShipper,
+        type: typeDriverLicense,
+        imageBackSide: driverLicenseBackSide,
+        imageFontSide: driverLicenseFontSide,
+      });
+      await documentShipperTypeDriver.save();
+  
+      return {
+        result: true,
+        createShipper: newShipper,
+        documents: [documentShipperTypeIDCard, documentShipperTypeDriver],
+      };
     } catch (error) {
-      return { result: false, createShipper: error };
+      console.log(error);
+      return { result: false, error };
     }
   }
 
@@ -865,6 +918,7 @@ export class ShipperService {
       } catch (error) {
           return { result: false, AllShipper: error }
       }
+  }
 
   async getHistory(id: string) {
     try {
@@ -1325,6 +1379,50 @@ export class ShipperService {
     }
     const rating = numberOfReview > 0 ? totalPointReview / numberOfReview : 0;
     return { result: true, rating: rating };
+  }
+
+  async checkDriverLicenseDocument(image: string): Promise<any> {
+    try {
+      const apiKey = 'Y3n5OWk2LJukIzk08KGDipA5oIwzW73V';
+      const apiUrl = 'https://api.fpt.ai/vision/dlr/vnm';
+
+      // Tải hình ảnh từ URL và lưu vào một tệp tạm thời
+      const response = await axios({
+        url: image,
+        method: 'GET',
+        responseType: 'stream',
+      });
+
+      const tempFilePath = path.join(os.tmpdir(), path.basename(image));
+      const writer = fs.createWriteStream(tempFilePath);
+
+      response.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+
+      // Gửi tệp tạm thời đến API của FPT.AI
+      const form = new FormData();
+      form.append('image', fs.createReadStream(tempFilePath));
+
+      const headers = {
+        ...form.getHeaders(),
+        api_key: apiKey,
+      };
+
+      const apiResponse = await axios.post(apiUrl, form, { headers });
+
+      // Xóa tệp tạm thời sau khi sử dụng
+      fs.unlinkSync(tempFilePath);
+
+      return apiResponse.data;
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error('Đã xảy ra lỗi khi gửi yêu cầu:', error);
+      return { success: false, message: 'Do not ID card' };
+    }
   }
     
   async getShipperIsDeleted(){

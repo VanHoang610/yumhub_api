@@ -17,4 +17,4 @@ import { DocumentMerchantService } from './document.service';
     providers: [DocumentMerchantService]
 })
 
-export class DocumentModule { };
+export class DocumentMerchantModule { };

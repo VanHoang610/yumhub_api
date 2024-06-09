@@ -1,3 +1,4 @@
+import { DocumentMerchant } from 'src/schemas/documentMerchant.schema';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -7,7 +8,7 @@ import { MerchantModule } from './modules/merchants/merchant.module';
 import { ShipperModule } from './modules/shippers/shipper.module';
 import { PaymentMethodModule } from './modules/paymentMethodMerchant/paymentMethodMerchant.module';
 import { AddressModule } from './modules/address/address.module';
-import { DocumentModule } from './modules/documentMerchant/document.module';
+import { DocumentMerchantModule } from './modules/documentMerchant/document.module';
 import { OrderModule } from './modules/orders/order.module';
 import { UserMerchantModule } from './modules/userMerchant/merchant.module';
 import { DocumentTypeModule } from './modules/documentTypes/document.module';
@@ -31,6 +32,7 @@ import { AdsModule } from './modules/ads/ads.module';
 import { PaymentMethodMerchant } from './schemas/paymentMethodMerchant.schema';
 import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
 import { FeeModule } from './modules/fee/fee.module';
+import { DocumentShipperModule } from './modules/documentShipper/document.module';
 
 @Module({
   imports: [
@@ -41,7 +43,8 @@ import { FeeModule } from './modules/fee/fee.module';
     PaymentMethodModule,
     AddressModule,
     OrderModule,
-    DocumentModule,
+    DocumentMerchantModule,
+    DocumentShipperModule,
     DocumentTypeModule,
     FoodModule,
     DetailOrderModule,
