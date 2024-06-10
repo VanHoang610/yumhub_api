@@ -30,6 +30,9 @@ export class Address {
     @Prop({required: false}) //vĩ độ
     latitude: number
 
+    @Prop({required: false}) //nhà riêng, công ty, trường
+    name: string
+
 }
 
 export const AddressSchema = SchemaFactory.createForClass(Address);

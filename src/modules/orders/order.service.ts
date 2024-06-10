@@ -509,9 +509,9 @@ export class OrderService {
                     if (voucherID && (await voucherID).typeOfVoucherID === voucherType) totalVoucher3 += (await voucherID).discountAmount
                 }
             }
+
             let month3 = { totalRevenue: totalRevenue3, totalFood: totalFood3, totalShip: totalShip3, totalMerchant: totalProfitMerchant3, totalShipper: totalProfitShipper3, totalVocher: totalVoucher3 }
             return { result: true, twoMonthAgos: month1, lastMonth: month2, thisMonth: month3 };
-
 
         } catch (error) {
             return { result: false , log: error};
