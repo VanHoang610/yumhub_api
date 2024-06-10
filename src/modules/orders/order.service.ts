@@ -514,8 +514,7 @@ export class OrderService {
             return { result: true, twoMonthAgos: month1, lastMonth: month2, thisMonth: month3 };
 
         } catch (error) {
-            return { result: false };
-
+            return { result: false , log: error};
         }
     }
 
