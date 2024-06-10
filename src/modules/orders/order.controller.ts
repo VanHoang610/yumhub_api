@@ -146,6 +146,15 @@ export class OrderController {
             return error
         }
     }
+    // @Get('revenueFoodDelivery2')
+    // @UseGuards(AuthGuard)
+    // revenueFoodDelivery2(@Query('month') month: string) {
+    //     try {
+    //         return this.orderServices.test(month);
+    //     } catch (error) {
+    //         return error
+    //     }
+    // }
 
     @Get('revenueFoodDelivery')
     @UseGuards(AuthGuard)

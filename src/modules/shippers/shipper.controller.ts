@@ -261,4 +261,10 @@ export class ShipperController {
     const { image } = body;
     return this.shipperService.checkDriverLicenseDocument(image);
   }
+  
+  @Get('listShipperIsDeleted')
+  @UseGuards(AuthGuard)
+  listShipperIsDeleted() {
+    return this.shipperService.getShipperIsDeleted();
+  }
 }
