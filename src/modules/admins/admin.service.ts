@@ -61,7 +61,8 @@ export class AdminService {
                 _id: admin._id,
                 userName: admin.userName,
                 email: admin.email,
-                fullName: admin.fullName
+                fullName: admin.fullName,
+                position: admin.position
             };
             const token = await this.jwtService.signAsync(payload);
             admin.password = undefined;
