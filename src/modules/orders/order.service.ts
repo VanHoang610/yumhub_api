@@ -514,7 +514,7 @@ export class OrderService {
 
 
         } catch (error) {
-            return { result: false };
+            return { result: false , log: error};
         }
     }
 
