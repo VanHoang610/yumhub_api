@@ -56,4 +56,12 @@ export class RegisterShipperDto {
     @IsOptional()
     @IsString()
     driverLicenseBackSide?: string
+
+    @IsOptional()
+    @IsString()
+    parrotCarFontSide?: string
+
+    @IsOptional()
+    @IsString()
+    parrotCarBackSide?: string
 }

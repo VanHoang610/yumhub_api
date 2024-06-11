@@ -388,6 +388,7 @@ export class MerchantService {
     try {
       const checkAccount = await this.userMerchantModel.findOne({
         phoneNumber: user.phoneNumber,
+        deleted: false
       });
       if (!checkAccount)
         throw new HttpException('Không đúng SDT', HttpStatus.NOT_FOUND);
@@ -704,9 +705,9 @@ export class MerchantService {
       if (!detailMerchant)
         throw new HttpException('Not Found Merchant', HttpStatus.NOT_FOUND);
       const user = await this.userMerchantModel.findOne({ merchantID: id });
-      const document = await this.documentMerchantModel.findOne({
+      const document = await this.documentMerchantModel.find({
         merchantID: id,
-      });
+      }).populate('documentTypeID');
       const paymentMethod = await this.paymentMethodMerchantModel.findOne({
         merchantID: id,
       });

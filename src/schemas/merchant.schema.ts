@@ -44,6 +44,9 @@ export class Merchant {
     @Prop({required: false, default: 0})
     balance?: number
 
+    @Prop({required: false})
+    hotline?: string
+
 }
 
 export const MerchantSchema = SchemaFactory.createForClass(Merchant)
