@@ -232,15 +232,18 @@ export class CustomerServices {
     try {
       let checkAccount = await this.customers.findOne({
         phoneNumber: user.phoneNumber,
+        deleted: false
       });
       if (!checkAccount) {
         checkAccount = await this.userMerchantModel.findOne({
           phoneNumber: user.phoneNumber,
+          deleted: false
         });
       }
       if (!checkAccount) {
         checkAccount = await this.shipperModel.findOne({
           phoneNumber: user.phoneNumber,
+          deleted: false
         });
       }
       if (!checkAccount)

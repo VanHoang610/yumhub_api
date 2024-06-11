@@ -1,4 +1,4 @@
-import { DocumentShipper, DocumentShipperSchema } from './../../schemas/document.schemaShipper';
+import { DocumentShipper, DocumentShipperSchema } from '../../schemas/documentShipper.schema';
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose';
 import { DocumentShipperController } from './document.controller';

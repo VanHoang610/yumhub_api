@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common/decorators/core'
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { DocumentShipper } from 'src/schemas/document.schemaShipper';
-import { DocumentMerchant } from 'src/schemas/documentMerchant.schema';
+import { DocumentShipper } from 'src/schemas/documentShipper.schema';
 
 @Injectable()
 export class DocumentShipperService {
