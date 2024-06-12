@@ -1,9 +1,10 @@
 
-import { Controller, Post, Body, Get, HttpException, HttpStatus, Patch, Param, ValidationPipe, UseGuards } from '@nestjs/common'
+import { Controller, Post, Body, Get, HttpException, HttpStatus, Patch, Param, ValidationPipe, UseGuards, Query } from '@nestjs/common'
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from 'src/dto/dto.createVoucher';
 import mongoose from 'mongoose';
 import { AuthGuard } from 'src/helper/auth.middleware';
+import { UpdateVoucherDto } from 'src/dto/dto.updateVoucher';
 
 @Controller('vouchers')
 export class VoucherController {
@@ -56,11 +57,10 @@ export class VoucherController {
         throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
-    @Patch('updateVoucher/:id')
+    @Patch('updateVoucher')
     @UseGuards(AuthGuard)
-    async updateShipper(@Param('id') id: string, @Body(new ValidationPipe()) updateVoucher: CreateVoucherDto){
-        const isValid = mongoose.Types.ObjectId.isValid(id);
-        if(!isValid) throw new HttpException("Invalid ID", 40);
+    async updateShipper(@Query('id') id: string, @Body(new ValidationPipe()) updateVoucher: UpdateVoucherDto){
+        console.log(updateVoucher)
         return  await this.voucherService.updateVoucher(id, updateVoucher);
     }
 }

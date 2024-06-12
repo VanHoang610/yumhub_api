@@ -42,7 +42,7 @@ export class ShipperService {
     private typeShipperModel: Model<TransactionTypeShipper>,
     @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
-  ) {}
+  ) { }
 
   async addData() {
     try {
@@ -852,17 +852,17 @@ export class ShipperService {
       if (existingShipper) {
         throw new HttpException('Shipper already exists', HttpStatus.CONFLICT);
       }
-  
+
       const {
         phoneNumber, email, avatar, fullName, sex, birthDay,
         address, brandBike, modeCode, idBike,
         idCardBackSide, idCardFontSide, driverLicenseBackSide, driverLicenseFontSide
       } = shipperDto;
-  
+
       if (!idCardBackSide || !idCardFontSide || !driverLicenseBackSide || !driverLicenseFontSide) {
         throw new HttpException('ID card and driver license images are required', HttpStatus.BAD_REQUEST);
       }
-  
+
       const newShipper = new this.shipperModel({
         phoneNumber,
         email,
@@ -877,10 +877,10 @@ export class ShipperService {
         status: 1,
         joinDay: Date.now(),
       });
-  
+
       await newShipper.save();
       const idShipper = newShipper._id;
-  
+
       const typeIDCard = new ObjectId('66642316fc13ae0853b09bb7');
       const documentShipperTypeIDCard = new this.documentShipperModal({
         shipperID: idShipper,
@@ -889,7 +889,7 @@ export class ShipperService {
         imageFontSide: idCardFontSide,
       });
       await documentShipperTypeIDCard.save();
-  
+
       const typeDriverLicense = new ObjectId('66642316fc13ae0853b09bb8');
       const documentShipperTypeDriver = new this.documentShipperModal({
         shipperID: idShipper,
@@ -898,7 +898,7 @@ export class ShipperService {
         imageFontSide: driverLicenseFontSide,
       });
       await documentShipperTypeDriver.save();
-  
+
       return {
         result: true,
         createShipper: newShipper,
@@ -910,14 +910,46 @@ export class ShipperService {
     }
   }
 
-   async getAllShipper() {
-      try {
-          const shippers = await this.shipperModel.find({deleted: false});
-          if (!shippers) return { Message: "Not found shipper" }
-          return { result: true, AllShipper: shippers }
-      } catch (error) {
-          return { result: false, AllShipper: error }
+  async getAllShipper() {
+    try {
+      const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
+      const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
+      const vehicleCertificate_id = new ObjectId('6661419cfc13ae26b1b09bfc'); // giấy tờ xe
+
+      const documents = async (idShipper, type) => {
+        const document = await this.documentShipperModal.findOne({
+          shipperID: idShipper,
+          documentTypeID: type
+        });
+        return {
+          front: document ? document.imageFontSide : null,
+          back: document ? document.imageBackSide : null
+        };
+      };
+
+      const shippers = await this.shipperModel.find({ deleted: false });
+      if (shippers.length === 0) {
+        return { result: false, message: "No shipper found" };
       }
+
+      const promises = shippers.map(async (shipper) => {
+        const idCard = await documents(shipper._id, idCard_id);
+        const driverLicense = await documents(shipper._id, driverLicense_id);
+        const vehicleCertificate = await documents(shipper._id, vehicleCertificate_id);
+
+        return {
+          ...shipper.toObject(),
+          idCard,
+          driverLicense,
+          vehicleCertificate
+        };
+      });
+
+      const shipperData = await Promise.all(promises);
+      return { result: true, AllShipper: shipperData };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
   }
 
   async getHistory(id: string) {
@@ -1249,8 +1281,38 @@ export class ShipperService {
 
   async listShipperApproval() {
     try {
-      const listShipper = await this.shipperModel.find({ status: 1 });
-      return { result: true, listMerchantApproval: listShipper };
+      const listShipper = await this.shipperModel.find({ status: 1, deleted: false });
+      if (listShipper.length === 0) {
+        return { result: true, listShipper: listShipper };
+      }
+      const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
+      const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
+      const vehicleCertificate_id = new ObjectId('6661419cfc13ae26b1b09bfc'); // giấy tờ xe
+      
+      const documents = async (idShipper, type) => {
+        const document = await this.documentShipperModal.findOne({
+          shipperID: idShipper,
+          documentTypeID: type
+        });
+        return {
+          front: document ? document.imageFontSide : null,
+          back: document ? document.imageBackSide : null
+        };
+      };
+      const promise = await listShipper.map(async (shipper) => {
+        const idCard = await documents(shipper._id, idCard_id);
+        const driverLicense = await documents(shipper._id, driverLicense_id);
+        const vehicleCertificate = await documents(shipper._id, vehicleCertificate_id);
+
+        return {
+          ...shipper.toObject(),
+          idCard,
+          driverLicense,
+          vehicleCertificate
+        };
+      });
+      const shipperData = await Promise.all(promise);
+      return { result: true, listShipper: shipperData };
     } catch (error) {
       return { result: false, error };
     }
@@ -1424,9 +1486,9 @@ export class ShipperService {
       return { success: false, message: 'Do not ID card' };
     }
   }
-    
-  async getShipperIsDeleted(){
-     const deletedShipper = await this.shipperModel.find({deleted: true})
-     return {result: true, deletedShipper: deletedShipper}
-    }
+
+  async getShipperIsDeleted() {
+    const deletedShipper = await this.shipperModel.find({ deleted: true })
+    return { result: true, deletedShipper: deletedShipper }
+  }
 }
