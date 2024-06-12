@@ -25,7 +25,7 @@ export class UploadService {
     await promisify(fs.rename)(file.path, filePath);
 
     // Return the URL of the uploaded file
-    return 'http://172.16.16.16:3000/uploads/' + uniqueFileName;
+    return 'http://192.168.0.102:3000/uploads/' + uniqueFileName;
   }
 
   // Function to generate a unique file name by appending a timestamp

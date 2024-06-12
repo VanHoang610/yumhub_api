@@ -25,14 +25,15 @@ import * as FormData from 'form-data';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { DocumentShipper } from 'src/schemas/document.schemaShipper';
+import { DocumentShipper } from 'src/schemas/documentShipper.schema';
 
 @Injectable()
 export class ShipperService {
   constructor(
     private jwtService: JwtService,
     @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
-    @InjectModel(DocumentShipper.name) private documentShipperModal: Model<DocumentShipper>,
+    @InjectModel(DocumentShipper.name)
+    private documentShipperModal: Model<DocumentShipper>,
     @InjectModel(Order.name) private orderModel: Model<Order>,
     @InjectModel(ResetPassword.name)
     private resetPasswordModel: Model<ResetPassword>,
@@ -854,13 +855,37 @@ export class ShipperService {
       }
 
       const {
-        phoneNumber, email, avatar, fullName, sex, birthDay,
-        address, brandBike, modeCode, idBike,
-        idCardBackSide, idCardFontSide, driverLicenseBackSide, driverLicenseFontSide
+        phoneNumber,
+        email,
+        avatar,
+        fullName,
+        sex,
+        birthDay,
+        address,
+        brandBike,
+        modeCode,
+        idBike,
+        idCardBackSide,
+        idCardFontSide,
+        driverLicenseBackSide,
+        driverLicenseFontSide,
+        parrotCarFontSide,
+        parrotCarBackSide,
       } = shipperDto;
 
-      if (!idCardBackSide || !idCardFontSide || !driverLicenseBackSide || !driverLicenseFontSide) {
-        throw new HttpException('ID card and driver license images are required', HttpStatus.BAD_REQUEST);
+
+      if (
+        !idCardBackSide ||
+        !idCardFontSide ||
+        !driverLicenseBackSide ||
+        !driverLicenseFontSide ||
+        !parrotCarFontSide ||
+        !parrotCarBackSide
+      ) {
+        throw new HttpException(
+          'ID card and driver license and parrot car images are required',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const newShipper = new this.shipperModel({
@@ -881,28 +906,47 @@ export class ShipperService {
       await newShipper.save();
       const idShipper = newShipper._id;
 
+
+      //căn cước
       const typeIDCard = new ObjectId('66642316fc13ae0853b09bb7');
       const documentShipperTypeIDCard = new this.documentShipperModal({
         shipperID: idShipper,
-        type: typeIDCard,
+        documentTypeID: typeIDCard,
         imageBackSide: idCardBackSide,
         imageFontSide: idCardFontSide,
       });
       await documentShipperTypeIDCard.save();
 
+
+      // bằng lái
       const typeDriverLicense = new ObjectId('66642316fc13ae0853b09bb8');
       const documentShipperTypeDriver = new this.documentShipperModal({
         shipperID: idShipper,
-        type: typeDriverLicense,
+        documentTypeID: typeDriverLicense,
         imageBackSide: driverLicenseBackSide,
         imageFontSide: driverLicenseFontSide,
       });
       await documentShipperTypeDriver.save();
 
+
+      // giấy tờ xe
+      const typeParrotCar = new ObjectId('6667dc72a588bba5a76a9ec4');
+      const documentShipperTypeParrot = new this.documentShipperModal({
+        shipperID: idShipper,
+        documentTypeID: typeParrotCar,
+        imageBackSide: parrotCarBackSide,
+        imageFontSide: parrotCarFontSide,
+      });
+      await documentShipperTypeParrot.save();
+
       return {
         result: true,
         createShipper: newShipper,
-        documents: [documentShipperTypeIDCard, documentShipperTypeDriver],
+        documents: [
+          documentShipperTypeIDCard,
+          documentShipperTypeDriver,
+          documentShipperTypeParrot,
+        ],
       };
     } catch (error) {
       console.log(error);
@@ -1024,6 +1068,7 @@ export class ShipperService {
       const checkAccount = await this.shipperModel.findOne({
         phoneNumber: user.phoneNumber,
         status: 2,
+        deleted: false,
       });
       if (!checkAccount)
         throw new HttpException('Không đúng SDT', HttpStatus.NOT_FOUND);
@@ -1488,7 +1533,21 @@ export class ShipperService {
   }
 
   async getShipperIsDeleted() {
-    const deletedShipper = await this.shipperModel.find({ deleted: true })
-    return { result: true, deletedShipper: deletedShipper }
+    const deletedShipper = await this.shipperModel.find({ deleted: true });
+    return { result: true, deletedShipper: deletedShipper };
+  }
+
+  async getAllDocument(id: string) {
+    try {
+      const document = await this.documentShipperModal.find({ shipperID: id }).populate('documentTypeID');
+      if (!document)
+        throw new HttpException(
+          'Not find document shipper',
+          HttpStatus.NOT_FOUND,
+        );
+      return { result: true, document: document };
+    } catch (error) {
+      return { result: false, document: error };
+    }
   }
 }

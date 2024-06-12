@@ -254,17 +254,18 @@ export class ShipperController {
     return this.shipperService.getRating(id);
   }
 
-  //check giấy tờ merchant
+  //check giấy tờ bằng lái xe
   @Post('checkDriverLicenseDocument')
   @UseGuards(AuthGuard)
   checkDriverLicenseDocument(@Body() body: { image: string }) {
     const { image } = body;
     return this.shipperService.checkDriverLicenseDocument(image);
   }
-  
-  @Get('listShipperIsDeleted')
+
+  // lấy ra tất cả giấy tờ của shipper
+  @Get('getAllDocument')
   @UseGuards(AuthGuard)
-  listShipperIsDeleted() {
-    return this.shipperService.getShipperIsDeleted();
+  getAllDocument(@Query('id') id: string ) {
+    return this.shipperService.getAllDocument(id);
   }
 }
