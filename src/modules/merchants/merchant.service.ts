@@ -301,9 +301,7 @@ export class MerchantService {
       const orders = await this.orderModel
         .find({ merchantID: id })
         .sort({ timeBook: 1 })
-        .populate('customerID')
-        .populate('merchantID')
-        .populate('shipperID');
+        .populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID');
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
     } catch (error) {

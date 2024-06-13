@@ -965,7 +965,7 @@ export class ShipperService {
       const orders = await this.orderModel
         .find({ shipperID: id })
         .sort({ timeBook: 1 })
-        .populate('customerID');
+        .populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID');
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 
       return { result: true, historyShipper: orders };
