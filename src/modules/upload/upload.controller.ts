@@ -5,13 +5,12 @@ import { UploadService } from './upload.service';
 import { imageDto } from 'src/dto/dto.image';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
-import { AuthGuard } from 'src/helper/auth.middleware';
 
 @Controller("files")
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
   @Post('upload')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     const fileUrl = await this.uploadService.uploadFile(file);
