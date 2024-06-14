@@ -15,8 +15,9 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm install --only=production
+RUN npm install @nestjs/cli -g
 
 COPY --from=build /app/dist ./dist
 
 EXPOSE 3001
-CMD ["node", "dist/main"]
+CMD ["npm", "start"]
