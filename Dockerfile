@@ -1,23 +1,34 @@
-# Stage 1: Build the application
-FROM node:20 AS build
+# Stage 1: Build stage
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+
+RUN npm install --production
+
+# Copy tsconfig.json for TypeScript configuration
+COPY tsconfig.json .
+
+# Copy the rest of the application code
 COPY . .
+
+# Build TypeScript
 RUN npm run build
 
-# Stage 2: Run the application
-FROM node:14-alpine
+# Stage 2: Production stage
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --only=production
-RUN npm install @nestjs/cli -g
-
+COPY --from=build /app/package*.json ./
 COPY --from=build /app/dist ./dist
 
+# Install production dependencies
+RUN npm install --only=production
+
+# Expose the port that NestJS is listening on
 EXPOSE 3001
-CMD ["npm", "start"]
+
+# Command to run the application
+CMD ["node", "dist/main"]
