@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
 
-async function createAppInstance(port: number) {
+async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Cấu hình CORS
@@ -19,23 +19,14 @@ async function createAppInstance(port: number) {
   app.useStaticAssets(path.join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-
+  
+  const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
 
-  // Hot module replacement
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
 }
-
-async function bootstrap() {
-  const port1 = process.env.PORT1 ? parseInt(process.env.PORT1, 10) : 3000;
-  const port2 = process.env.PORT2 ? parseInt(process.env.PORT2, 10) : 3001;
-
-  await createAppInstance(port1);
-  await createAppInstance(port2);
-}
-
 bootstrap();
+
