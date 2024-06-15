@@ -28,7 +28,8 @@ COPY --from=build /app/dist ./dist
 RUN npm install --only=production
 
 # Expose the port that NestJS is listening on
-EXPOSE 3001 || 3000
+EXPOSE 3001
+EXPOSE 3000
 
 # Command to run the application
 CMD ["node", "dist/main"]
