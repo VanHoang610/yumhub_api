@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import { Shipper } from "./shipper.schema";
 import { DocumentType } from "./documentType.schema";
 
-
 @Schema()
 export class DocumentShipper {
 
