@@ -52,7 +52,7 @@ export class AdminService {
 
     async loginAdmin(login: LoginAdminDto) {
         try {
-            const admin = await this.adminModel.findOne({ userName: login.userName })
+            const admin = await this.adminModel.findOne({ userName: login.userName, deleted: false})
             if (!admin) throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
             const compare = await bcrypt.compare(login.password, admin.password);
             if (!compare) throw new HttpException('Password wrong', HttpStatus.UNAUTHORIZED)

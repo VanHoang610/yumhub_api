@@ -217,9 +217,7 @@ export class CustomerServices {
     try {
       const orders = await this.orderModel
         .find({ customerID: id })
-        .populate('customerID')
-        .populate('merchantID')
-        .populate('shipperID')
+        .populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID')
         .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
@@ -232,15 +230,18 @@ export class CustomerServices {
     try {
       let checkAccount = await this.customers.findOne({
         phoneNumber: user.phoneNumber,
+        deleted: false
       });
       if (!checkAccount) {
         checkAccount = await this.userMerchantModel.findOne({
           phoneNumber: user.phoneNumber,
+          deleted: false
         });
       }
       if (!checkAccount) {
         checkAccount = await this.shipperModel.findOne({
           phoneNumber: user.phoneNumber,
+          deleted: false
         });
       }
       if (!checkAccount)

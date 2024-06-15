@@ -11,7 +11,7 @@ export class DocumentShipper {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType'})
     documentTypeID: DocumentType
-    
+
     @Prop({required: false})
     description?: string
     
