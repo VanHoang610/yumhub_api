@@ -48,8 +48,20 @@ export class RegisterMerchatDto {
     @IsString()
     email: string
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    imageDocuments: string[];
+    idCardFrontSide?: string
+
+    @IsOptional()
+    @IsString()
+    idCardBackSide?: string
+
+    @IsOptional()
+    @IsString()
+    businessFrontSide?: string
+
+    @IsOptional()
+    @IsString()
+    businessBackSide?: string
 
 }

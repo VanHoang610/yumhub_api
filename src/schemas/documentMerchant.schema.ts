@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { Merchant } from './merchant.schema';
+import { DocumentType } from './documentType.schema';
 
 @Schema()
 export class DocumentMerchant {

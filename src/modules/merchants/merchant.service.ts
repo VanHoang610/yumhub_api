@@ -166,7 +166,7 @@ export class MerchantService {
       const existingUserMerchant = await this.userMerchantModel.findOne({
         email: merchant.email,
       });
-      
+
       if (existingUserMerchant) {
         throw new HttpException(
           'User merchant already exists',
@@ -200,21 +200,46 @@ export class MerchantService {
       await newUserMerchant.save();
 
       // Tạo mới các documents nếu có
-      if (merchant.imageDocuments && merchant.imageDocuments.length > 0) {
-        var documentMerchant = merchant.imageDocuments.map(async (image) => {
-          const imageDocument = new this.documentMerchantModel({
-            merchantID: idMerchant,
-            image: image,
-          });
-          return await imageDocument.save();
-        });
+      if (
+        !merchant.idCardFrontSide ||
+        !merchant.idCardBackSide ||
+        !merchant.businessBackSide ||
+        !merchant.businessFrontSide
+      ) {
+        throw new HttpException(
+          'ID card and business license images are required',
+          HttpStatus.BAD_REQUEST,
+        );
       }
-      const createdDocuments = await Promise.all(documentMerchant);
+
+      //căn cước
+      const typeIDCard = new ObjectId('66642316fc13ae0853b09bb7');
+      const documentMerchantTypeIDCard = new this.documentMerchantModel({
+        merchantID: idMerchant,
+        documentTypeID: typeIDCard,
+        imageBackSide: merchant.idCardBackSide,
+        imageFontSide: merchant.idCardFrontSide,
+      });
+      await documentMerchantTypeIDCard.save();
+
+      // giấy phép kinh doanh
+      const typeBusiness = new ObjectId('6667e63ea588bba5a76a9f02');
+      const documentShipperTypeBusiness = new this.documentMerchantModel({
+        merchantID: idMerchant,
+        documentTypeID: typeBusiness,
+        imageBackSide: merchant.businessBackSide,
+        imageFontSide: merchant.businessFrontSide,
+      });
+      await documentShipperTypeBusiness.save();
+
       return {
         result: true,
         newMerchant: newMerchant,
         newUserMerchant: newUserMerchant,
-        documents: createdDocuments,
+        documents: {
+          idCard: documentMerchantTypeIDCard,
+          businessLincense: documentShipperTypeBusiness,
+        },
       };
     } catch (error) {
       console.log(error);
@@ -301,7 +326,10 @@ export class MerchantService {
       const orders = await this.orderModel
         .find({ merchantID: id })
         .sort({ timeBook: 1 })
-        .populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID');
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID')
+        .populate('voucherID');
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
     } catch (error) {
@@ -386,7 +414,7 @@ export class MerchantService {
     try {
       const checkAccount = await this.userMerchantModel.findOne({
         phoneNumber: user.phoneNumber,
-        deleted: false
+        deleted: false,
       });
       if (!checkAccount)
         throw new HttpException('Không đúng SDT', HttpStatus.NOT_FOUND);
@@ -703,9 +731,11 @@ export class MerchantService {
       if (!detailMerchant)
         throw new HttpException('Not Found Merchant', HttpStatus.NOT_FOUND);
       const user = await this.userMerchantModel.findOne({ merchantID: id });
-      const document = await this.documentMerchantModel.find({
-        merchantID: id,
-      }).populate('documentTypeID');
+      const document = await this.documentMerchantModel
+        .find({
+          merchantID: id,
+        })
+        .populate('documentTypeID');
       const paymentMethod = await this.paymentMethodMerchantModel.findOne({
         merchantID: id,
       });

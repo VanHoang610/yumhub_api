@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { Shipper } from "./shipper.schema";
-import { DocumentType } from "./documentTypeShipper.schema";
+import { DocumentType } from "./documentType.schema";
 
 
 @Schema()
