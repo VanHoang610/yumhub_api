@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { Shipper } from "./shipper.schema";
-import { DocumentTypeShipper } from "./documentTypeShipper.schema";
+import { DocumentType } from "./documentType.schema";
 
 @Schema()
 export class DocumentShipper {
@@ -10,8 +10,8 @@ export class DocumentShipper {
     shipperID?: Shipper
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'DocumentType'})
-    documentTypeID: DocumentTypeShipper
-
+    documentTypeID: DocumentType
+    
     @Prop({required: false})
     description?: string
     
