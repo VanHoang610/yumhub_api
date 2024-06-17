@@ -241,6 +241,13 @@ export class MerchantController {
     return this.merchantService.getMerchantById(id);
   }
 
+   // chi tiết tài khoản user merchant
+   @Get('getUserMerchantById')
+   @UseGuards(AuthGuard)
+   getUserMerchantById(@Query('id') id: string) {
+     return this.merchantService.getUserMerchantById(id);
+   }
+
   // nạp tiền merchant
   @Post('topUp')
   @UseGuards(AuthGuard)
