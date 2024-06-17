@@ -156,15 +156,9 @@ export class MerchantService {
 
   async createMerchant(merchant: RegisterMerchatDto) {
     try {
-      const existingMerchant = await this.merchants.findOne({
-        email: merchant.email,
-      });
-      if (existingMerchant) {
-        throw new HttpException('Merchant already exists', HttpStatus.CONFLICT);
-      }
-
       const existingUserMerchant = await this.userMerchantModel.findOne({
         email: merchant.email,
+        phoneNumber: merchant.phoneNumber
       });
 
       if (existingUserMerchant) {
@@ -185,7 +179,6 @@ export class MerchantService {
         status: 1,
         creatAt: Date.now(),
       });
-      await newMerchant.save();
 
       // Tạo mới userMerchant
       const idMerchant = newMerchant._id;
@@ -197,7 +190,6 @@ export class MerchantService {
         avatar: merchant.avatar,
         email: merchant.email,
       });
-      await newUserMerchant.save();
 
       // Tạo mới các documents nếu có
       if (
@@ -232,6 +224,8 @@ export class MerchantService {
       });
       await documentShipperTypeBusiness.save();
 
+      await newMerchant.save();
+      await newUserMerchant.save();
       return {
         result: true,
         newMerchant: newMerchant,
@@ -420,7 +414,7 @@ export class MerchantService {
         throw new HttpException('Không đúng SDT', HttpStatus.NOT_FOUND);
       const checkStatus = await this.merchants.findOne({
         _id: checkAccount.merchantID,
-        status: 2,
+        status: 3,
       });
       if (!checkStatus)
         throw new HttpException('Tài khoản chưa đăng ký', HttpStatus.NOT_FOUND);
@@ -749,6 +743,19 @@ export class MerchantService {
       };
 
       return { result: true, detailMerchant: mergedDetailMerchant };
+    } catch (error) {
+      return { result: false, error };
+    }
+  }
+
+  async getUserMerchantById(id: string) {
+    try {
+      const userMerchant = await this.userMerchantModel.findById(id);
+      userMerchant.password = undefined;
+      if (!userMerchant)
+        throw new HttpException('Not Found User Merchant', HttpStatus.NOT_FOUND)
+
+      return { result: true, userMerchant: userMerchant };
     } catch (error) {
       return { result: false, error };
     }
