@@ -268,4 +268,10 @@ export class ShipperController {
   getAllDocument(@Query('id') id: string ) {
     return this.shipperService.getAllDocument(id);
   }
+
+  @Get("listShipperIsDeleted")
+  @UseGuards(AuthGuard)
+  listShipperIsDeleted() {
+    return this.shipperService.getShipperIsDeleted();
+  }
 }
