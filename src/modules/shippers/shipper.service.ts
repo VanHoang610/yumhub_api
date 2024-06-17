@@ -958,7 +958,7 @@ export class ShipperService {
     try {
       const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
       const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
-      const vehicleCertificate_id = new ObjectId('6661419cfc13ae26b1b09bfc'); // giấy tờ xe
+      const vehicleCertificate_id = new ObjectId('6667dc72a588bba5a76a9ec4'); // giấy tờ xe
 
       const documents = async (idShipper, type) => {
         const document = await this.documentShipperModal.findOne({
@@ -1332,7 +1332,7 @@ export class ShipperService {
       }
       const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
       const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
-      const vehicleCertificate_id = new ObjectId('6661419cfc13ae26b1b09bfc'); // giấy tờ xe
+      const vehicleCertificate_id = new ObjectId('6667dc72a588bba5a76a9ec4'); // giấy tờ xe
       
       const documents = async (idShipper, type) => {
         const document = await this.documentShipperModal.findOne({
