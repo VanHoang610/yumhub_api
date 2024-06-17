@@ -10,7 +10,7 @@ export class UploadService {
   private readonly storage: admin.storage.Storage;
 
   constructor() {
-    const serviceAccount = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth/serviceAccountKey.json'), 'utf8'));
+    const serviceAccount = require('../auth/serviceAccountKey.json');
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
