@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Bucket } from '@google-cloud/storage';
 
 @Injectable()
 export class UploadService {
@@ -10,7 +9,7 @@ export class UploadService {
   private readonly storage: admin.storage.Storage;
 
   constructor() {
-    const serviceAccount = require('../auth/serviceAccountKey.json');
+    const serviceAccount = JSON.parse(fs.readFileSync('../auth/serviceAccountKey.json', 'utf8'));
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
