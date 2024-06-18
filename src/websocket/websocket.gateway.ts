@@ -12,7 +12,7 @@ export class dth_socket {
 
         // // Tạo HTTP server
         // const server = http.createServer(app);
-        const PORT = process.env.PORT || 8080;
+        const PORT = process.env.PORT;
         const server = express()
             .use((req, res) => res.sendFile("/index.html", { root: __dirname }))
             .listen(PORT, () => console.log(`Listening on ${PORT}`));
