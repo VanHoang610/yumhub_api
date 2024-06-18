@@ -4,6 +4,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,7 +23,8 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
   
-  await app.listen(3001);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
 
   if (module.hot) {
     module.hot.accept();

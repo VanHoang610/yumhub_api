@@ -269,6 +269,7 @@ export class ShipperController {
     return this.shipperService.getAllDocument(id);
   }
 
+
   //tìm kiếm shipper
   @Post('findShipper')
   @UseGuards(AuthGuard)
@@ -283,5 +284,10 @@ export class ShipperController {
   findApproveShipper(@Body() body: { keyword: string }) {
     const { keyword } = body;
     return this.shipperService.findApproveShipper(keyword);
+
+  @Get("listShipperIsDeleted")
+  @UseGuards(AuthGuard)
+  listShipperIsDeleted() {
+    return this.shipperService.getShipperIsDeleted();
   }
 }
