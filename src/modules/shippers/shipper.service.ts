@@ -971,7 +971,7 @@ export class ShipperService {
         };
       };
 
-      const shippers = await this.shipperModel.find({ deleted: false });
+      const shippers = await this.shipperModel.find({ deleted: false, status: { $ne: 1 } });
       if (shippers.length === 0) {
         return { result: false, message: "No shipper found" };
       }
@@ -1387,9 +1387,9 @@ export class ShipperService {
   
       const detailShipper = {
         ...shipper.toObject(),
-        idCard: document1 ? document1.imageFontSide : null,
-        driverLicense: document2 ? document2.imageFontSide : null,
-        vehicleCertificate: document3 ? document3.imageFontSide : null
+        idCard: {front: document1 ? document1.imageFontSide : null, back: document1 ? document1.imageBackSide : null},
+        driverLicense: {front: document2 ? document2.imageFontSide : null, back: document2 ? document2.imageBackSide : null},
+        vehicleCertificate: {front: document3 ? document3.imageFontSide : null, back: document3 ? document3.imageBackSide : null},
       };
   
       return { result: true, detailShipper: detailShipper };
