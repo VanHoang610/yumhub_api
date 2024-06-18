@@ -17,7 +17,7 @@ import { DetailOrderModule } from './modules/detailOrders/detailOrder.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { ImageReviewModule } from './modules/imageReviews/imageReview.module';
 import { AdminModule } from './modules/admins/admin.module';
-import { uploadModule } from './modules/upload/upload.module';
+import { UploadModule } from './modules/upload/upload.module';
 import { VoucherModule } from './modules/vouchers/voucher.module';
 import { HistoryWalletMerchantModule } from './modules/historyWalletMerchant/walletMerchant.module';
 import { HistoryWalletShipperModule } from './modules/historyWalletShipper/history.module';
@@ -52,7 +52,7 @@ import { dth_socket } from './websocket/websocket.gateway';
     ReviewModule,
     ImageReviewModule,
     AdminModule,
-    uploadModule,
+    UploadModule,
     VoucherModule,
 
     //new
