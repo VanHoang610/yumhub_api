@@ -312,9 +312,9 @@ export class CustomerServices {
     }
   }
 
-  async resetPass(id: string, password: string) {
+  async resetPass(email: string, password: string) {
     try {
-      const user = await this.customers.findById(id);
+      const user = await this.customers.findOne({email: email});
       if (!user)
         throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
       const passwordNew = await bcrypt.hash(password, 10);
