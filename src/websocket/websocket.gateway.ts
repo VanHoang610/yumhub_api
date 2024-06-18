@@ -1,61 +1,120 @@
 import * as WebSocket from 'ws';
-import { IncomingMessage } from 'http';
+import * as http from 'http';
+import * as express from 'express';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 export class dth_socket {
     constructor() {
-        const PORT = process.env.WS_PORT || 8081;
-        const wss = new WebSocket.Server({ port: PORT });
+        const app = express();
+        const port = process.env.PORT || 8080;
 
-        const clients = {};
+        // Tạo HTTP server
+        const server = http.createServer(app);
 
-        function sendMessageToClient(token, message) {
-            const clientID = getClientIDByToken(token);
+        // Tạo WebSocket server sử dụng HTTP server
+        const wss = new WebSocket.Server({ server });
+
+        const clientsCustomer = {};
+        const clientsShipper = {};
+        const clientsMerchant = {};
+
+        function sendMessageToClient(id, typeClient, message) {
+            const clientID = getClientID(id, typeClient);
             if (clientID) {
-                const client = clients[clientID];
-                client.connection.send(message);
+                switch (typeClient) {
+                    case "customer":
+                        clientsCustomer[clientID].connection.send(message);
+                        break;
+                    case "shipper":
+                        clientsShipper[clientID].connection.send(message);
+                        break;
+                    case "merchant":
+                        clientsMerchant[clientID].connection.send(message);
+                        break;
+                    default:
+                        break;
+                }
             } else {
-                console.log('Token not found for client: ' + token);
+                console.log('Client ID not found: ' + id);
             }
         }
 
-        function handleNewConnection(connection, token) {
-            clients[token] = { connection: connection };
-
-            console.log('New client connected, Token: ' + token);
-
+        function handleNewConnection(connection, id, typeClient) {
+            switch (typeClient) {
+                case "customer":
+                    clientsCustomer[id] = { connection: connection, id: id };
+                    break;
+                case "shipper":
+                    clientsShipper[id] = { connection: connection, id: id };
+                    break;
+                case "merchant":
+                    clientsMerchant[id] = { connection: connection, id: id };
+                    break;
+                default:
+                    break;
+            }
+            console.log(`New ${typeClient} client connected, ID: ${id}`);
             connection.send('Hello! Welcome to YumHub server');
         }
 
-        function getClientIDByToken(token) {
-            return Object.keys(clients).find(clientID => clientID === token);
+        function getClientID(id, typeClient) {
+            switch (typeClient) {
+                case "customer":
+                    return Object.keys(clientsCustomer).find(clientID => clientsCustomer[clientID].id === id);
+                case "shipper":
+                    return Object.keys(clientsShipper).find(clientID => clientsShipper[clientID].id === id);
+                case "merchant":
+                    return Object.keys(clientsMerchant).find(clientID => clientsMerchant[clientID].id === id);
+                default:
+                    break;
+            }
         }
 
-        wss.on('connection', (connection: WebSocket, req: IncomingMessage) => {
-            const token = req.headers['token'] as string;
+        wss.on('connection', (connection, req) => {
+            const token = req.headers['token'];
+            const id = req.headers['id'];
+            const typeClient = req.headers['typeclient'];
 
-            if (!token) {
+            if (!token || !id || !typeClient) {
                 connection.close();
                 return;
             }
-            handleNewConnection(connection, token);
+            handleNewConnection(connection, id, typeClient);
 
-            connection.on('message', (message: WebSocket.Data) => {
+            connection.on('message', (message) => {
                 const jsonString = message.toString();
                 const jsonObject = JSON.parse(jsonString);
 
-                if (jsonObject.command === 'book') {
-                    console.log(jsonObject.command);
+                switch (jsonObject.command) {
+                    case "connect":
+                        console.log(jsonObject.data);
+                        break;
+                    case "book":
+                        console.log(jsonObject.data.customerID._id);
+                        sendMessageToClient("660c99c2fc13ae788b50fbdc", "merchant", "jsonObject.data");
+                        sendMessageToClient("6604e1ec5a6c5ad8711aebfa", "shipper", "jsonObject.data");
+                        break;
+                    case "cancel":
+
+                        break;
+                    default:
+                        break;
                 }
             });
 
             connection.on('close', () => {
-                delete clients[token];
-                console.log('Client disconnected, Token: ' + token);
+                // Clean up client connections when they disconnect
+                delete clientsCustomer[id];
+                delete clientsShipper[id];
+                delete clientsMerchant[id];
+                console.log(`Client ${typeClient} with ID ${id} disconnected.`);
             });
         });
 
-        console.log(`WebSocket server is running on port ${PORT}`);
+        // Lắng nghe HTTP server trên cổng do Heroku cung cấp
+        server.listen(port, () => {
+            console.log(`Server is listening on port ${port}`);
+        });
     }
 }
