@@ -1,9 +1,11 @@
 import * as WebSocket from 'ws';
 import { IncomingMessage } from 'http';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-export class dth_socket {
+export class DthSocket {
     constructor() {
-        const PORT = process.env.PORT || 8080;
+        const PORT = process.env.WS_PORT || 8081;
         const wss = new WebSocket.Server({ port: PORT });
 
         const clients = {};
