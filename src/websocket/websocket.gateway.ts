@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-export class DthSocket {
+export class dth_socket {
     constructor() {
         const PORT = process.env.WS_PORT || 8081;
         const wss = new WebSocket.Server({ port: PORT });
