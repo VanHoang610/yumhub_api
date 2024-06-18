@@ -265,9 +265,25 @@ export class ShipperController {
   // lấy ra tất cả giấy tờ của shipper
   @Get('getAllDocument')
   @UseGuards(AuthGuard)
-  getAllDocument(@Query('id') id: string ) {
+  getAllDocument(@Query('id') id: string) {
     return this.shipperService.getAllDocument(id);
   }
+
+
+  //tìm kiếm shipper
+  @Post('findShipper')
+  @UseGuards(AuthGuard)
+  findShipper(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.shipperService.findShipper(keyword);
+  }
+
+  //tìm kiếm shipper đang phê duyệt
+  @Post('findApproveShipper')
+  @UseGuards(AuthGuard)
+  findApproveShipper(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.shipperService.findApproveShipper(keyword);
 
   @Get("listShipperIsDeleted")
   @UseGuards(AuthGuard)

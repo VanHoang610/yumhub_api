@@ -50,4 +50,7 @@ export class ShipperDto {
     @IsString()
     idBike: string
 
+    @IsOptional()
+    status: number
+
 }
