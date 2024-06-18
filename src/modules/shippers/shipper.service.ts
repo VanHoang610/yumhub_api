@@ -1144,19 +1144,19 @@ export class ShipperService {
     }
   }
 
-  async resetPass(id: string, password: string) {
-    try {
-      const user = await this.shipperModel.findById(id);
-      if (!user)
-        throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
-      const passwordNew = await bcrypt.hash(password, 10);
-      user.password = passwordNew;
-      user.save();
-      return { result: true, data: user };
-    } catch (error) {
-      return { result: false, data: error };
+    async resetPass(email: string, password: string) {
+      try {
+        const user = await this.shipperModel.findOne({email: email});
+        if (!user)
+          throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
+        const passwordNew = await bcrypt.hash(password, 10);
+        user.password = passwordNew;
+        user.save();
+        return { result: true, data: user };
+      } catch (error) {
+        return { result: false, data: error };
+      }
     }
-  }
 
   async changePass(id: string, passOld: string, passNew: string) {
     try {

@@ -187,9 +187,9 @@ export class ShipperController {
 
   //cập nhật mật khẩu
   @Post('resetPass')
-  resetPass(@Query('id') id: string, @Body() body: { password: string }) {
-    const { password } = body;
-    return this.shipperService.resetPass(id, password);
+  resetPass (@Body() body: { email: string, password: string }) {
+    const { password, email } = body;
+    return this.shipperService.resetPass(email, password);
   }
 
   //đổi mật khẩu
@@ -269,7 +269,6 @@ export class ShipperController {
     return this.shipperService.getAllDocument(id);
   }
 
-
   //tìm kiếm shipper
   @Post('findShipper')
   @UseGuards(AuthGuard)
@@ -284,8 +283,9 @@ export class ShipperController {
   findApproveShipper(@Body() body: { keyword: string }) {
     const { keyword } = body;
     return this.shipperService.findApproveShipper(keyword);
+  }
 
-  @Get("listShipperIsDeleted")
+  @Get('listShipperIsDeleted')
   @UseGuards(AuthGuard)
   listShipperIsDeleted() {
     return this.shipperService.getShipperIsDeleted();
