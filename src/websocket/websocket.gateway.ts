@@ -1,51 +1,59 @@
-import { json } from 'stream/consumers';
 import * as WebSocket from 'ws';
+import { IncomingMessage } from 'http';
 
 export class dth_socket {
     constructor() {
-        const wss = new WebSocket.Server({ port: 8080 });
+        const PORT = process.env.PORT || 8080;
+        const wss = new WebSocket.Server({ port: PORT });
 
         const clients = {};
 
-        function sendMessageToClient(token, message){
+        function sendMessageToClient(token, message) {
             const clientID = getClientIDByToken(token);
-            if(clientID){
+            if (clientID) {
                 const client = clients[clientID];
                 client.connection.send(message);
-            }else{
-                console.log('Token not found client:'+ token);
+            } else {
+                console.log('Token not found for client: ' + token);
             }
         }
 
-        function handleNewConnection(connection, token){
+        function handleNewConnection(connection, token) {
             clients[token] = { connection: connection };
 
-            console.log('Client mới đã kết nối, Token: ' + token);
+            console.log('New client connected, Token: ' + token);
 
-            connection.send('Hello! welcome to YumHub server');
+            connection.send('Hello! Welcome to YumHub server');
         }
 
-        function getClientIDByToken(token){
-            return Object.keys(clients).find(clientID => clients[clientID].token === token);
+        function getClientIDByToken(token) {
+            return Object.keys(clients).find(clientID => clientID === token);
         }
 
-        wss.on('connection', (connection, req) => {
-            const token = req.headers['token'];
+        wss.on('connection', (connection: WebSocket, req: IncomingMessage) => {
+            const token = req.headers['token'] as string;
 
-            if(!token){
+            if (!token) {
                 connection.close();
                 return;
             }
             handleNewConnection(connection, token);
-            connection.on('message', (message) => {
-                const jsonString = message.toString();
 
+            connection.on('message', (message: WebSocket.Data) => {
+                const jsonString = message.toString();
                 const jsonObject = JSON.parse(jsonString);
 
-                if (jsonObject.command == 'book'){
+                if (jsonObject.command === 'book') {
                     console.log(jsonObject.command);
                 }
-                });
-            })
+            });
+
+            connection.on('close', () => {
+                delete clients[token];
+                console.log('Client disconnected, Token: ' + token);
+            });
+        });
+
+        console.log(`WebSocket server is running on port ${PORT}`);
     }
 }
