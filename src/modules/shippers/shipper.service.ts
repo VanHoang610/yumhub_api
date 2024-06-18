@@ -1550,4 +1550,43 @@ export class ShipperService {
       return { result: false, document: error };
     }
   }
+
+  async findShipper(keyword: string) {
+    try {
+      const shippers = await this.shipperModel.find({
+        $or: [
+          { fullName: new RegExp(keyword, 'i') }, // thường hay hoa đều được
+          { idBike: new RegExp(keyword, 'i') },
+        ],
+      });
+      if (shippers.length === 0) {
+        return { result: false, message: 'Not Found Shippers', shippers: [] };
+      }
+      return { result: true, shippers: shippers };
+    } catch (error) {
+      return { result: false, shippers: error };
+    }
+  }
+
+  async findApproveShipper(keyword: string) {
+    try {
+      const shippers = await this.shipperModel.find({
+        $and: [
+          {
+            $or: [
+              { fullName: new RegExp(keyword, 'i') },
+              { idBike: new RegExp(keyword, 'i') },
+            ],
+          },
+          { status: { $in: [1, 2] } },
+        ],
+      });
+      if (shippers.length === 0) {
+        return { result: false, message: 'Not Found Shipper', shippers: [] };
+      }
+      return { result: true, shippers: shippers };
+    } catch (error) {
+      return { result: false, shippers: error };
+    }
+  }
 }
