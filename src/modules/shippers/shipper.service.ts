@@ -1333,7 +1333,7 @@ export class ShipperService {
       const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
       const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
       const vehicleCertificate_id = new ObjectId('6667dc72a588bba5a76a9ec4'); // giấy tờ xe
-      
+
       const documents = async (idShipper, type) => {
         const document = await this.documentShipperModal.findOne({
           shipperID: idShipper,
@@ -1365,12 +1365,39 @@ export class ShipperService {
 
   async getShipperById(id: string) {
     try {
-      const detailShipper = await this.shipperModel.findById(id);
+      const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
+      const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
+      const vehicleCertificate_id = new ObjectId('6667dc72a588bba5a76a9ec4'); // giấy tờ xe
+  
+      const [document1, document2, document3, shipper] = await Promise.all([
+        this.documentShipperModal.findOne({
+          shipperID: id,
+          documentTypeID: idCard_id
+        }),
+        this.documentShipperModal.findOne({
+          shipperID: id,
+          documentTypeID: driverLicense_id
+        }),
+        this.documentShipperModal.findOne({
+          shipperID: id,
+          documentTypeID: vehicleCertificate_id
+        }),
+        this.shipperModel.findOne({ _id: id })
+      ]);
+  
+      const detailShipper = {
+        ...shipper.toObject(),
+        idCard: document1 ? document1.imageFontSide : null,
+        driverLicense: document2 ? document2.imageFontSide : null,
+        vehicleCertificate: document3 ? document3.imageFontSide : null
+      };
+  
       return { result: true, detailShipper: detailShipper };
     } catch (error) {
       return { result: false, error };
     }
   }
+  
 
   async topUptopUpShipper(id: string, topUp: HistoryMerchantDto) {
     try {
