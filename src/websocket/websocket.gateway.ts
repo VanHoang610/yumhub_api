@@ -7,7 +7,7 @@ dotenv.config();
 export class dth_socket {
     constructor() {
         const app = express();
-        const port = process.env.PORT || 8080;
+        // const port = process.env.PORT || 8080;
 
         // Tạo HTTP server
         const server = http.createServer(app);
@@ -113,8 +113,8 @@ export class dth_socket {
         });
 
         // Lắng nghe HTTP server trên cổng do Heroku cung cấp
-        server.listen(port, () => {
-            console.log(`Server is listening on port ${port}`);
-        });
+        // server.listen(port, () => {
+        //     console.log(`Server is listening on port ${port}`);
+        // });
     }
 }
