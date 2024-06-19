@@ -1,7 +1,6 @@
 import {
     WebSocketGateway,
     WebSocketServer,
-    SubscribeMessage,
     OnGatewayConnection,
     OnGatewayDisconnect,
   } from '@nestjs/websockets';
@@ -23,20 +22,14 @@ import {
     private merchants: ConnectedClient[] = [];
   
     handleConnection(client: Socket) {
-      console.log('Client connected:', client.id);
-    }
+      const { id_user, type_user } = client.handshake.query;
   
-    handleDisconnect(client: Socket) {
-      console.log('Client disconnected:', client.id);
-      this.removeClient(client);
-    }
+      const connectedClient: ConnectedClient = {
+        socket: client,
+        id_user: id_user as string,
+        type_user: type_user as string,
+      };
   
-    @SubscribeMessage('register')
-    handleRegister(client: Socket, payload: { id_user: string, type_user: string }) {
-      const { id_user, type_user } = payload;
-  
-      const connectedClient: ConnectedClient = { socket: client, id_user, type_user };
-      
       if (type_user === 'customer') {
         this.customers.push(connectedClient);
       } else if (type_user === 'shipper') {
@@ -45,7 +38,12 @@ import {
         this.merchants.push(connectedClient);
       }
   
-      console.log(`${type_user} registered:`, id_user);
+      console.log(`${type_user} connected:`, id_user);
+    }
+  
+    handleDisconnect(client: Socket) {
+      console.log('Client disconnected:', client.id);
+      this.removeClient(client);
     }
   
     private removeClient(client: Socket) {
