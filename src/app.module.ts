@@ -33,7 +33,7 @@ import { PaymentMethodMerchant } from './schemas/paymentMethodMerchant.schema';
 import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
 import { FeeModule } from './modules/fee/fee.module';
 import { DocumentShipperModule } from './modules/documentShipper/document.module';
-import { dth_socket } from './websocket/websocket.gateway';
+import { RealtimeGateway  } from './websocket/realtime.gateway';
 
 @Module({
   imports: [
@@ -72,6 +72,6 @@ import { dth_socket } from './websocket/websocket.gateway';
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController],
-  providers: [AppService, dth_socket],
+  providers: [AppService, RealtimeGateway],
 })
 export class AppModule { }
