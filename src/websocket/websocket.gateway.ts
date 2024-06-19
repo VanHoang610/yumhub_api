@@ -1,21 +1,17 @@
-import * as WebSocket from 'ws';
+const { Server } = require('ws');
 import * as http from 'http';
 import * as express from 'express';
 import * as dotenv from 'dotenv';
-const { Server } = require('ws');
 dotenv.config();
 
 export class dth_socket {
     constructor() {
-        // const app = express();
-        // const port = process.env.PORT || 8080;
+        const app = express();
+        const port = process.env.PORT || 8080;
 
-        // // Tạo HTTP server
-        // const server = http.createServer(app);
-        const PORT = process.env.PORT;
-        const server = express()
-            .use((req, res) => res.sendFile("/index.html", { root: __dirname }))
-            .listen(PORT, () => console.log(`Listening on ${PORT}`));
+        // Tạo HTTP server
+        const server = http.createServer(app);
+
         // Tạo WebSocket server sử dụng HTTP server
         const wss = new Server({ server });
 
@@ -114,6 +110,11 @@ export class dth_socket {
                 delete clientsMerchant[id];
                 console.log(`Client ${typeClient} with ID ${id} disconnected.`);
             });
+        });
+
+        // Lắng nghe HTTP server trên cổng do Heroku cung cấp
+        server.listen(port, () => {
+            console.log(`Server is listening on port ${port}`);
         });
     }
 }
