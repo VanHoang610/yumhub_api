@@ -1001,7 +1001,7 @@ export class MerchantService {
               { address: new RegExp(keyword, 'i') },
             ],
           },
-          { status: { $in: [4] } },
+          { deleted: true },
         ],
       });
       if (merchants.length === 0) {

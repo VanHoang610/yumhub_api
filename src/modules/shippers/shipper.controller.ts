@@ -187,7 +187,7 @@ export class ShipperController {
 
   //cập nhật mật khẩu
   @Post('resetPass')
-  resetPass (@Body() body: { email: string, password: string }) {
+  resetPass(@Body() body: { email: string; password: string }) {
     const { password, email } = body;
     return this.shipperService.resetPass(email, password);
   }
@@ -275,6 +275,14 @@ export class ShipperController {
   findShipper(@Body() body: { keyword: string }) {
     const { keyword } = body;
     return this.shipperService.findShipper(keyword);
+  }
+
+  //tìm kiếm shipper đã xóa
+  @Post('findDeletedShipper')
+  @UseGuards(AuthGuard)
+  findDeletedShipper(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.shipperService.findDeletedShipper(keyword);
   }
 
   //tìm kiếm shipper đang phê duyệt
