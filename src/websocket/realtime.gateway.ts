@@ -58,7 +58,7 @@ import {
     handleMessage(client: Socket, @MessageBody() payload: any): void {
       const { id_user, type_user, message } = payload;
       console.log(`Received message from ${type_user} (ID: ${id_user}):`, message);
-      this.sendMessageToClient(this.findClientById(id_user).socket, message);
+      this.sendMessageToClient(this.findClientById(id_user).socket, message._id);
       // this.server.emit('message', { id_user, type_user, message });
     }
   
