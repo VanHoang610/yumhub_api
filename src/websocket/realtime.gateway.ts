@@ -56,9 +56,16 @@ import {
   
     @SubscribeMessage('message')
     handleMessage(client: Socket, @MessageBody() payload: any): void {
-      const { id_user, type_user, message } = payload;
+      const { id_user, type_user, command, message } = payload;
       console.log(`Received message from ${type_user} (ID: ${id_user}):`, message);
-      this.sendMessageToClient(this.findClientById(id_user).socket, message._id);
+      if(type_user === "customer" && command === "placeOrder"){
+        if (this.findClientById(message.shipperID._id, "shipper")){
+          this.sendMessageToClient(this.findClientById(message.shipperID._id, "shipper").socket, message._id);
+        }else{
+          this.sendMessageToClient(this.findClientById(id_user, "customer").socket, "shipper không hoạt động");
+        }
+      }
+      
       // this.server.emit('message', { id_user, type_user, message });
     }
   
@@ -68,12 +75,17 @@ import {
     }
   
     // Function để tìm kiếm client
-    findClientById(id_user: string): ConnectedClient | undefined {
-      return (
-        this.customers.find(client => client.id_user === id_user) ||
-        this.shippers.find(client => client.id_user === id_user) ||
-        this.merchants.find(client => client.id_user === id_user)
-      );
+    findClientById(id_user: string, type_user: string): ConnectedClient | undefined {
+        switch (type_user) {
+          case "customer":
+            return this.customers.find(client => client.id_user === id_user)
+          case "shipper":
+            return this.shippers.find(client => client.id_user === id_user)
+          case "merchant":
+            return this.merchants.find(client => client.id_user === id_user)
+          default:
+            return undefined
+        }
     }
   }
   
