@@ -90,7 +90,10 @@ import {
         //   this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
         // }
         console.log(order.shipperID._id);
+        console.log(order.customerID._id);
+        
         console.log(this.findClientById(order.shipperID._id, "shipper"));
+        console.log(this.findClientById(order.customerID._id, "customer"));
       }else if(type_user_send === "shipper"){
         if(this.findClientById(order.customerID._id, "customer")){
           this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, order);
