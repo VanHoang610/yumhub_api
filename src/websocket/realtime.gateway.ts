@@ -86,9 +86,8 @@ import {
       if(type_user_send === "customer"){
         if (this.findClientById(order.shipperID._id, "shipper") !== undefined){
           this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
-        }else if(this.findClientById("66705a6cfe11f9a831a3c32e", "customer") !== undefined){
-          console.log(this.findClientById("66705a6cfe11f9a831a3c32e", "customer").socket);
-          this.sendMessageToClient(this.findClientById("66705a6cfe11f9a831a3c32e", "customer").socket, command, "shipper không hoạt động");
+        }else if(this.findClientById(order.customerID._id, "customer") !== undefined){
+          this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
         }
       }else if(type_user_send === "shipper"){
         if(this.findClientById(order.customerID._id, "customer") !== undefined){
@@ -125,7 +124,7 @@ import {
         this.realTimeTo2Object(type_user, command, order);
       }
       // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
-      if(type_user === "shipper" && command === "cancelled"){
+      if(type_user === "shipper" && command === "cancelled_from_shipper"){
         this.realTimeTo2Object(type_user, command, order);
       }
       // shipper đã đến nơi giao
@@ -141,7 +140,7 @@ import {
         this.realTimeTo1Object(type_user, command, order);
       }
       // merchant hủy đơn hàng
-      if(type_user === "merchant" && command === "cancelled"){
+      if(type_user === "merchant" && command === "cancelled_from_merchant"){
         this.realTimeTo2Object(type_user, command, order);
       }
     }
