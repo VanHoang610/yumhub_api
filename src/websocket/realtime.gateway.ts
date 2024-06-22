@@ -86,11 +86,11 @@ import {
       if(type_user_send === "customer"){
         if (this.findClientById(order.shipperID._id, "shipper") !== undefined){
           this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
-        }else{
-          this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
+        }else if(this.findClientById(order.customerID._id, "customer") !== undefined){
+          this.sendMessageToClient(this.findClientById("66705a6cfe11f9a831a3c32e", "customer").socket, command, "shipper không hoạt động");
         }
       }else if(type_user_send === "shipper"){
-        if(this.findClientById(order.customerID._id, "customer")){
+        if(this.findClientById(order.customerID._id, "customer") !== undefined){
           this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, order);
         }else{
           // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
