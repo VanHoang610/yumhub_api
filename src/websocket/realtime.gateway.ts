@@ -84,16 +84,11 @@ import {
     }
     private realTimeTo1Object(type_user_send : string, command : string, order : any){
       if(type_user_send === "customer"){
-        // if (this.findClientById(order.shipperID._id, "shipper")){
-        //   this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
-        // }else{
-        //   this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
-        // }
-        console.log(order.shipperID._id);
-        console.log(order.customerID._id);
-        
-        console.log(this.findClientById(order.shipperID._id, "shipper"));
-        console.log(this.findClientById(order.customerID._id, "customer"));
+        if (this.findClientById(order.shipperID._id, "shipper") !== undefined){
+          this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
+        }else{
+          this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
+        }
       }else if(type_user_send === "shipper"){
         if(this.findClientById(order.customerID._id, "customer")){
           this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, order);
