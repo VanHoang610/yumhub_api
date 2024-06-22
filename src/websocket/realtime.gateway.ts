@@ -87,6 +87,7 @@ import {
         if (this.findClientById(order.shipperID._id, "shipper") !== undefined){
           this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
         }else if(this.findClientById(order.customerID._id, "customer") !== undefined){
+          console.log(this.findClientById("66705a6cfe11f9a831a3c32e", "customer").socket);
           this.sendMessageToClient(this.findClientById("66705a6cfe11f9a831a3c32e", "customer").socket, command, "shipper không hoạt động");
         }
       }else if(type_user_send === "shipper"){
