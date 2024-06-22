@@ -147,7 +147,7 @@ import {
   
     // Function để gửi tin nhắn từ server tới client cụ thể
     sendMessageToClient(client: Socket, command: string, order: any): void {
-      client.emit('message', order);
+      client.emit('message', {command : command, order : order});
     }
   
     // Function để tìm kiếm client
