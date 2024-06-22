@@ -68,8 +68,6 @@ import {
           merchantClients.forEach(client => {
             this.sendMessageToClient(client.socket, command, order);
           })
-        }else{
-          // có thể xử lý bắn notification trên app merchant nếu nhà hàng không hoạt động app
         }
       }else {
         if (this.findClientById(order.customerID._id, "customer")){
@@ -78,7 +76,7 @@ import {
           // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
         }
         if (this.findClientById(order.merchantID._id, "shipper")){
-          this.sendMessageToClient(this.findClientById(order.merchantID._id, "shipper").socket, command, order);
+          this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
         }else{
           // có thể xử lý bắn notification trên app merchant nếu khách hàng không hoạt động app
         }
@@ -86,11 +84,13 @@ import {
     }
     private realTimeTo1Object(type_user_send : string, command : string, order : any){
       if(type_user_send === "customer"){
-        if (this.findClientById(order.shipperID._id, "shipper")){
-          this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
-        }else{
-          this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
-        }
+        // if (this.findClientById(order.shipperID._id, "shipper")){
+        //   this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
+        // }else{
+        //   this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
+        // }
+        console.log(order.shipperID._id);
+        console.log(this.findClientById(order.shipperID._id, "shipper"));
       }else if(type_user_send === "shipper"){
         if(this.findClientById(order.customerID._id, "customer")){
           this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, order);
@@ -115,87 +115,35 @@ import {
       }
       // shipper xác nhận nhận đơn hàng
       if(type_user === "shipper" && command === "accept"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
-        if (this.findClientById(message.merchantID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.merchantID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app merchant nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo2Object(type_user, command, order);
       }
       // shipper đã đến nhà hàng
       if(type_user === "shipper" && command === "waiting"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo1Object(type_user, command, order);
       }
       // shipper đã lấy hàng
       if(type_user === "shipper" && command === "delivering"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
-        if (this.findClientById(message.merchantID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.merchantID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app merchant nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo2Object(type_user, command, order);
       }
       // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
       if(type_user === "shipper" && command === "cancelled"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
-        if (this.findClientById(message.merchantID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.merchantID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app merchant nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo2Object(type_user, command, order);
       }
       // shipper đã đến nơi giao
       if(type_user === "shipper" && command === "arrived"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo1Object(type_user, command, order);
       }
       // shipper giao hàng thành công
       if(type_user === "shipper" && command === "success"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo1Object(type_user, command, order);
       }
       // shipper hủy đơn hàng (khách boom hàng)
       if(type_user === "shipper" && command === "fake_order"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo1Object(type_user, command, order);
       }
       // merchant hủy đơn hàng
       if(type_user === "merchant" && command === "cancelled"){
-        if (this.findClientById(message.customerID._id, "customer")){
-          this.sendMessageToClient(this.findClientById(message.customerID._id, "customer").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
-        }
-        if (this.findClientById(message.shipperID._id, "shipper")){
-          this.sendMessageToClient(this.findClientById(message.shipperID._id, "shipper").socket, message);
-        }else{
-          // có thể xử lý bắn notification trên app merchant nếu khách hàng không hoạt động app
-        }
+        this.realTimeTo2Object(type_user, command, order);
       }
     }
   
