@@ -26,11 +26,14 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mongoose": "^10.0.4",
     "@nestjs/platform-express": "^10.3.8",
+    "@nestjs/platform-socket.io": "^10.3.9",
+    "@nestjs/websockets": "^10.3.9",
     "@typegoose/typegoose": "^12.2.0",
     "@types/mongoose": "^5.11.97",
     "aws-sdk": "^2.1642.0",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
+    "bufferutil": "^4.0.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
@@ -45,6 +48,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.5",
+    "utf-8-validate": "^5.0.10",
     "ws": "^8.17.0"
   },
   "devDependencies": {
