@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class ShipperDto {
 
@@ -49,5 +49,8 @@ export class ShipperDto {
     @IsOptional()
     @IsString()
     idBike: string
+
+    @IsOptional()
+    status: number
 
 }

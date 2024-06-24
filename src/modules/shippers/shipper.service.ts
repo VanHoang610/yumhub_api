@@ -43,7 +43,7 @@ export class ShipperService {
     private typeShipperModel: Model<TransactionTypeShipper>,
     @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
-  ) { }
+  ) {}
 
   async addData() {
     try {
@@ -873,7 +873,6 @@ export class ShipperService {
         parrotCarBackSide,
       } = shipperDto;
 
-
       if (
         !idCardBackSide ||
         !idCardFontSide ||
@@ -906,7 +905,6 @@ export class ShipperService {
       await newShipper.save();
       const idShipper = newShipper._id;
 
-
       //căn cước
       const typeIDCard = new ObjectId('66642316fc13ae0853b09bb7');
       const documentShipperTypeIDCard = new this.documentShipperModal({
@@ -917,7 +915,6 @@ export class ShipperService {
       });
       await documentShipperTypeIDCard.save();
 
-
       // bằng lái
       const typeDriverLicense = new ObjectId('66642316fc13ae0853b09bb8');
       const documentShipperTypeDriver = new this.documentShipperModal({
@@ -927,7 +924,6 @@ export class ShipperService {
         imageFontSide: driverLicenseFontSide,
       });
       await documentShipperTypeDriver.save();
-
 
       // giấy tờ xe
       const typeParrotCar = new ObjectId('6667dc72a588bba5a76a9ec4');
@@ -963,29 +959,35 @@ export class ShipperService {
       const documents = async (idShipper, type) => {
         const document = await this.documentShipperModal.findOne({
           shipperID: idShipper,
-          documentTypeID: type
+          documentTypeID: type,
         });
         return {
           front: document ? document.imageFontSide : null,
-          back: document ? document.imageBackSide : null
+          back: document ? document.imageBackSide : null,
         };
       };
 
-      const shippers = await this.shipperModel.find({ deleted: false });
+      const shippers = await this.shipperModel.find({
+        deleted: false,
+        status: { $ne: 1 },
+      });
       if (shippers.length === 0) {
-        return { result: false, message: "No shipper found" };
+        return { result: false, message: 'No shipper found' };
       }
 
       const promises = shippers.map(async (shipper) => {
         const idCard = await documents(shipper._id, idCard_id);
         const driverLicense = await documents(shipper._id, driverLicense_id);
-        const vehicleCertificate = await documents(shipper._id, vehicleCertificate_id);
+        const vehicleCertificate = await documents(
+          shipper._id,
+          vehicleCertificate_id,
+        );
 
         return {
           ...shipper.toObject(),
           idCard,
           driverLicense,
-          vehicleCertificate
+          vehicleCertificate,
         };
       });
 
@@ -1001,7 +1003,10 @@ export class ShipperService {
       const orders = await this.orderModel
         .find({ shipperID: id })
         .sort({ timeBook: 1 })
-        .populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID');
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID')
+        .populate('voucherID');
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 
       return { result: true, historyShipper: orders };
@@ -1144,9 +1149,9 @@ export class ShipperService {
     }
   }
 
-  async resetPass(id: string, password: string) {
+  async resetPass(email: string, password: string) {
     try {
-      const user = await this.shipperModel.findById(id);
+      const user = await this.shipperModel.findOne({ email: email });
       if (!user)
         throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
       const passwordNew = await bcrypt.hash(password, 10);
@@ -1326,7 +1331,10 @@ export class ShipperService {
 
   async listShipperApproval() {
     try {
-      const listShipper = await this.shipperModel.find({ status: 1, deleted: false });
+      const listShipper = await this.shipperModel.find({
+        status: 1,
+        deleted: false,
+      });
       if (listShipper.length === 0) {
         return { result: true, listShipper: listShipper };
       }
@@ -1337,23 +1345,26 @@ export class ShipperService {
       const documents = async (idShipper, type) => {
         const document = await this.documentShipperModal.findOne({
           shipperID: idShipper,
-          documentTypeID: type
+          documentTypeID: type,
         });
         return {
           front: document ? document.imageFontSide : null,
-          back: document ? document.imageBackSide : null
+          back: document ? document.imageBackSide : null,
         };
       };
       const promise = await listShipper.map(async (shipper) => {
         const idCard = await documents(shipper._id, idCard_id);
         const driverLicense = await documents(shipper._id, driverLicense_id);
-        const vehicleCertificate = await documents(shipper._id, vehicleCertificate_id);
+        const vehicleCertificate = await documents(
+          shipper._id,
+          vehicleCertificate_id,
+        );
 
         return {
           ...shipper.toObject(),
           idCard,
           driverLicense,
-          vehicleCertificate
+          vehicleCertificate,
         };
       });
       const shipperData = await Promise.all(promise);
@@ -1368,36 +1379,44 @@ export class ShipperService {
       const idCard_id = new ObjectId('66642316fc13ae0853b09bb7'); // cccd
       const driverLicense_id = new ObjectId('66642316fc13ae0853b09bb8'); // giấy phép lái xe
       const vehicleCertificate_id = new ObjectId('6667dc72a588bba5a76a9ec4'); // giấy tờ xe
-  
+
       const [document1, document2, document3, shipper] = await Promise.all([
         this.documentShipperModal.findOne({
           shipperID: id,
-          documentTypeID: idCard_id
+          documentTypeID: idCard_id,
         }),
         this.documentShipperModal.findOne({
           shipperID: id,
-          documentTypeID: driverLicense_id
+          documentTypeID: driverLicense_id,
         }),
         this.documentShipperModal.findOne({
           shipperID: id,
-          documentTypeID: vehicleCertificate_id
+          documentTypeID: vehicleCertificate_id,
         }),
-        this.shipperModel.findOne({ _id: id })
+        this.shipperModel.findOne({ _id: id }),
       ]);
-  
+
       const detailShipper = {
         ...shipper.toObject(),
-        idCard: document1 ? document1.imageFontSide : null,
-        driverLicense: document2 ? document2.imageFontSide : null,
-        vehicleCertificate: document3 ? document3.imageFontSide : null
+        idCard: {
+          front: document1 ? document1.imageFontSide : null,
+          back: document1 ? document1.imageBackSide : null,
+        },
+        driverLicense: {
+          front: document2 ? document2.imageFontSide : null,
+          back: document2 ? document2.imageBackSide : null,
+        },
+        vehicleCertificate: {
+          front: document3 ? document3.imageFontSide : null,
+          back: document3 ? document3.imageBackSide : null,
+        },
       };
-  
+
       return { result: true, detailShipper: detailShipper };
     } catch (error) {
       return { result: false, error };
     }
   }
-  
 
   async topUptopUpShipper(id: string, topUp: HistoryMerchantDto) {
     try {
@@ -1566,7 +1585,9 @@ export class ShipperService {
 
   async getAllDocument(id: string) {
     try {
-      const document = await this.documentShipperModal.find({ shipperID: id }).populate('documentTypeID');
+      const document = await this.documentShipperModal
+        .find({ shipperID: id })
+        .populate('documentTypeID');
       if (!document)
         throw new HttpException(
           'Not find document shipper',
@@ -1575,6 +1596,69 @@ export class ShipperService {
       return { result: true, document: document };
     } catch (error) {
       return { result: false, document: error };
+    }
+  }
+
+  async findShipper(keyword: string) {
+    try {
+      const shippers = await this.shipperModel.find({
+        $or: [
+          { fullName: new RegExp(keyword, 'i') }, // thường hay hoa đều được
+          { address: new RegExp(keyword, 'i') },
+          { idBike: new RegExp(keyword, 'i') },
+        ],
+      });
+      if (shippers.length === 0) {
+        return { result: false, message: 'Not Found Shippers', shippers: [] };
+      }
+      return { result: true, shippers: shippers };
+    } catch (error) {
+      return { result: false, shippers: error };
+    }
+  }
+
+  async findDeletedShipper(keyword: string) {
+    try {
+      const shippers = await this.shipperModel.find({
+        $and: [
+          {
+            $or: [
+              { fullName: new RegExp(keyword, 'i') }, // thường hay hoa đều được
+              { address: new RegExp(keyword, 'i') },
+              { idBike: new RegExp(keyword, 'i') },
+            ],
+          },
+          { deleted: true },
+        ],
+      });
+      if (shippers.length === 0) {
+        return { result: false, message: 'Not Found Shippers', shippers: [] };
+      }
+      return { result: true, shippers: shippers };
+    } catch (error) {
+      return { result: false, shippers: error };
+    }
+  }
+
+  async findApproveShipper(keyword: string) {
+    try {
+      const shippers = await this.shipperModel.find({
+        $and: [
+          {
+            $or: [
+              { fullName: new RegExp(keyword, 'i') },
+              { idBike: new RegExp(keyword, 'i') },
+            ],
+          },
+          { status: { $in: [1, 2] } },
+        ],
+      });
+      if (shippers.length === 0) {
+        return { result: false, message: 'Not Found Shipper', shippers: [] };
+      }
+      return { result: true, shippers: shippers };
+    } catch (error) {
+      return { result: false, shippers: error };
     }
   }
 }

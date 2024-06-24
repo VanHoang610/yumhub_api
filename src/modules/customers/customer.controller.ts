@@ -116,9 +116,9 @@ export class CustomerController {
 
   //cập nhật mật khẩu
   @Post('resetPass')
-  resetPass(@Query('id') id: string, @Body() body: { password: string }) {
-    const { password } = body;
-    return this.customerService.resetPass(id, password);
+  resetPass (@Body() body: { email: string, password: string }) {
+    const { password, email } = body;
+    return this.customerService.resetPass(email, password);
   }
 
   //đổi mật khẩu
