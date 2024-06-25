@@ -386,7 +386,7 @@ export class MerchantService {
   async get5NearestShippers(id: string) {
     try {
       const merchant = await this.merchants.findById(id).exec();
-      const shipper = await this.shipperModel.find({ status: 7 }).exec();
+      const shipper = await this.shipperModel.find({ status: 3 }).exec();
 
       //tính quãng đường
       const sortShipper = shipper.map((shipper) => {
