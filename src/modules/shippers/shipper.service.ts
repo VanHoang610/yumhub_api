@@ -1072,7 +1072,7 @@ export class ShipperService {
     try {
       const checkAccount = await this.shipperModel.findOne({
         phoneNumber: user.phoneNumber,
-        status: 2,
+        status: 3,
         deleted: false,
       });
       if (!checkAccount)
