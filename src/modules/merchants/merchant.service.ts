@@ -414,7 +414,7 @@ export class MerchantService {
         throw new HttpException('Không đúng SDT', HttpStatus.NOT_FOUND);
       const checkStatus = await this.merchants.findOne({
         _id: checkAccount.merchantID,
-        status: 3,
+        status: { $gt: 2 },
       });
       if (!checkStatus)
         throw new HttpException('Tài khoản chưa đăng ký', HttpStatus.NOT_FOUND);

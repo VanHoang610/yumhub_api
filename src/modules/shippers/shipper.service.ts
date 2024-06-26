@@ -1072,9 +1072,10 @@ export class ShipperService {
     try {
       const checkAccount = await this.shipperModel.findOne({
         phoneNumber: user.phoneNumber,
-        status: 3,
+        status: { $gt: 2 },
         deleted: false,
       });
+
       if (!checkAccount)
         throw new HttpException('Không đúng SDT', HttpStatus.NOT_FOUND);
       const compare = await bcrypt.compare(
