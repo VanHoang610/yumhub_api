@@ -642,7 +642,7 @@ export class OrderService {
             };
 
             // Kiểm tra nếu updateOrder.status là số
-            if (typeof updateOrder.status === 'number') {
+            if (updateOrder.status && typeof updateOrder.status === 'number') {
                 const statusName = statusMap[updateOrder.status];
                 if (statusName) {
                     // Tìm kiếm trạng thái theo tên
