@@ -217,7 +217,10 @@ export class CustomerServices {
     try {
       const orders = await this.orderModel
         .find({ customerID: id })
-        .populate('customerID').populate('merchantID').populate('shipperID').populate('voucherID')
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID')
+        .populate('voucherID')
         .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
@@ -230,18 +233,18 @@ export class CustomerServices {
     try {
       let checkAccount = await this.customers.findOne({
         phoneNumber: user.phoneNumber,
-        deleted: false
+        deleted: false,
       });
       if (!checkAccount) {
         checkAccount = await this.userMerchantModel.findOne({
           phoneNumber: user.phoneNumber,
-          deleted: false
+          deleted: false,
         });
       }
       if (!checkAccount) {
         checkAccount = await this.shipperModel.findOne({
           phoneNumber: user.phoneNumber,
-          deleted: false
+          deleted: false,
         });
       }
       if (!checkAccount)
@@ -314,7 +317,7 @@ export class CustomerServices {
 
   async resetPass(email: string, password: string) {
     try {
-      const user = await this.customers.findOne({email: email});
+      const user = await this.customers.findOne({ email: email });
       if (!user)
         throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
       const passwordNew = await bcrypt.hash(password, 10);
@@ -427,10 +430,15 @@ export class CustomerServices {
           break;
       }
 
-      const orderByCustomer = await this.orderModel.find({
-        customerID: customerID,
-        status: statusOrder,
-      });
+      const orderByCustomer = await this.orderModel
+        .find({
+          customerID: customerID,
+          status: statusOrder,
+        })
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID')
+        .populate('voucherID');
       if (!orderByCustomer)
         throw new HttpException(
           'Not Found OrderByCustomer',
