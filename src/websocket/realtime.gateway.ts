@@ -70,12 +70,13 @@ import {
           })
         }
       }else {
+        
         if (this.findClientById(order.customerID._id, "customer")){
           this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, order);
         }else{
           // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
         }
-        if (this.findClientById(order.merchantID._id, "shipper")){
+        if (this.findClientById(order.shipperID._id, "shipper")){
           this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
         }else{
           // có thể xử lý bắn notification trên app merchant nếu khách hàng không hoạt động app
