@@ -630,14 +630,14 @@ export class OrderService {
             const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
             // Mapping số nguyên sang tên trạng thái
             const statusMap = {
-                1: "pending",
+                1: "cart",
                 2: "processing",
-                3: "arrivedEatery",
-                4: "shipped",
-                5: "delivered",
+                3: "waiting",
+                4: "delivering",
+                5: "success",
                 6: "cancel",
-                7: "onHold",
-                8: "backordered",
+                7: "arrived",
+                8: "goToMerchant",
                 9: "fakeOrder",
             };
 
