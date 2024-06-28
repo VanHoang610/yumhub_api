@@ -377,10 +377,10 @@ export class OrderService {
             const endOfMonthDate = endOfMonth(date);
             const endOfMonthWithTime = set(endOfMonthDate, { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
             const startOfMonthDate = startOfMonth(date);
-    
+
             const DeliveredID = new ObjectId("661760e3fc13ae3574ab8de1");
             const fakeOrderID = new ObjectId("6656a8738913d56206f64e01");
-    
+
             const createAggregatePipeline = (startOfMonth, endOfMonth, statusID) => [
                 {
                     $match: {
@@ -422,36 +422,36 @@ export class OrderService {
                     }
                 }
             ];
-    
+
             const promises = [];
-    
+
             for (let i = 0; i < 3; i++) {
                 const startOfMonth = subMonths(startOfMonthDate, i);
                 const endOfMonth = subMonths(endOfMonthWithTime, i);
-    
+
                 const orderSuccessPipeline = createAggregatePipeline(startOfMonth, endOfMonth, DeliveredID);
                 const orderFakePipeline = createAggregatePipeline(startOfMonth, endOfMonth, fakeOrderID);
-    
+
                 const orderSuccessPromise = this.orderModel.aggregate(orderSuccessPipeline).exec();
                 const orderFakePromise = this.orderModel.aggregate(orderFakePipeline).exec();
-    
+
                 promises.push(orderSuccessPromise, orderFakePromise);
             }
-    
+
             const results = await Promise.all(promises);
-    
+
             const revenueData = [];
             for (let i = 0; i < results.length; i += 2) {
                 const orderSuccess = results[i][0] || {};
                 const orderFake = results[i + 1][0] || {};
-    
+
                 const totalRevenue = (orderSuccess.totalRevenue || 0) + (orderFake.totalRevenue || 0);
                 const totalFood = (orderSuccess.totalFood || 0) + (orderFake.totalFood || 0);
                 const totalShip = (orderSuccess.totalShip || 0); // Only successful orders have shipping cost
                 const totalProfitMerchant = (orderSuccess.totalMerchant || 0) + (orderFake.totalMerchant || 0);
                 const totalProfitShipper = (orderSuccess.totalShipper || 0); // Only successful orders have shipper profit
                 const totalVoucher = (orderSuccess.totalVoucher || 0) + (orderFake.totalVoucher || 0);
-    
+
                 revenueData.push({
                     totalRevenue: totalRevenue,
                     totalFood: totalFood,
@@ -461,7 +461,7 @@ export class OrderService {
                     totalVoucher: totalVoucher
                 });
             }
-    
+
             return {
                 result: true,
                 twoMonthAgos: revenueData[2] || {},
@@ -472,7 +472,7 @@ export class OrderService {
             return { result: false, log: error };
         }
     }
-    
+
     // // doanh thu truyền vào tháng lấy ra doanh thu tháng đó và 2 tháng trước
     // async revenueFoodAndDelivery(month: string) {
     //     try {
@@ -630,37 +630,40 @@ export class OrderService {
             const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
             // Mapping số nguyên sang tên trạng thái
             const statusMap = {
-                1: "pending",
+                1: "cart",
                 2: "processing",
-                3: "arrivedEatery",
-                4: "shipped",
-                5: "delivered",
+                3: "waiting",
+                4: "delivering",
+                5: "success",
                 6: "cancel",
-                7: "onHold",
-                8: "backordered",
+                7: "arrived",
+                8: "goToMerchant",
                 9: "fakeOrder",
             };
 
             // Kiểm tra nếu updateOrder.status là số
-            if (typeof updateOrder.status === 'number') {
-                const statusName = statusMap[updateOrder.status];
-                if (statusName) {
-                    // Tìm kiếm trạng thái theo tên
-                    const statusDoc = await this.statusModel.findOne({ name: statusName }).exec();
-                    if (!statusDoc) {
-                        return { result: false, message: `Status name '${statusName}' not found` };
+            if (updateOrder.status) {
+                if (typeof updateOrder.status === 'number') {
+                    const statusName = statusMap[updateOrder.status];
+                    if (statusName) {
+                        // Tìm kiếm trạng thái theo tên
+                        const statusDoc = await this.statusModel.findOne({ name: statusName }).exec();
+                        if (!statusDoc) {
+                            return { result: false, message: `Status name '${statusName}' not found` };
+                        }
+                        updateOrder.status = statusDoc._id;
+                    } else {
+                        return { result: false, message: "Nhập giá trị status từ 1-8" };
                     }
-                    updateOrder.status = statusDoc._id;
                 } else {
-                    return { result: false, message: "Nhập giá trị status từ 1-8" };
-                }
-            } else {
-                // Kiểm tra nếu updateOrder.status là _id hợp lệ
-                const status = await this.statusModel.findById(updateOrder.status);
-                if (!status) {
-                    return { result: false, message: "Invalid status ID" };
+                    // Kiểm tra nếu updateOrder.status là _id hợp lệ
+                    const status = await this.statusModel.findById(updateOrder.status);
+                    if (!status) {
+                        return { result: false, message: "Invalid status ID" };
+                    }
                 }
             }
+
 
             // Cập nhật đơn hàng
             const update = await this.orderModel.findByIdAndUpdate(
