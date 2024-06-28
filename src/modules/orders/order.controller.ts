@@ -175,6 +175,7 @@ export class OrderController {
             return error
         }
     }
+
     @Get("searchOrder")
     @UseGuards(AuthGuard)
     searchOrder(@Query('key') key: string) {
@@ -183,5 +184,12 @@ export class OrderController {
         } catch (error) {
             return error
         }
+    }
+
+    //lấy ra tất cả review của một order
+    @Get('getReviewOfOrder')
+    @UseGuards(AuthGuard)
+    getReviewOfOrder(@Query('id') id: string) {
+        return this.orderServices.getReviewOfOrder(id);
     }
 }
