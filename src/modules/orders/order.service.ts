@@ -965,4 +965,14 @@ export class OrderService {
         }
     }
 
+    async getReviewOfOrder (id: string) {
+        try {
+            const review = await this.reviewModel.find({orderID: id}).populate('orderID').populate('typeOfReview');
+            if(!review) throw new HttpException('Not Found Review', HttpStatus.NOT_FOUND);
+
+            return { result: true, listReview: review }
+        } catch (error) {
+            return { result: false, listReview: error }
+        }
+    }
 }
