@@ -172,7 +172,7 @@ export class OrderService {
     async getAllOrder() {
         try {
             const orders = await this.orderModel
-                .find()
+            .find({ status: { $ne: '661760e3fc13ae3574ab8ddd' } }) // ne: not equal=>không bằng
                 .populate('customerID')
                 .populate('merchantID')
                 .populate('shipperID')
