@@ -318,12 +318,13 @@ export class MerchantService {
   async getHistoryMerchant(id: string) {
     try {
       const orders = await this.orderModel
-        .find({ merchantID: id })
-        .sort({ timeBook: 1 })
-        .populate('customerID')
-        .populate('merchantID')
-        .populate('shipperID')
-        .populate('voucherID');
+      .find({ merchantID: id, status: { $ne: '661760e3fc13ae3574ab8ddd' } }) // ne: not equal=>không bằng })
+      .populate('customerID')
+      .populate('merchantID')
+      .populate('shipperID')
+      .populate('voucherID')
+      .populate('status')
+      .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
     } catch (error) {
