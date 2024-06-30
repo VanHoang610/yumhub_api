@@ -158,7 +158,7 @@ export class MerchantService {
     try {
       const existingUserMerchant = await this.userMerchantModel.findOne({
         email: merchant.email,
-        phoneNumber: merchant.phoneNumber
+        phoneNumber: merchant.phoneNumber,
       });
 
       if (existingUserMerchant) {
@@ -318,13 +318,13 @@ export class MerchantService {
   async getHistoryMerchant(id: string) {
     try {
       const orders = await this.orderModel
-      .find({ merchantID: id, status: { $ne: '661760e3fc13ae3574ab8ddd' } }) // ne: not equal=>không bằng })
-      .populate('customerID')
-      .populate('merchantID')
-      .populate('shipperID')
-      .populate('voucherID')
-      .populate('status')
-      .sort({ timeBook: 1 });
+        .find({ merchantID: id, status: { $ne: '661760e3fc13ae3574ab8ddd' } }) // ne: not equal=>không bằng })
+        .populate('customerID')
+        .populate('merchantID')
+        .populate('shipperID')
+        .populate('voucherID')
+        .populate('status')
+        .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
     } catch (error) {
@@ -490,7 +490,7 @@ export class MerchantService {
 
   async resetPass(email: string, password: string) {
     try {
-      const user = await this.userMerchantModel.findOne({email: email});
+      const user = await this.userMerchantModel.findOne({ email: email });
       if (!user)
         throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
       const passwordNew = await bcrypt.hash(password, 10);
@@ -754,7 +754,10 @@ export class MerchantService {
       const userMerchant = await this.userMerchantModel.findById(id);
       userMerchant.password = undefined;
       if (!userMerchant)
-        throw new HttpException('Not Found User Merchant', HttpStatus.NOT_FOUND)
+        throw new HttpException(
+          'Not Found User Merchant',
+          HttpStatus.NOT_FOUND,
+        );
 
       return { result: true, userMerchant: userMerchant };
     } catch (error) {
@@ -911,27 +914,62 @@ export class MerchantService {
     }
   }
 
-  async getNearMerchant(id: string) {
+  async getNearMerchant(id: string, longitude?: number, latitude?: number) {
     try {
+      let sortMerchant;
+
       const addressCustomer = await this.addressModol.findOne({
         customerID: id,
       });
       if (!addressCustomer)
-        throw new HttpException('Not Found Address', HttpStatus.NOT_FOUND);
-      const merchants = await this.merchants.find({ status: 3 }).exec();
-      if (!merchants)
-        throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+        throw new HttpException('Not Found CustomerID', HttpStatus.NOT_FOUND);
 
-      //tính quãng đường
-      const sortMerchant = merchants.map((merchant) => {
-        const distance = Math.sqrt(
-          Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
-            Math.pow(merchant.latitude - addressCustomer.latitude, 2),
-        );
-        return { ...merchant.toObject(), distance };
-      });
+      if (!addressCustomer && !longitude && !latitude) {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
 
-      sortMerchant.sort((a, b) => a.distance - b.distance);
+        return { result: true, nearestCustomer: merchants };
+      }
+
+      if (longitude && latitude) {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+
+        // tính quãng đường
+        sortMerchant = merchants.map((merchant) => {
+          const distance = Math.sqrt(
+            Math.pow(merchant.longitude - longitude, 2) +
+              Math.pow(merchant.latitude - latitude, 2),
+          );
+          return { ...merchant.toObject(), distance };
+        });
+
+        sortMerchant.sort((a, b) => a.distance - b.distance);
+      } else if (addressCustomer?.longitude && addressCustomer?.latitude) {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+
+        // tính quãng đường từ địa chỉ khách hàng
+        sortMerchant = merchants.map((merchant) => {
+          const distance = Math.sqrt(
+            Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
+              Math.pow(merchant.latitude - addressCustomer.latitude, 2),
+          );
+          return { ...merchant.toObject(), distance };
+        });
+
+        sortMerchant.sort((a, b) => a.distance - b.distance);
+      } else {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+
+        sortMerchant = merchants;
+      }
+
       // const nearestCustomer = sortMerchant.slice(0, 5);
       return { result: true, nearestCustomer: sortMerchant };
     } catch (error) {
