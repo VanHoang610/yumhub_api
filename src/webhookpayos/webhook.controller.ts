@@ -1,9 +1,15 @@
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Get } from '@nestjs/common';
 import { Response } from 'express';
 import { WebhookDataDto } from './webhook-data.dto';
 
 @Controller('webhook')
 export class WebhookController {
+
+  @Get()
+  async testEndpoint(@Res() res: Response) {
+    return res.status(HttpStatus.OK).send('Webhook test endpoint working!');
+  }
+
   @Post()
   async handleWebhook(@Body() payload: WebhookDataDto, @Res() res: Response) {
     console.log('Received webhook:', payload);
@@ -27,10 +33,7 @@ export class WebhookController {
       virtualAccountNumber,
     } = payload;
 
-    // Xử lý dữ liệu webhook ở đây
     console.log(`Order ${orderCode} received with amount ${amount}.`);
-
-    // Thêm logic xử lý dữ liệu từ webhook theo yêu cầu của bạn
 
     res.status(HttpStatus.OK).send('Webhook received');
   }
