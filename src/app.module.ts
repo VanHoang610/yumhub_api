@@ -36,6 +36,7 @@ import { DocumentShipperModule } from './modules/documentShipper/document.module
 import { RealtimeGateway  } from './websocket/realtime.gateway';
 import { WebhookController } from './webhookpayos/webhook.controller'
 import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
+import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
 
 @Module({
   imports: [
@@ -75,6 +76,6 @@ import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
   ],
   controllers: [AppController,
     WebhookController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto],
 })
 export class AppModule {}
