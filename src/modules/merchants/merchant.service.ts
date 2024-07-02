@@ -905,8 +905,8 @@ export class MerchantService {
         },
         {
           $lookup: {
-            from: 'GroupOfFood', // Name of the typeOfFood collection
-            localField: 'typeOfFood', // Assuming the field in foodModel is named 'typeOfFood'
+            from: 'groupOfFood', // Name of the typeOfFood collection
+            localField: 'groupOfFood', // Assuming the field in foodModel is named 'typeOfFood'
             foreignField: '_id',
             as: 'typeOfFoodDetails',
           },
