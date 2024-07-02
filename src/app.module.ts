@@ -34,6 +34,8 @@ import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
 import { FeeModule } from './modules/fee/fee.module';
 import { DocumentShipperModule } from './modules/documentShipper/document.module';
 import { RealtimeGateway  } from './websocket/realtime.gateway';
+import { WebhookController } from './webhookpayos/webhook.controller'
+import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
 
 @Module({
   imports: [
@@ -71,7 +73,8 @@ import { RealtimeGateway  } from './websocket/realtime.gateway';
     FeeModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
-  controllers: [AppController],
-  providers: [AppService, RealtimeGateway],
+  controllers: [AppController,
+    WebhookController,],
+  providers: [AppService, WebhookDataDto, RealtimeGateway],
 })
-export class AppModule { }
+export class AppModule {}
