@@ -1228,7 +1228,7 @@ export class ShipperService {
     try {
       const start = new Date(dateStart).setHours(0, 0, 0, 0);
       const end = new Date(dateEnd).setHours(23, 59, 59, 999);
-      const DeliveredID = await this.statusModel.findOne({ name: 'delivered' });
+      const DeliveredID = await this.statusModel.findOne({ name: 'success' });
       const CancelID = await this.statusModel.findOne({ name: 'cancel' });
       // Tính tổng doanh thu
       var totalRevenue = 0;

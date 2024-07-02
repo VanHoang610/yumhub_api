@@ -276,6 +276,13 @@ export class MerchantController {
     return this.merchantService.getFoodByMerchant(id);
   }
 
+  // lấy tất cả food của merchant
+  @Get('getFood')
+  @UseGuards(AuthGuard)
+  getFood(@Query('id') id: string) {
+    return this.merchantService.getAllFoodByMerchant(id);
+  }
+
   @Get('rating')
   @UseGuards(AuthGuard)
   rating(@Query('id') id: string) {
