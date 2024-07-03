@@ -25,5 +25,10 @@ export class GroupOfFoodController {
         return await this.groupFoodServices.deleteGroupOfFood(id);
     }
 
+    @Post('getAll')
+    @UseGuards(AuthGuard)
+    async getAllGroupOfFood(@Query('id') id: string) {
+        return await this.groupFoodServices.getAllGroupByMerchant(id);
+    }
 
 }

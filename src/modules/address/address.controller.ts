@@ -16,7 +16,7 @@ export class AddressController {
         return this.addressService.showAll(id);
     }
     
-    @Get('deleteAddress')
+    @Post('deleteAddress')
     deleteAddress (@Query('id') id: string) {
         return this.addressService.deleteAddress(id);
     }
