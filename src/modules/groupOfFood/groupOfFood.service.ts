@@ -42,4 +42,8 @@ export class GroupOfFoodService {
         }
         return deleteGroup;
     }
+
+    async getAllGroupByMerchant(id : string) {
+        return await this.groupFoodModel.find({ merchantID: id });
+    }
 }

@@ -881,48 +881,18 @@ export class MerchantService {
       return { result: false, allFood: error };
     }
   }
-
   async getAllFoodByMerchant(id: string) {
     try {
       const merchant = await this.merchants.findById(id);
       if (!merchant)
         throw new HttpException('Not Find Merchant', HttpStatus.NOT_FOUND);
-        
       const idMerchant = merchant._id;
-  
-      const allFood = await this.foodModel.aggregate([
-        {
-          $match: {
-            merchantID: idMerchant,
-          },
-        },
-        {
-          $lookup: {
-            from: 'FoodStatus', // Name of the status collection
-            localField: 'status',
-            foreignField: '_id',
-            as: 'statusDetails',
-          },
-        },
-        {
-          $unwind: '$statusDetails', // Unwind the statusDetails array to include the status object directly
-        },
-        {
-          $lookup: {
-            from: 'groupOfFood', // Name of the typeOfFood collection
-            localField: 'groupOfFood', // Assuming the field in foodModel is named 'typeOfFood'
-            foreignField: '_id',
-            as: 'typeOfFoodDetails',
-          },
-        },
-        {
-          $unwind: '$typeOfFoodDetails', // Unwind the typeOfFoodDetails array to include the typeOfFood object directly
-        },
-      ]);
-  
-      if (!allFood || allFood.length === 0)
+      const allFood = await this.foodModel.find({
+        merchantID: idMerchant,
+      }).populate('status').populate('groupOfFood').exec();
+      if (!allFood)
         throw new HttpException('Not Find Food', HttpStatus.NOT_FOUND);
-  
+
       return { result: true, allFood: allFood };
     } catch (error) {
       return { result: false, allFood: error };
