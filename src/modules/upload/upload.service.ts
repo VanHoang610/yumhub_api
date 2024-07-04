@@ -70,12 +70,12 @@ export class UploadService {
     return `${timestamp}${extension}`;
   }
 
-  async sendNotification(token: string, payload: admin.messaging.MessagingPayload): Promise<string> {
+  async sendNotification(token: string, message: admin.messaging.Message): Promise<void> {
     try {
-      const response = await this.messaging.sendToDevice(token, payload);
-      return response.results[0].messageId;
+      await admin.messaging().send(message);
+      console.log('Notification sent successfully');
     } catch (error) {
-      throw new Error(`Failed to send notification: ${error.message}`);
+      console.error('Failed to send notification:', error.message);
     }
   }
 }
