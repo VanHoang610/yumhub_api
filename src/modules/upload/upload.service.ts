@@ -7,6 +7,7 @@ import * as fs from 'fs';
 export class UploadService {
   // private bucket: admin.storage.Bucket;
   private readonly storage: admin.storage.Storage;
+  private readonly messaging: admin.messaging.Messaging;
 
   constructor() {
     const serviceAccount = {
@@ -67,5 +68,14 @@ export class UploadService {
     const timestamp = new Date().getTime();
     const extension = path.extname(originalName);
     return `${timestamp}${extension}`;
+  }
+
+  async sendNotification(token: string, payload: admin.messaging.MessagingPayload): Promise<string> {
+    try {
+      const response = await this.messaging.sendToDevice(token, payload);
+      return response.results[0].messageId;
+    } catch (error) {
+      throw new Error(`Failed to send notification: ${error.message}`);
+    }
   }
 }
