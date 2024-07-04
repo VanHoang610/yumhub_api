@@ -16,7 +16,21 @@ export class UploadController {
 @Controller('notifications')
 export class NotificationController {
   constructor(private readonly uploadService: UploadService) {}
+  private tokens: string[] = [];
 
+  @Post('save-token')
+  async saveToken(@Body() body: { token: string }) {
+    const { token } = body;
+
+    if (!token) {
+      throw new Error('Token is required');
+    }
+
+    this.tokens.push(token);
+    console.log('Token saved:', token);
+    return { message: 'Token saved successfully' };
+  }
+  
   @Post('send')
   async sendNotification(@Body() body: { token: string; message: string }) {
     const message = {
@@ -30,3 +44,5 @@ export class NotificationController {
     await this.uploadService.sendNotification(body.token, message);
   }
 }
+
+
