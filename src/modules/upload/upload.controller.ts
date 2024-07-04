@@ -4,7 +4,7 @@ import { UploadService } from './upload.service';
 
 @Controller('files')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) { }
+  constructor(private readonly uploadService: UploadService) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -15,7 +15,7 @@ export class UploadController {
 }
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly uploadService: UploadService) { }
+  constructor(private readonly uploadService: UploadService) {}
   private tokens: string[] = [];
 
   @Post('save-token')
@@ -30,22 +30,18 @@ export class NotificationController {
     console.log('Token saved:', token);
     return { message: 'Token saved successfully' };
   }
-
+  
   @Post('send')
-  async sendNotification(@Body() body: { token: string; message: string; title: string; icon: string; color: string; sound: string }) {
+  async sendNotification(@Body() body: { token: string; message: string }) {
     const message = {
       notification: {
-        title: 'YumHub',
+        title: 'New Notification',
         body: body.message,
-        icon: 'https://storage.googleapis.com/yumhub-api-c3646.appspot.com/1720104848209.jpg',
-        color: '#005987',
-        sound: 'https://storage.googleapis.com/yumhub-api-c3646.appspot.com/1720107599797.mp3',
       },
       token: body.token,
     };
 
     await this.uploadService.sendNotification(body.token, message);
-    return { message: 'Notification sent successfully' };
   }
 }
 
