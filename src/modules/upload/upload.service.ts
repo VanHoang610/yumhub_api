@@ -27,7 +27,7 @@ export class UploadService {
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET, // Thay bằng tên bucket của bạn
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
     });
 
     this.storage = admin.storage();
