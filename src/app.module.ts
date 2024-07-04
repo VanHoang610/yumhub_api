@@ -37,8 +37,6 @@ import { RealtimeGateway  } from './websocket/realtime.gateway';
 import { WebhookController } from './webhookpayos/webhook.controller'
 import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
 import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
-import { FirebaseService } from './modules/firebase/firebase-admin.service';
-import { NotificationsController  } from './modules/firebase/firebase-admin.controller';
 
 @Module({
   imports: [
@@ -77,7 +75,7 @@ import { NotificationsController  } from './modules/firebase/firebase-admin.cont
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController,
-    WebhookController,NotificationsController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, FirebaseService],
+    WebhookController,],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto],
 })
 export class AppModule {}
