@@ -14,6 +14,7 @@ import {
 import { FoodService } from './food.service';
 import { FoodDto } from 'src/dto/dto.food';
 import { AuthGuard } from 'src/helper/auth.middleware';
+import { UpdateFoodDto } from 'src/dto/dto.updateFood';
 
 @Controller('food')
 export class FoodController {
@@ -96,12 +97,23 @@ export class FoodController {
       return error;
     }
   }
-  @Get('/search')
+  @Get('search')
   @UseGuards(AuthGuard)
   async searchFoods(@Body() body: { price: number; name: string }) {
     try {
       const { price, name } = body;
       return this.foodService.searchFoods(price, name);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  @Patch('updateFood')
+  @UseGuards(AuthGuard)
+  updateFood(@Body() body: { ID: string; update: UpdateFoodDto}) {
+    try {
+      const { ID, update } = body;
+      return this.foodService.updateFood(ID, update);
     } catch (error) {
       return error;
     }

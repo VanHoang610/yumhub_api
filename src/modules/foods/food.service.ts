@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common/decorators/core';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { FoodDto } from 'src/dto/dto.food';
+import { UpdateFoodDto } from 'src/dto/dto.updateFood';
 import { Food } from 'src/schemas/food.schema';
 import { FoodStatus } from 'src/schemas/foodStatus.schema';
 import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
@@ -263,12 +264,27 @@ export class FoodService {
   //     }
   // }
 
+  async updateFood(foodId: string, updateFood: UpdateFoodDto) {
+    try {
+      const Foods = await this.FoodModel.findByIdAndUpdate(
+        foodId,
+        updateFood,
+        { new: true }
+      );
+      if (!Foods) return { Message: 'Not found food' };
+      return { result: true, Foods: Foods };
+    } catch (error) {
+      return { result: false, Foods: error };
+    }
+  }
+
   async searchFoodByName(any: string) {
     return this.FoodModel.find({
       nameFood: { $regex: any, $options: 'i' },
     }).exec();
   }
 
+  
   async searchFoods(price: number, name: string) {
     // Tạo một object để chứa các điều kiện lọc
     const query: any = { status: '661fb317ee3a326f69b55386' }; // status onSale
