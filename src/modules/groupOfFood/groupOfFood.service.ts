@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common/decorators/core'
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Food } from 'src/schemas/food.schema';
-import { OrderStatus } from 'src/schemas/orderStatus.schema';
 import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
 import { NotFoundException } from '@nestjs/common';
+
 
 @Injectable()
 export class GroupOfFoodService {
@@ -35,13 +35,20 @@ export class GroupOfFoodService {
     }
 
     async deleteGroupOfFood(id: string) {
-        await this.foodModel.findByIdAndUpdate({ groupOfFoodID: id }, { groupOfFoodID: null });
-        const deleteGroup= await this.groupFoodModel.findByIdAndDelete(id);
+        // Update all documents in the foodModel where groupOfFood matches the id
+        await this.foodModel.updateMany({ groupOfFood: id }, { $set: { groupOfFood: null } });
+    
+        // Delete the groupFoodModel document by its id
+        const deleteGroup = await this.groupFoodModel.findByIdAndDelete(id);
         if (!deleteGroup) {
             throw new NotFoundException(`GroupOfFood with id ${id} not found`);
         }
-        return deleteGroup;
+        return {
+            result: true,
+            data: "đã xoá thành công group"+ deleteGroup.name
+        };
     }
+    
 
     async getAllGroupByMerchant(id : string) {
         return await this.groupFoodModel.find({ merchantID: id });
