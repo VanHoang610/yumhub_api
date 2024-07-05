@@ -37,6 +37,7 @@ import { RealtimeGateway  } from './websocket/realtime.gateway';
 import { WebhookController } from './webhookpayos/webhook.controller'
 import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
 import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
+import { UploadService } from './modules/upload/upload.service';
 
 @Module({
   imports: [
@@ -76,6 +77,6 @@ import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
   ],
   controllers: [AppController,
     WebhookController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService],
 })
 export class AppModule {}
