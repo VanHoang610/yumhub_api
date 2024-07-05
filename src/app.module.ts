@@ -17,7 +17,7 @@ import { DetailOrderModule } from './modules/detailOrders/detailOrder.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { ImageReviewModule } from './modules/imageReviews/imageReview.module';
 import { AdminModule } from './modules/admins/admin.module';
-import { UploadModule } from './modules/upload/upload.module';
+// import { UploadModule } from './modules/upload/upload.module';
 import { VoucherModule } from './modules/vouchers/voucher.module';
 import { HistoryWalletMerchantModule } from './modules/historyWalletMerchant/walletMerchant.module';
 import { HistoryWalletShipperModule } from './modules/historyWalletShipper/history.module';
@@ -38,6 +38,7 @@ import { WebhookController } from './webhookpayos/webhook.controller'
 import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
 import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
 import { UploadService } from './modules/upload/upload.service';
+import { UploadController } from './modules/upload/upload.controller';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { UploadService } from './modules/upload/upload.service';
     ReviewModule,
     ImageReviewModule,
     AdminModule,
-    UploadModule,
+    // UploadModule,
     VoucherModule,
 
     //new
@@ -76,7 +77,7 @@ import { UploadService } from './modules/upload/upload.service';
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController,
-    WebhookController,],
+    WebhookController,UploadController,],
   providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService],
 })
 export class AppModule {}
