@@ -48,16 +48,6 @@ import {
       }
   
       console.log(`${type_user} connected:`, id_user, tokenNotifaction);
-
-      const message = {
-        notification: {
-          title: 'New Notification',
-          body: "ha thi thu thương",
-        },
-        token: tokenNotifaction as string,
-      };
-    
-      this.uploadService.sendNotification(tokenNotifaction as string, message);
     }
   
     handleDisconnect(client: Socket) {
@@ -122,6 +112,7 @@ import {
       // khách hàng đặt đơn hàng
       if(type_user === "customer" && command === "placeOrder"){
         this.realTimeTo1Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Bạn có đơn hàng mới")
       }
       // shipper từ chối nhận đơn hàng
       if(type_user === "shipper" && command === "refuse"){
@@ -130,6 +121,8 @@ import {
       // shipper xác nhận nhận đơn hàng
       if(type_user === "shipper" && command === "accept"){
         this.realTimeTo2Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đã có tài xế nhận đơn")
+        this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Bạn có đơn hàng mới")
       }
       // shipper đã đến nhà hàng
       if(type_user === "shipper" && command === "waiting"){
@@ -142,10 +135,13 @@ import {
       // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
       if(type_user === "shipper" && command === "cancelled_from_shipper"){
         this.realTimeTo2Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
+        this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
       }
       // shipper đã đến nơi giao
       if(type_user === "shipper" && command === "arrived"){
         this.realTimeTo1Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tài xế đã đến nơi giao")
       }
       // shipper giao hàng thành công
       if(type_user === "shipper" && command === "success"){
@@ -154,10 +150,13 @@ import {
       // shipper hủy đơn hàng (khách boom hàng)
       if(type_user === "shipper" && command === "fake_order"){
         this.realTimeTo1Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy vì không liên lạc được cho bạn")
       }
       // merchant hủy đơn hàng
       if(type_user === "merchant" && command === "cancelled_from_merchant"){
         this.realTimeTo2Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
       }
     }
   
@@ -179,6 +178,17 @@ import {
     }
     findAllClientMerchantById(id_merchant: string): ConnectedClient[] | undefined {
       return this.merchants.filter(client => client.id_merchant === id_merchant);
+    }
+    sendNotication(tokenNotifaction: string, messageBody: string){
+      const message = {
+        notification: {
+          title: 'YumHub',
+          body: messageBody,
+        },
+        token: tokenNotifaction,
+      };
+    
+      this.uploadService.sendNotification(message);
     }
   }
   

@@ -70,7 +70,7 @@ export class UploadService {
     return `${timestamp}${extension}`;
   }
 
-  async sendNotification(token: string, message: admin.messaging.Message): Promise<void> {
+  async sendNotification(message: admin.messaging.Message): Promise<void> {
     try {
       await admin.messaging().send(message);
       console.log('Notification sent successfully');

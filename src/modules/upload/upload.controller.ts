@@ -41,7 +41,7 @@ export class NotificationController {
       token: body.token,
     };
 
-    await this.uploadService.sendNotification(body.token, message);
+    await this.uploadService.sendNotification(message);
   }
 }
 
