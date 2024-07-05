@@ -19,13 +19,14 @@ import {
   
   @WebSocketGateway()
   export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    constructor(private readonly uploadService: UploadService) {}
     @WebSocketServer()
     server: Server;
   
     private customers: ConnectedClient[] = [];
     private shippers: ConnectedClient[] = [];
     private merchants: ConnectedClient[] = [];
-    constructor(private readonly uploadService: UploadService) {}
+    
   
     handleConnection (client: Socket) {
       const { id_user, type_user, id_merchant, tokenNotifaction } = client.handshake.query;
