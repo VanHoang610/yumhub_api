@@ -47,8 +47,7 @@ import {
         this.merchants.push(connectedClient);
       }
   
-      console.log(`${type_user} connected:`, id_user);
-      console.log(`${type_user} connected:`, id_user);
+      console.log(`${type_user} connected:`, id_user, tokenNotifaction);
 
       const message = {
         notification: {
