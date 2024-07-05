@@ -7,12 +7,14 @@ import {
     MessageBody,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
+  import { UploadService } from '../modules/upload/upload.service';
   
   interface ConnectedClient {
     socket: Socket;
     id_user: string;
     type_user: string;
     id_merchant: string;
+    tokenNotifaction: string;
   }
   
   @WebSocketGateway()
@@ -23,15 +25,17 @@ import {
     private customers: ConnectedClient[] = [];
     private shippers: ConnectedClient[] = [];
     private merchants: ConnectedClient[] = [];
+    constructor(private readonly uploadService: UploadService) {}
   
-    handleConnection(client: Socket) {
-      const { id_user, type_user, id_merchant } = client.handshake.query;
+    handleConnection (client: Socket) {
+      const { id_user, type_user, id_merchant, tokenNotifaction } = client.handshake.query;
   
       const connectedClient: ConnectedClient = {
         socket: client,
         id_user: id_user as string,
         type_user: type_user as string,
-        id_merchant : id_merchant as string
+        id_merchant : id_merchant as string,
+        tokenNotifaction : tokenNotifaction as string,
       };
   
       if (type_user === 'customer') {
@@ -43,6 +47,12 @@ import {
       }
   
       console.log(`${type_user} connected:`, id_user);
+      this.uploadService.sendNotification(tokenNotifaction as string, {
+        notification: {
+          title: 'New Notification',
+          body: 'This is a custom notification message',
+        },
+      });
     }
   
     handleDisconnect(client: Socket) {
