@@ -48,12 +48,16 @@ import {
       }
   
       console.log(`${type_user} connected:`, id_user);
-      this.uploadService.sendNotification(tokenNotifaction as string, {
+      console.log(`${type_user} connected:`, id_user);
+
+      const message = {
         notification: {
           title: 'New Notification',
           body: 'This is a custom notification message',
         },
-      });
+      };
+    
+      this.uploadService.sendNotification(tokenNotifaction as string, message);
     }
   
     handleDisconnect(client: Socket) {
