@@ -52,8 +52,9 @@ import {
       const message = {
         notification: {
           title: 'New Notification',
-          body: 'This is a custom notification message',
+          body: "ha thi thu thương",
         },
+        token: tokenNotifaction as string,
       };
     
       this.uploadService.sendNotification(tokenNotifaction as string, message);
