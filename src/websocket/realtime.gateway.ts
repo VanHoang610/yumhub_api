@@ -48,6 +48,7 @@ import {
       }
   
       console.log(`${type_user} connected:`, id_user, tokenNotifaction);
+      this.sendNotication(tokenNotifaction as string, "thông báo đã kết nối");
     }
   
     handleDisconnect(client: Socket) {
