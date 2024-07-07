@@ -76,12 +76,6 @@ import {
       } else {
         this.chatRooms.set(roomName, [chatMessage1, chatMessage2]);
       }
-      if (type_user === 'shipper'){
-        this.sendNotication(this.findClientById("6678dfdc0d224fa4bbb27fa9", "customer").tokenNotifaction, "Tin nhắn mới")
-        this.sendNotication(this.findClientById("6659909e220eacc819e64ff2", "shipper").tokenNotifaction, "Tin nhắn mới")
-      }
-      this.sendFullChatToClient(this.findClientById("6678dfdc0d224fa4bbb27fa9", "customer").socket, {_id : "660c9dc319f26b917ea15837"});
-      this.sendFullChatToClient(this.findClientById("6659909e220eacc819e64ff2", "shipper").socket, {_id : "660c9dc319f26b917ea15837"});
     }
   
     handleDisconnect(client: Socket) {
