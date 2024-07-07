@@ -16,6 +16,12 @@ import {
     id_merchant: string;
     tokenNotifaction: string;
   }
+  interface MessageRow {
+    typeUser: string;
+    message: string;
+    timestamp: Date;
+    type_mess: string;
+  }
   
   @WebSocketGateway()
   export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -26,6 +32,7 @@ import {
     private customers: ConnectedClient[] = [];
     private shippers: ConnectedClient[] = [];
     private merchants: ConnectedClient[] = [];
+    private chatRooms: Map<string, MessageRow[]> = new Map();
     
   
     handleConnection (client: Socket) {
@@ -124,6 +131,7 @@ import {
         this.realTimeTo2Object(type_user, command, order);
         this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đã có tài xế nhận đơn")
         this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Bạn có đơn hàng mới")
+        this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
       }
       // shipper đã đến nhà hàng
       if(type_user === "shipper" && command === "waiting"){
@@ -138,6 +146,7 @@ import {
         this.realTimeTo2Object(type_user, command, order);
         this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
         this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
+        this.deleteChatRoom(order._id);
       }
       // shipper đã đến nơi giao
       if(type_user === "shipper" && command === "arrived"){
@@ -147,6 +156,9 @@ import {
       // shipper giao hàng thành công
       if(type_user === "shipper" && command === "success"){
         this.realTimeTo1Object(type_user, command, order);
+        setTimeout(() => {
+          this.deleteChatRoom(order._id);
+        }, 3 * 60 * 60 * 1000); // 3 giờ
       }
       // shipper hủy đơn hàng (khách boom hàng)
       if(type_user === "shipper" && command === "fake_order"){
@@ -158,12 +170,44 @@ import {
         this.realTimeTo2Object(type_user, command, order);
         this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
         this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
+        this.deleteChatRoom(order._id);
       }
     }
+    @SubscribeMessage('chatMessage')
+    handleChatMessage(client: Socket, @MessageBody() payload: any): void {
+      const { order, type_user, message, type_mess } = payload;
+      const roomName = `room_${order._id}`;
+      const chatMessage: MessageRow = {
+        typeUser: type_user,
+        message : message,
+        timestamp: new Date(),
+        type_mess : type_mess
+      };
+  
+      if (this.chatRooms.has(roomName)) {
+        this.chatRooms.get(roomName).push(chatMessage);
+      } else {
+        this.chatRooms.set(roomName, [chatMessage]);
+      }
+      this.server.to(roomName).emit('chatMessage', chatMessage);
+      if (type_user === 'shipper'){
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tin nhắn mới")
+      }else{
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Tin nhắn mới")
+      }
+      this.sendFullChatToClient(this.findClientById(order.customerID._id, "customer").socket, order);
+      this.sendFullChatToClient(this.findClientById(order.shipperID._id, "shipper").socket, order);
+    }
+  
   
     // Function để gửi tin nhắn từ server tới client cụ thể
     sendMessageToClient(client: Socket, command: string, order: any): void {
       client.emit('message', {command : command, order : order});
+    }
+    //gửi tin nhắn từ sever tới client về chat
+    sendFullChatToClient(client: Socket, order: any): void {
+      const roomName = `room_${order._id}`;
+      client.emit('chatMessage', {order : order, command : "chat", fullchat : this.chatRooms.get(roomName)});
     }
   
     // Function để tìm kiếm client
@@ -191,5 +235,17 @@ import {
     
       this.uploadService.sendNotification(message);
     }
+    private createChatRoom(orderId: string, customerId: string, shipperId: string) {
+      const roomName = `room_${orderId}`;
+      this.server.to([customerId, shipperId]).socketsJoin(roomName);
+      this.chatRooms.set(roomName, []);
+    }
+  
+    private deleteChatRoom(orderId: string) {
+      const roomName = `room_${orderId}`;
+      this.chatRooms.delete(roomName);
+      this.server.socketsLeave(roomName);
+    }
+  
   }
   
