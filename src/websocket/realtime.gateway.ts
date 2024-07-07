@@ -210,12 +210,12 @@ import {
         this.chatRooms.set(roomName, [chatMessage]);
       }
       this.server.to(roomName).emit('chatMessage', chatMessage);
-      if (type_user === 'shipper' && this.findClientById(order.customerID._id, "customer").tokenNotifaction){
-        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tin nhắn mới")
-      }else{
+      // if (type_user === 'shipper' && this.findClientById(order.customerID._id, "customer").tokenNotifaction){
+      //   this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tin nhắn mới")
+      // }else{
         this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Tin nhắn mới")
-      }
-      this.sendFullChatToClient(this.findClientById(order.customerID._id, "customer").socket, order);
+      // }
+      // this.sendFullChatToClient(this.findClientById(order.customerID._id, "customer").socket, order);
       this.sendFullChatToClient(this.findClientById(order.shipperID._id, "shipper").socket, order);
     }
   
