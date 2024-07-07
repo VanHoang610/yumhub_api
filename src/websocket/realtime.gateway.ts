@@ -33,7 +33,6 @@ import {
     private shippers: ConnectedClient[] = [];
     private merchants: ConnectedClient[] = [];
     private chatRooms: Map<string, MessageRow[]> = new Map();
-    
   
     handleConnection (client: Socket) {
       const { id_user, type_user, id_merchant, tokenNotifaction } = client.handshake.query;
@@ -56,6 +55,33 @@ import {
   
       console.log(`${type_user} connected:`, id_user, tokenNotifaction);
       this.sendNotication(tokenNotifaction as string, "thông báo đã kết nối");
+      this.createChatRoom("660c9dc319f26b917ea15837","6678dfdc0d224fa4bbb27fa9", "6659909e220eacc819e64ff2");
+      const roomName = `room_660c9dc319f26b917ea15837`;
+      const chatMessage1: MessageRow = {
+        typeUser: "shipper",
+        message : "ban vui long cho chut nhe",
+        timestamp: new Date(),
+        type_mess : "text"
+      };
+      const chatMessage2: MessageRow = {
+        typeUser: "customer",
+        message : "oke",
+        timestamp: new Date(),
+        type_mess : "text"
+      };
+  
+      if (this.chatRooms.has(roomName)) {
+        this.chatRooms.get(roomName).push(chatMessage1);
+        this.chatRooms.get(roomName).push(chatMessage2);
+      } else {
+        this.chatRooms.set(roomName, [chatMessage1, chatMessage2]);
+      }
+      if (type_user === 'shipper'){
+        this.sendNotication(this.findClientById("6678dfdc0d224fa4bbb27fa9", "customer").tokenNotifaction, "Tin nhắn mới")
+        this.sendNotication(this.findClientById("6659909e220eacc819e64ff2", "shipper").tokenNotifaction, "Tin nhắn mới")
+      }
+      this.sendFullChatToClient(this.findClientById("6678dfdc0d224fa4bbb27fa9", "customer").socket, {_id : "660c9dc319f26b917ea15837"});
+      this.sendFullChatToClient(this.findClientById("6659909e220eacc819e64ff2", "shipper").socket, {_id : "660c9dc319f26b917ea15837"});
     }
   
     handleDisconnect(client: Socket) {
