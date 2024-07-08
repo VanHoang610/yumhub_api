@@ -57,6 +57,7 @@ export class OrderController {
             return error
         }
     }
+
     @Get('RevenueYumhub')
     @UseGuards(AuthGuard)
     getRevenueTime(@Body() body: { month: string }) {
@@ -191,5 +192,13 @@ export class OrderController {
     @UseGuards(AuthGuard)
     getReviewOfOrder(@Query('id') id: string) {
         return this.orderServices.getReviewOfOrder(id);
+    }
+
+    // lấy ra chi tiết order(tên món ăn, tổng số món,...)
+    @Get('getListFoodByOrder')
+    @UseGuards(AuthGuard)
+    getListFoodByOrder(@Query('id') id: string, @Body() body: { status: number}) {
+        const { status } = body;
+        return this.orderServices.getListFoodByOrder(id, status);
     }
 }
