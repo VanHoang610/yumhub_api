@@ -14,7 +14,7 @@ interface ConnectedClient {
   id_user: string;
   type_user: string;
   id_merchant: string;
-  tokenNotifaction: string;
+  tokenNotification: string;
 }
 interface MessageRow {
   typeUser: string;
@@ -35,14 +35,14 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   private chatRooms: Map<string, MessageRow[]> = new Map();
 
   handleConnection(client: Socket) {
-    const { id_user, type_user, id_merchant, tokenNotifaction } = client.handshake.query;
+    const { id_user, type_user, id_merchant, tokenNotification } = client.handshake.query;
 
     const connectedClient: ConnectedClient = {
       socket: client,
       id_user: id_user as string,
       type_user: type_user as string,
       id_merchant: id_merchant as string,
-      tokenNotifaction: tokenNotifaction as string,
+      tokenNotification: tokenNotification as string,
     };
 
     if (type_user === 'customer') {
@@ -53,29 +53,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.merchants.push(connectedClient);
     }
 
-    console.log(`${type_user} connected:`, id_user, tokenNotifaction);
-    // this.sendNotication(tokenNotifaction as string, "thông báo đã kết nối");
-    // this.createChatRoom("660c9dc319f26b917ea15837","6678dfdc0d224fa4bbb27fa9", "6659909e220eacc819e64ff2");
-    // const roomName = `room_660c9dc319f26b917ea15837`;
-    // const chatMessage1: MessageRow = {
-    //   typeUser: "shipper",
-    //   message : "ban vui long cho chut nhe",
-    //   timestamp: new Date(),
-    //   type_mess : "text"
-    // };
-    // const chatMessage2: MessageRow = {
-    //   typeUser: "customer",
-    //   message : "oke",
-    //   timestamp: new Date(),
-    //   type_mess : "text"
-    // };
-
-    // if (this.chatRooms.has(roomName)) {
-    //   this.chatRooms.get(roomName).push(chatMessage1);
-    //   this.chatRooms.get(roomName).push(chatMessage2);
-    // } else {
-    //   this.chatRooms.set(roomName, [chatMessage1, chatMessage2]);
-    // }
+    console.log(`${type_user} connected:`, id_user, tokenNotification);
   }
 
   handleDisconnect(client: Socket) {
@@ -140,7 +118,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     // khách hàng đặt đơn hàng
     if (type_user === "customer" && command === "placeOrder") {
       this.realTimeTo1Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Bạn có đơn hàng mới")
+      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Bạn có đơn hàng mới")
     }
     // shipper từ chối nhận đơn hàng
     if (type_user === "shipper" && command === "refuse") {
@@ -149,8 +127,8 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     // shipper xác nhận nhận đơn hàng
     if (type_user === "shipper" && command === "accept") {
       this.realTimeTo2Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đã có tài xế nhận đơn")
-      this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Bạn có đơn hàng mới")
+      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đã có tài xế nhận đơn")
+      this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotification, "Bạn có đơn hàng mới")
       this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
     }
     // shipper đã đến nhà hàng
@@ -164,14 +142,14 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
     if (type_user === "shipper" && command === "cancelled_from_shipper") {
       this.realTimeTo2Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
-      this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
+      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy từ tài xế")
+      this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotification, "Đơn hàng đã bị hủy từ tài xế")
       this.deleteChatRoom(order._id);
     }
     // shipper đã đến nơi giao
     if (type_user === "shipper" && command === "arrived") {
       this.realTimeTo1Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tài xế đã đến nơi giao")
+      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tài xế đã đến nơi giao")
     }
     // shipper giao hàng thành công
     if (type_user === "shipper" && command === "success") {
@@ -183,13 +161,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     // shipper hủy đơn hàng (khách boom hàng)
     if (type_user === "shipper" && command === "fake_order") {
       this.realTimeTo1Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy vì không liên lạc được cho bạn")
+      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy vì không liên lạc được cho bạn")
     }
     // merchant hủy đơn hàng
     if (type_user === "merchant" && command === "cancelled_from_merchant") {
       this.realTimeTo2Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
-      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
+      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy từ nhà hàng")
+      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Đơn hàng đã bị hủy từ nhà hàng")
       this.deleteChatRoom(order._id);
     }
   }
@@ -210,10 +188,10 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.chatRooms.set(roomName, [chatMessage]);
     }
     this.server.to(roomName).emit('chatMessage', chatMessage);
-    if (type_user === 'shipper' && this.findClientById(order.customerID._id, "customer").tokenNotifaction) {
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tin nhắn mới")
+    if (type_user === 'shipper' && this.findClientById(order.customerID._id, "customer").tokenNotification) {
+      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tin nhắn mới")
     } else {
-      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Tin nhắn mới")
+      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Tin nhắn mới")
     }
     this.sendFullChatToClient(this.findClientById(order.customerID._id, "customer").socket, order);
     this.sendFullChatToClient(this.findClientById(order.shipperID._id, "shipper").socket, order);
@@ -244,13 +222,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   findAllClientMerchantById(id_merchant: string): ConnectedClient[] | undefined {
     return this.merchants.filter(client => client.id_merchant === id_merchant);
   }
-  sendNotication(tokenNotifaction: string, messageBody: string) {
+  sendNotication(tokenNotification: string, messageBody: string) {
     const message = {
       notification: {
         title: 'YumHub',
         body: messageBody,
       },
-      token: tokenNotifaction,
+      token: tokenNotification,
     };
 
     this.uploadService.sendNotification(message);
