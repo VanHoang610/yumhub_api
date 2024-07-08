@@ -1092,7 +1092,7 @@ export class OrderService {
   async getListFoodByOrder(id: string, status: number) {
     try {
       let user;
-      let customerID, merchantID;
+      let customerID, merchantID, shipperID;
       user = await this.customerModel.findById(id);
       if (user) {
         customerID = user._id;
@@ -1100,12 +1100,18 @@ export class OrderService {
         user = await this.merchantModel.findById(id);
         if (user) {
           merchantID = user._id;
+        } else {
+          user = await this.shipperModel.findById(id);
+          if (user) {
+            shipperID = user._id;
+          }
         }
       }
+
       if (!user) {
         throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
       }
-  
+
       let statusOrder;
       switch (status) {
         case 1:
@@ -1132,7 +1138,7 @@ export class OrderService {
         default:
           throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
       }
-  
+
       let orders;
       if (customerID) {
         orders = await this.orderModel
@@ -1144,33 +1150,37 @@ export class OrderService {
           .find({ merchantID, status: statusOrder })
           .populate('customerID')
           .populate('shipperID');
+      } else if (shipperID) {
+        orders = await this.orderModel
+          .find({ shipperID, status: statusOrder })
+          .populate('customerID')
+          .populate('merchantID');
       }
-  
+
       if (!orders || orders.length === 0) {
         throw new HttpException('No orders found', HttpStatus.NOT_FOUND);
       }
-  
-      const orderIDs = orders.map(order => order._id);
-  
+
+      const orderIDs = orders.map((order) => order._id);
+
       const detailOrders = await this.detailOrderModel
         .find({ orderID: { $in: orderIDs } })
         .populate('foodID');
-  
-      const ordersWithDetails = orders.map(order => {
-        const orderDetail = detailOrders.filter(detail => detail.orderID.toString() === order._id.toString());
+
+      const ordersWithDetails = orders.map((order) => {
+        const orderDetail = detailOrders.filter(
+          (detail) => detail.orderID.toString() === order._id.toString(),
+        );
         return {
           ...order.toObject(),
           detailOrder: orderDetail,
         };
       });
-  
+
       return { result: true, listOrder: ordersWithDetails };
     } catch (error) {
       console.log('Error:', error);
       return { result: false, listReview: error.message };
     }
   }
-  
-  
-  
 }
