@@ -22,6 +22,10 @@ import { TypeOfVoucher, TypeOfVoucherSchema } from 'src/schemas/typeOfVoucher.sc
                 schema: OrderSchema
             },
             {
+                name: DetailOrder.name,
+                schema: DetailOrderSchema
+            },
+            {
                 name: Customer.name,
                 schema: CustomerSchema
             },

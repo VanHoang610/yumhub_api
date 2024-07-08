@@ -1018,7 +1018,7 @@ export class MerchantService {
 
   async getAllDeletedMerchant() {
     try {
-      const merchants = await this.merchants.find({ status: 4 });
+      const merchants = await this.merchants.find({ deleted: true });
       if (!merchants)
         throw new HttpException(
           'Not Found Deleted Merchants',
@@ -1044,7 +1044,7 @@ export class MerchantService {
         ],
       });
       if (merchants.length === 0) {
-        return { result: false, message: 'Not Found Customers', merchants: [] };
+        return { result: false, message: 'Not Found Merchants', merchants: [] };
       }
       return { result: true, merchants: merchants };
     } catch (error) {
