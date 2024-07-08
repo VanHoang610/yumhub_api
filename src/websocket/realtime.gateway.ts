@@ -7,31 +7,42 @@ import {
     MessageBody,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
+  import { UploadService } from '../modules/upload/upload.service';
   
   interface ConnectedClient {
     socket: Socket;
     id_user: string;
     type_user: string;
     id_merchant: string;
+    tokenNotifaction: string;
+  }
+  interface MessageRow {
+    typeUser: string;
+    message: string;
+    timestamp: Date;
+    type_mess: string;
   }
   
   @WebSocketGateway()
   export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    constructor(private readonly uploadService: UploadService) {}
     @WebSocketServer()
     server: Server;
   
     private customers: ConnectedClient[] = [];
     private shippers: ConnectedClient[] = [];
     private merchants: ConnectedClient[] = [];
+    private chatRooms: Map<string, MessageRow[]> = new Map();
   
-    handleConnection(client: Socket) {
-      const { id_user, type_user, id_merchant } = client.handshake.query;
+    handleConnection (client: Socket) {
+      const { id_user, type_user, id_merchant, tokenNotifaction } = client.handshake.query;
   
       const connectedClient: ConnectedClient = {
         socket: client,
         id_user: id_user as string,
         type_user: type_user as string,
-        id_merchant : id_merchant as string
+        id_merchant : id_merchant as string,
+        tokenNotifaction : tokenNotifaction as string,
       };
   
       if (type_user === 'customer') {
@@ -42,7 +53,29 @@ import {
         this.merchants.push(connectedClient);
       }
   
-      console.log(`${type_user} connected:`, id_user);
+      console.log(`${type_user} connected:`, id_user, tokenNotifaction);
+      this.sendNotication(tokenNotifaction as string, "thông báo đã kết nối");
+      this.createChatRoom("660c9dc319f26b917ea15837","6678dfdc0d224fa4bbb27fa9", "6659909e220eacc819e64ff2");
+      const roomName = `room_660c9dc319f26b917ea15837`;
+      const chatMessage1: MessageRow = {
+        typeUser: "shipper",
+        message : "ban vui long cho chut nhe",
+        timestamp: new Date(),
+        type_mess : "text"
+      };
+      const chatMessage2: MessageRow = {
+        typeUser: "customer",
+        message : "oke",
+        timestamp: new Date(),
+        type_mess : "text"
+      };
+  
+      if (this.chatRooms.has(roomName)) {
+        this.chatRooms.get(roomName).push(chatMessage1);
+        this.chatRooms.get(roomName).push(chatMessage2);
+      } else {
+        this.chatRooms.set(roomName, [chatMessage1, chatMessage2]);
+      }
     }
   
     handleDisconnect(client: Socket) {
@@ -107,6 +140,7 @@ import {
       // khách hàng đặt đơn hàng
       if(type_user === "customer" && command === "placeOrder"){
         this.realTimeTo1Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Bạn có đơn hàng mới")
       }
       // shipper từ chối nhận đơn hàng
       if(type_user === "shipper" && command === "refuse"){
@@ -115,6 +149,9 @@ import {
       // shipper xác nhận nhận đơn hàng
       if(type_user === "shipper" && command === "accept"){
         this.realTimeTo2Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đã có tài xế nhận đơn")
+        this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Bạn có đơn hàng mới")
+        this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
       }
       // shipper đã đến nhà hàng
       if(type_user === "shipper" && command === "waiting"){
@@ -127,28 +164,70 @@ import {
       // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
       if(type_user === "shipper" && command === "cancelled_from_shipper"){
         this.realTimeTo2Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
+        this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotifaction, "Đơn hàng đã bị hủy từ tài xế")
+        this.deleteChatRoom(order._id);
       }
       // shipper đã đến nơi giao
       if(type_user === "shipper" && command === "arrived"){
         this.realTimeTo1Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tài xế đã đến nơi giao")
       }
       // shipper giao hàng thành công
       if(type_user === "shipper" && command === "success"){
         this.realTimeTo1Object(type_user, command, order);
+        setTimeout(() => {
+          this.deleteChatRoom(order._id);
+        }, 3 * 60 * 60 * 1000); // 3 giờ
       }
       // shipper hủy đơn hàng (khách boom hàng)
       if(type_user === "shipper" && command === "fake_order"){
         this.realTimeTo1Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy vì không liên lạc được cho bạn")
       }
       // merchant hủy đơn hàng
       if(type_user === "merchant" && command === "cancelled_from_merchant"){
         this.realTimeTo2Object(type_user, command, order);
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Đơn hàng đã bị hủy từ nhà hàng")
+        this.deleteChatRoom(order._id);
       }
     }
+    @SubscribeMessage('chatMessage')
+    handleChatMessage(client: Socket, @MessageBody() payload: any): void {
+      const { order, type_user, message, type_mess } = payload;
+      const roomName = `room_${order._id}`;
+      const chatMessage: MessageRow = {
+        typeUser: type_user,
+        message : message,
+        timestamp: new Date(),
+        type_mess : type_mess
+      };
+  
+      if (this.chatRooms.has(roomName)) {
+        this.chatRooms.get(roomName).push(chatMessage);
+      } else {
+        this.chatRooms.set(roomName, [chatMessage]);
+      }
+      this.server.to(roomName).emit('chatMessage', chatMessage);
+      // if (type_user === 'shipper' && this.findClientById(order.customerID._id, "customer").tokenNotifaction){
+      //   this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotifaction, "Tin nhắn mới")
+      // }else{
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotifaction, "Tin nhắn mới")
+      // }
+      // this.sendFullChatToClient(this.findClientById(order.customerID._id, "customer").socket, order);
+      this.sendFullChatToClient(this.findClientById(order.shipperID._id, "shipper").socket, order);
+    }
+  
   
     // Function để gửi tin nhắn từ server tới client cụ thể
     sendMessageToClient(client: Socket, command: string, order: any): void {
       client.emit('message', {command : command, order : order});
+    }
+    //gửi tin nhắn từ sever tới client về chat
+    sendFullChatToClient(client: Socket, order: any): void {
+      const roomName = `room_${order._id}`;
+      client.emit('chatMessage', {order : order, command : "chat", fullchat : this.chatRooms.get(roomName)});
     }
   
     // Function để tìm kiếm client
@@ -165,5 +244,28 @@ import {
     findAllClientMerchantById(id_merchant: string): ConnectedClient[] | undefined {
       return this.merchants.filter(client => client.id_merchant === id_merchant);
     }
+    sendNotication(tokenNotifaction: string, messageBody: string){
+      const message = {
+        notification: {
+          title: 'YumHub',
+          body: messageBody,
+        },
+        token: tokenNotifaction,
+      };
+    
+      this.uploadService.sendNotification(message);
+    }
+    private createChatRoom(orderId: string, customerId: string, shipperId: string) {
+      const roomName = `room_${orderId}`;
+      this.server.to([customerId, shipperId]).socketsJoin(roomName);
+      this.chatRooms.set(roomName, []);
+    }
+  
+    private deleteChatRoom(orderId: string) {
+      const roomName = `room_${orderId}`;
+      this.chatRooms.delete(roomName);
+      this.server.socketsLeave(roomName);
+    }
+  
   }
   

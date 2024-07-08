@@ -7,6 +7,7 @@ import * as fs from 'fs';
 export class UploadService {
   // private bucket: admin.storage.Bucket;
   private readonly storage: admin.storage.Storage;
+  private readonly messaging: admin.messaging.Messaging;
 
   constructor() {
     const serviceAccount = {
@@ -27,7 +28,7 @@ export class UploadService {
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET, // Thay bằng tên bucket của bạn
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
     });
 
     this.storage = admin.storage();
@@ -67,5 +68,14 @@ export class UploadService {
     const timestamp = new Date().getTime();
     const extension = path.extname(originalName);
     return `${timestamp}${extension}`;
+  }
+
+  async sendNotification(message: admin.messaging.Message): Promise<void> {
+    try {
+      await admin.messaging().send(message);
+      console.log('Notification sent successfully');
+    } catch (error) {
+      console.error('Failed to send notification:', error.message);
+    }
   }
 }

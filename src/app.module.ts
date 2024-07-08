@@ -17,7 +17,7 @@ import { DetailOrderModule } from './modules/detailOrders/detailOrder.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { ImageReviewModule } from './modules/imageReviews/imageReview.module';
 import { AdminModule } from './modules/admins/admin.module';
-import { UploadModule } from './modules/upload/upload.module';
+// import { UploadModule } from './modules/upload/upload.module';
 import { VoucherModule } from './modules/vouchers/voucher.module';
 import { HistoryWalletMerchantModule } from './modules/historyWalletMerchant/walletMerchant.module';
 import { HistoryWalletShipperModule } from './modules/historyWalletShipper/history.module';
@@ -34,6 +34,11 @@ import { GroupOfFoodModule } from './modules/groupOfFood/groupOfFood.module';
 import { FeeModule } from './modules/fee/fee.module';
 import { DocumentShipperModule } from './modules/documentShipper/document.module';
 import { RealtimeGateway  } from './websocket/realtime.gateway';
+import { WebhookController } from './webhookpayos/webhook.controller'
+import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
+import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
+import { UploadService } from './modules/upload/upload.service';
+import { UploadController } from './modules/upload/upload.controller';
 
 @Module({
   imports: [
@@ -52,7 +57,7 @@ import { RealtimeGateway  } from './websocket/realtime.gateway';
     ReviewModule,
     ImageReviewModule,
     AdminModule,
-    UploadModule,
+    // UploadModule,
     VoucherModule,
 
     //new
@@ -71,7 +76,8 @@ import { RealtimeGateway  } from './websocket/realtime.gateway';
     FeeModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
-  controllers: [AppController],
-  providers: [AppService, RealtimeGateway],
+  controllers: [AppController,
+    WebhookController,UploadController,],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService],
 })
-export class AppModule { }
+export class AppModule {}
