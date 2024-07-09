@@ -10,7 +10,7 @@ export class BraintreeService {
       environment: braintree.Environment.Sandbox,
       merchantId: 'yp4k3yww4mjxy3mk',
       publicKey: '5kcf6f794qx8nw8w',
-      privateKey: 'sandbox_cs9945ws_yp4k3yww4mjxy3mk',
+      privateKey: '803f84dacf11a76c3b44a0b706c54132',
     });
   }
 
