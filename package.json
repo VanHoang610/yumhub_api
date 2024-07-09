@@ -33,6 +33,7 @@
     "aws-sdk": "^2.1642.0",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
+    "braintree": "^3.23.0",
     "bufferutil": "^4.0.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -48,6 +49,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.5",
+    "stripe": "^16.2.0",
     "utf-8-validate": "^5.0.10",
     "ws": "^8.17.0"
   },

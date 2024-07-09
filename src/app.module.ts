@@ -39,6 +39,7 @@ import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
 import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
 import { UploadService } from './modules/upload/upload.service';
 import { UploadController } from './modules/upload/upload.controller';
+import { BraintreeModule } from './modules/braintree/braintree.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { UploadController } from './modules/upload/upload.controller';
     foodStatusModule,
     AdsModule,
     FeeModule,
+    BraintreeModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController,
