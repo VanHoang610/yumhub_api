@@ -14,14 +14,15 @@ export class CreatePayoutDto {
       account_number?: string;
     };
   }
-
-@Controller('payout')
-export class PayoutController {
-  constructor(private readonly payoutService: PayoutService) {}
-
-  @Post()
-  async createPayout(@Body() createPayoutDto: CreatePayoutDto): Promise<any> {
-    const { amount, bankAccountInfo } = createPayoutDto;
-    return this.payoutService.createPayout(amount, bankAccountInfo);
+  
+  @Controller('payout')
+  export class PayoutController {
+    constructor(private readonly payoutService: PayoutService) {}
+  
+    @Post()
+    async createPayout(@Body() createPayoutDto: CreatePayoutDto): Promise<any> {
+      const { amount, bankAccountInfo } = createPayoutDto;
+      return this.payoutService.createPayout(amount, bankAccountInfo);
+    }
   }
-}
+  
