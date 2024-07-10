@@ -14,26 +14,27 @@ export class PayoutService {
 
   async createPayout(amount: number, bankAccountInfo: any): Promise<any> {
     try {
-      const bankAccountToken = await this.stripe.tokens.create({
-        bank_account: {
-          country: bankAccountInfo.country,
+      // Handle different countries
+      if (bankAccountInfo.country === 'VN') {
+        // Information about Vietnamese banks using SWIFT code
+        const bankTransfer = await this.stripe.transfers.create({
+          amount,
           currency: bankAccountInfo.currency,
-          account_holder_name: bankAccountInfo.account_holder_name,
-          account_holder_type: bankAccountInfo.account_holder_type,
-          routing_number: bankAccountInfo.routing_number,
-          account_number: bankAccountInfo.account_number,
-        },
-      });
-
-      const payout = await this.stripe.payouts.create({
-        amount: amount,
-        currency: 'usd',
-        destination: bankAccountToken.id,
-      });
-
-      return payout;
+          destination: bankAccountInfo.account_id, // Assuming account_id is the ID of the Stripe account or bank account
+        });
+        return bankTransfer;
+      } else {
+        // Handle other countries
+        const bankTransfer = await this.stripe.transfers.create({
+          amount,
+          currency: bankAccountInfo.currency,
+          destination: bankAccountInfo.account_id, // Assuming account_id is the ID of the Stripe account or bank account
+        });
+        return bankTransfer;
+      }
     } catch (error) {
-      throw new Error(`Error creating payout: ${error.message}`);
+      // Handle error
+      throw error;
     }
   }
 }
