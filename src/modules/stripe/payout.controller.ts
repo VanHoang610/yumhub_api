@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { PayoutService } from './payout.service';
 
+
 export class CreatePayoutDto {
     amount: number;
     bankAccountInfo: {

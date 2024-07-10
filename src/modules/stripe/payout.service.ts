@@ -14,24 +14,12 @@ export class PayoutService {
 
   async createPayout(amount: number, bankAccountInfo: any): Promise<any> {
     try {
-      // Handle different countries
-      if (bankAccountInfo.country === 'VN') {
-        // Information about Vietnamese banks using SWIFT code
-        const bankTransfer = await this.stripe.transfers.create({
-          amount,
-          currency: bankAccountInfo.currency,
-          destination: bankAccountInfo.account_id, // Assuming account_id is the ID of the Stripe account or bank account
-        });
-        return bankTransfer;
-      } else {
-        // Handle other countries
-        const bankTransfer = await this.stripe.transfers.create({
-          amount,
-          currency: bankAccountInfo.currency,
-          destination: bankAccountInfo.account_id, // Assuming account_id is the ID of the Stripe account or bank account
-        });
-        return bankTransfer;
-      }
+      const bankTransfer = await this.stripe.transfers.create({
+        amount,
+        currency: bankAccountInfo.currency,
+        destination: bankAccountInfo.account_id, // Assuming account_id is the ID of the Stripe account or bank account
+      });
+      return bankTransfer;
     } catch (error) {
       // Handle error
       throw error;
