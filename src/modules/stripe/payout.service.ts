@@ -7,7 +7,7 @@ export class PayoutService {
   private stripe: Stripe;
 
   constructor(private configService: ConfigService) {
-    this.stripe = new Stripe(this.configService.get<string>('sk_test_51PaYulRsnazNxSTCypiJ05A9ge3IrsKqITa6fidmlduJ81octzWBpFwhbwKnbqvrWxSxTjyAcvkd3Obd6eMY19ix00nTtUI9A2'), {
+    this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY'), {
       apiVersion: '2024-06-20',
     });
   }
