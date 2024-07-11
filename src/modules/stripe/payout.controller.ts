@@ -39,4 +39,8 @@ export class StripeController {
   async connectStripeCustomer(@Body('email') email: string) {
     return this.stripeService.createConnectedAccount(email);
   }
+  @Post('update-stripe-capability')
+  async updateCapability(@Body('id') id: string) {
+    return this.stripeService.updateCapability(id);
+  }
 }

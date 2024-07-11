@@ -58,7 +58,18 @@ export class StripeService {
     updateCapability
     return account;
   }
-
+  async updateCapability(id: string) {
+    const updateCapability = await this.stripe.accounts.updateCapability(
+      id,
+      'card_payments',
+      {
+        requested: true,
+      }
+    )
+    return updateCapability;
+  }
+  
+  
   async createPayout(amount: number, currency: string, destination: string) {
     return this.stripe.payouts.create({
       amount,
