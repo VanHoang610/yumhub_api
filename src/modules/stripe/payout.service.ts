@@ -61,7 +61,7 @@ export class StripeService {
   async updateCapability(id: string) {
     const account = await this.stripe.accounts.update(id, {
       business_profile: {
-        url: 'https://example.com', // URL của trang web của bạn
+        url: 'https://duantotnghiep-api-a32664265dc1.herokuapp.com', // URL của trang web của bạn
       },
       business_type: 'individual', // Hoặc 'company' nếu bạn đang cập nhật thông tin doanh nghiệp
       tos_acceptance: {
