@@ -37,6 +37,14 @@ export class StripeService {
   async createExternalAccount(customerId: string, bankAccount: any) {
     return this.stripe.customers.createSource(customerId, { source: bankAccount });
   }
+  async createConnectedAccount(email: string) {
+    const account = await this.stripe.accounts.create({
+      type: 'express',
+      country: 'US',
+      email: email,
+    });
+    return account;
+  }
 
   async createPayout(amount: number, currency: string, destination: string) {
     return this.stripe.payouts.create({

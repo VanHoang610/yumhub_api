@@ -35,4 +35,8 @@ export class StripeController {
     const { amount, currency, destination } = createPayoutDto;
     return this.stripeService.createPayout(amount, currency, destination);
   }
+  @Post('connect-stripe-customer')
+  async connectStripeCustomer(@Body()  email: string ) {
+    return this.stripeService.createConnectedAccount(email);
+  }
 }
