@@ -1,25 +1,30 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { PayoutService } from './payout.service';
+import { StripeService } from './payout.service';
 
-@Controller('payout')
-export class PayoutController {
-  constructor(private readonly payoutService: PayoutService) {}
+@Controller('stripe')
+export class StripeController {
+  constructor(private readonly stripeService: StripeService) {}
 
-  @Post('create-external-account')
-  async createExternalAccount(@Body() bankDetails: any) {
-    return this.payoutService.createExternalAccount('user_id', bankDetails);
+  @Post('create-customer')
+  async createCustomer(@Body('email') email: string) {
+    return this.stripeService.createCustomer(email);
+  }
+
+  @Post('create-payment-intent')
+  async createPaymentIntent(@Body() createPaymentIntentDto: { amount: number; currency: string; customerId: string }) {
+    const { amount, currency, customerId } = createPaymentIntentDto;
+    return this.stripeService.createPaymentIntent(amount, currency, customerId);
+  }
+
+  @Post('create-transfer')
+  async createTransfer(@Body() createTransferDto: { amount: number; currency: string; destination: string }) {
+    const { amount, currency, destination } = createTransferDto;
+    return this.stripeService.createTransfer(amount, currency, destination);
   }
 
   @Post('create-payout')
-  async createPayout(@Body() body: { accountId: string; amount: number }) {
-    return this.payoutService.createPayout(body.accountId, body.amount);
-  }
-  
-  @Post('create-payment-intent')
-  async createPaymentIntent(@Body('amount') amount: number) {
-    const paymentIntent = await this.payoutService.createPaymentIntent(amount);
-    return {
-      clientSecret: paymentIntent.client_secret,
-    };
+  async createPayout(@Body() createPayoutDto: { amount: number; currency: string; destination: string }) {
+    const { amount, currency, destination } = createPayoutDto;
+    return this.stripeService.createPayout(amount, currency, destination);
   }
 }
