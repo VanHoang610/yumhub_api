@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
@@ -12,28 +12,48 @@ export class PayoutService {
     });
   }
 
-  async createPayout(amount: number, bankAccountInfo: any): Promise<any> {
+  async createExternalAccount(userId: string, bankDetails: any) {
     try {
-      const bankAccountToken = await this.stripe.tokens.create({
-        bank_account: {
-          country: bankAccountInfo.country,
-          currency: bankAccountInfo.currency,
-          account_holder_name: bankAccountInfo.account_holder_name,
-          account_holder_type: bankAccountInfo.account_holder_type,
-          routing_number: bankAccountInfo.routing_number,
-          account_number: bankAccountInfo.account_number,
+      const account = await this.stripe.accounts.create({
+        type: 'custom',
+        country: 'US',
+        email: 'user@example.com',
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
         },
       });
 
+      const externalAccount = await this.stripe.accounts.createExternalAccount(account.id, {
+        external_account: {
+          object: 'bank_account',
+          country: 'US',
+          currency: 'usd',
+          account_holder_name: bankDetails.account_holder_name,
+          account_holder_type: 'individual',
+          routing_number: bankDetails.routing_number,
+          account_number: bankDetails.account_number,
+        },
+      });
+
+      return externalAccount;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async createPayout(accountId: string, amount: number) {
+    try {
       const payout = await this.stripe.payouts.create({
-        amount: amount,
+        amount,
         currency: 'usd',
-        destination: bankAccountToken.id,
+        destination: accountId,
+        method: 'instant',
       });
 
       return payout;
     } catch (error) {
-      throw new Error(`Error creating payout: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 

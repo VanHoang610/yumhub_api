@@ -5,12 +5,16 @@ import { PayoutService } from './payout.service';
 export class PayoutController {
   constructor(private readonly payoutService: PayoutService) {}
 
-  @Post()
-  async createPayout(@Body() payoutDto: any): Promise<any> {
-    const { amount, bankAccountInfo } = payoutDto;
-    return this.payoutService.createPayout(amount, bankAccountInfo);
+  @Post('create-external-account')
+  async createExternalAccount(@Body() bankDetails: any) {
+    return this.payoutService.createExternalAccount('user_id', bankDetails);
   }
 
+  @Post('create-payout')
+  async createPayout(@Body() body: { accountId: string; amount: number }) {
+    return this.payoutService.createPayout(body.accountId, body.amount);
+  }
+  
   @Post('create-payment-intent')
   async createPaymentIntent(@Body('amount') amount: number) {
     const paymentIntent = await this.payoutService.createPaymentIntent(amount);
