@@ -48,6 +48,14 @@ export class StripeService {
         // legacy_payments: { requested: true },
       },
     });
+    const updateCapability = await this.stripe.accounts.updateCapability(
+      account.id,
+      'card_payments',
+      {
+        requested: true,
+      }
+    )
+    updateCapability
     return account;
   }
 
