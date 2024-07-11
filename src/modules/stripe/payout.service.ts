@@ -14,47 +14,58 @@ export class PayoutService {
 
   async createPayout(amount: number, bankAccountInfo: any): Promise<any> {
     try {
-      const bankAccount = await this.createBankAccount(bankAccountInfo);
-
-      const bankTransfer = await this.stripe.transfers.create({
-        amount,
-        currency: bankAccountInfo.currency,
-        destination: bankAccount.id, // Sử dụng ID của tài khoản ngân hàng
+      // Kiểm tra xem khách hàng đã tồn tại chưa
+      const customers = await this.stripe.customers.list({
+        email: bankAccountInfo.email,
       });
-      return bankTransfer;
+
+      let customer: Stripe.Customer;
+      if (customers.data.length === 0) {
+        // Nếu khách hàng chưa tồn tại, tạo mới khách hàng
+        customer = await this.stripe.customers.create({
+          email: bankAccountInfo.email,
+          name: bankAccountInfo.account_holder_name,
+        });
+      } else {
+        // Nếu khách hàng đã tồn tại, lấy thông tin khách hàng
+        customer = customers.data[0];
+      }
+
+      // Tạo phương thức thanh toán cho khách hàng
+      const paymentMethod = await this.stripe.paymentMethods.create({
+        type: 'card',
+        card: {
+          number: '4242424242424242',
+          exp_month: 8,
+          exp_year: 2026,
+          cvc: '314',
+        },
+      });
+
+      // Gắn phương thức thanh toán với khách hàng
+      await this.stripe.paymentMethods.attach(paymentMethod.id, {
+        customer: customer.id,
+      });
+
+      // Đặt phương thức thanh toán mặc định cho khách hàng
+      await this.stripe.customers.update(customer.id, {
+        invoice_settings: {
+          default_payment_method: paymentMethod.id,
+        },
+      });
+
+      // Tạo thanh toán cho khách hàng
+      const paymentIntent = await this.stripe.paymentIntents.create({
+        amount: amount,
+        currency: bankAccountInfo.currency,
+        customer: customer.id,
+        payment_method: paymentMethod.id,
+        confirm: true,
+      });
+
+      return paymentIntent;
     } catch (error) {
       throw error;
     }
-  }
-
-  async createBankAccount(bankAccountInfo: any) {
-    const accountId = await this.getStripeAccountId(); // Lấy ID tài khoản Stripe của bạn
-
-    const bankAccount = await this.stripe.accounts.createExternalAccount(
-      accountId,
-      {
-        external_account: {
-          object: 'bank_account',
-          country: bankAccountInfo.country,
-          currency: bankAccountInfo.currency,
-          account_holder_name: bankAccountInfo.account_holder_name,
-          account_holder_type: bankAccountInfo.account_holder_type,
-          routing_number: bankAccountInfo.routing_number,
-          account_number: bankAccountInfo.account_number,
-        },
-      }
-    );
-    return bankAccount;
-  }
-
-  async getStripeAccountId(): Promise<string> {
-    // Tạo một tài khoản Stripe
-    const account = await this.stripe.accounts.create({
-      type: 'custom',
-      country: 'VN',
-      email: 'your-email@example.com', // Thay bằng email của bạn
-    });
-
-    return account.id;
   }
 }
