@@ -42,6 +42,11 @@ export class StripeService {
       type: 'express',
       country: 'US',
       email: email,
+      capabilities: {
+        transfers: { requested: true },
+        // crypto_transfers: { requested: true },
+        // legacy_payments: { requested: true },
+      },
     });
     return account;
   }
