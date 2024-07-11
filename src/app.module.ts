@@ -1,5 +1,6 @@
 import { DocumentMerchant } from 'src/schemas/documentMerchant.schema';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -39,9 +40,15 @@ import { WebhookDataDto } from './webhookpayos/webhook-data.dto';
 import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
 import { UploadService } from './modules/upload/upload.service';
 import { UploadController } from './modules/upload/upload.controller';
+import { BraintreeModule } from './modules/braintree/braintree.module';
+import { PayoutService } from './modules/stripe/payout.service';
+import { PayoutController } from './modules/stripe/payout.controller';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     CustomerModule,
     MerchantModule,
     ShipperModule,
@@ -74,10 +81,11 @@ import { UploadController } from './modules/upload/upload.controller';
     foodStatusModule,
     AdsModule,
     FeeModule,
+    BraintreeModule,
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController,
-    WebhookController,UploadController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService],
+    WebhookController,UploadController, PayoutController,],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, PayoutService],
 })
 export class AppModule {}
