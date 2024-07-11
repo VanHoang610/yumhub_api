@@ -10,4 +10,12 @@ export class PayoutController {
     const { amount, bankAccountInfo } = payoutDto;
     return this.payoutService.createPayout(amount, bankAccountInfo);
   }
+
+  @Post('create-payment-intent')
+  async createPaymentIntent(@Body('amount') amount: number) {
+    const paymentIntent = await this.payoutService.createPaymentIntent(amount);
+    return {
+      clientSecret: paymentIntent.client_secret,
+    };
+  }
 }
