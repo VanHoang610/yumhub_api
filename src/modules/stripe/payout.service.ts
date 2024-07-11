@@ -61,7 +61,7 @@ export class StripeService {
   async updateCapability(id: string) {
     const updateCapability = await this.stripe.accounts.updateCapability(
       id,
-      'card_payments',
+      'transfers',
       {
         requested: true,
       }
