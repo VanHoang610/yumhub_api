@@ -11,15 +11,23 @@ export class StripeController {
   }
 
   @Post('create-payment-intent')
-  async createPaymentIntent(@Body() createPaymentIntentDto: { amount: number; currency: string; customerId: string }) {
-    const { amount, currency, customerId } = createPaymentIntentDto;
-    return this.stripeService.createPaymentIntent(amount, currency, customerId);
+  async createPaymentIntent(@Body('amount') amount: number) {
+    const paymentIntent = await this.stripeService.createPaymentIntent(amount);
+    return {
+      clientSecret: paymentIntent.client_secret,
+    };
   }
 
   @Post('create-transfer')
   async createTransfer(@Body() createTransferDto: { amount: number; currency: string; destination: string }) {
     const { amount, currency, destination } = createTransferDto;
     return this.stripeService.createTransfer(amount, currency, destination);
+  }
+
+  @Post('create-external-account')
+  async createExternalAccount(@Body() createExternalAccountDto: { customerId: string; bankAccount: any }) {
+    const { customerId, bankAccount } = createExternalAccountDto;
+    return this.stripeService.createExternalAccount(customerId, bankAccount);
   }
 
   @Post('create-payout')

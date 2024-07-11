@@ -12,24 +12,30 @@ export class StripeService {
     });
   }
 
+  // payment done
+  async createPaymentIntent(amount: number, currency: string = 'usd'): Promise<Stripe.PaymentIntent> {
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      amount: amount * 100, // Số tiền phải được tính bằng cents
+      currency,
+      payment_method_types: ['card'],
+    });
+    return paymentIntent;
+  }
+  // payment done
+  // payout
   async createCustomer(email: string) {
     return this.stripe.customers.create({ email });
   }
-
-  async createPaymentIntent(amount: number, currency: string, customerId: string) {
-    return this.stripe.paymentIntents.create({
-      amount,
-      currency,
-      customer: customerId,
-    });
-  }
-
   async createTransfer(amount: number, currency: string, destination: string) {
     return this.stripe.transfers.create({
       amount,
       currency,
       destination,
     });
+  }
+
+  async createExternalAccount(customerId: string, bankAccount: any) {
+    return this.stripe.customers.createSource(customerId, { source: bankAccount });
   }
 
   async createPayout(amount: number, currency: string, destination: string) {
