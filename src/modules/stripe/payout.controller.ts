@@ -3,17 +3,17 @@ import { PayoutService } from './payout.service';
 
 
 export class CreatePayoutDto {
-  amount: number;
-  bankAccountInfo: {
-    email: string;
-    country: string;
-    currency: string;
-    account_holder_name: string;
-    account_holder_type: string;
-    routing_number: string;
-    account_number: string;
-  };
-}
+    amount: number;
+    bankAccountInfo: {
+      country: string;
+      currency: string;
+      account_id: string;
+      account_holder_name?: string;
+      account_holder_type?: string;
+      routing_number?: string;
+      account_number?: string;
+    };
+  }
   
   @Controller('payout')
   export class PayoutController {
@@ -23,5 +23,9 @@ export class CreatePayoutDto {
     async createPayout(@Body() createPayoutDto: CreatePayoutDto): Promise<any> {
       const { amount, bankAccountInfo } = createPayoutDto;
       return this.payoutService.createPayout(amount, bankAccountInfo);
+    }
+    @Post('checkout')
+    async createCheckout(): Promise<any> {
+      return this.payoutService.createCheckout();
     }
   }

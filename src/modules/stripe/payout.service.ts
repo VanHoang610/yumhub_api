@@ -56,14 +56,30 @@ export class PayoutService {
 
       // Tạo thanh toán cho khách hàng
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: amount,
-        currency: bankAccountInfo.currency,
-        customer: customer.id,
-        payment_method: paymentMethod.id,
-        confirm: true,
+        amount: 500,
+        currency: 'gbp',
+        payment_method: 'pm_card_visa',
       });
 
       return paymentIntent;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async createCheckout(): Promise<any> {
+
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        success_url: 'https://example.com/success',
+        line_items: [
+          {
+            price: 'price_1MotwRLkdIwHu7ixYcPLm5uZ',
+            quantity: 2,
+          },
+        ],
+        mode: 'payment',
+      });
+      return session
     } catch (error) {
       throw error;
     }
