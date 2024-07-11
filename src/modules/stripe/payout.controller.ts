@@ -36,7 +36,7 @@ export class StripeController {
     return this.stripeService.createPayout(amount, currency, destination);
   }
   @Post('connect-stripe-customer')
-  async connectStripeCustomer(@Body()  email: string ) {
+  async connectStripeCustomer(@Body('email') email: string) {
     return this.stripeService.createConnectedAccount(email);
   }
 }
