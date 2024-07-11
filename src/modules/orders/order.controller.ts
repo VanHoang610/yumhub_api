@@ -195,7 +195,7 @@ export class OrderController {
     }
 
     // lấy ra chi tiết order(tên món ăn, tổng số món,...)
-    @Get('getListFoodByOrder')
+    @Post('getListFoodByOrder')
     @UseGuards(AuthGuard)
     getListFoodByOrder(@Query('id') id: string, @Body() body: { status: number}) {
         const { status } = body;
