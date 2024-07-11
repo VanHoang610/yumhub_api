@@ -59,6 +59,17 @@ export class StripeService {
     return account;
   }
   async updateCapability(id: string) {
+    const account = await this.stripe.accounts.update(id, {
+      business_profile: {
+        url: 'https://example.com', // URL của trang web của bạn
+      },
+      business_type: 'individual', // Hoặc 'company' nếu bạn đang cập nhật thông tin doanh nghiệp
+      tos_acceptance: {
+        date: Math.floor(Date.now() / 1000), // Thời gian chấp nhận TOS (UNIX timestamp)
+        ip: '192.168.0.1', // Địa chỉ IP của người chấp nhận TOS
+      },
+    });
+    account
     const updateCapability = await this.stripe.accounts.updateCapability(
       id,
       'transfers',
@@ -66,7 +77,7 @@ export class StripeService {
         requested: true,
       }
     )
-    return updateCapability;
+    return {account, updateCapability};
   }
   
   
