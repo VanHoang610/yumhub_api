@@ -44,7 +44,7 @@ export class StripeService {
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: amount, // Số tiền phải được tính bằng cents
       currency,
-      payment_method_types: ['Google Pay'],
+      payment_method_types: ['google_pay'],
     });
     return paymentIntent;
   }
