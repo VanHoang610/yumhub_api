@@ -61,12 +61,40 @@ export class StripeService {
   async updateCapability(id: string) {
     const account = await this.stripe.accounts.update(id, {
       business_profile: {
+        mcc: '5734',
         url: 'https://duantotnghiep-api-a32664265dc1.herokuapp.com', // URL của trang web của bạn
       },
       business_type: 'individual', // Hoặc 'company' nếu bạn đang cập nhật thông tin doanh nghiệp
       tos_acceptance: {
         date: Math.floor(Date.now() / 1000), // Thời gian chấp nhận TOS (UNIX timestamp)
         ip: '192.168.0.1', // Địa chỉ IP của người chấp nhận TOS
+      },
+      individual: {
+        address: {
+          city: 'San Francisco',
+          line1: '123 Market St',
+          postal_code: '94105',
+          state: 'CA',
+        },
+        dob: {
+          day: 1,
+          month: 1,
+          year: 1990,
+        },
+        email: 'thuthuongxinhgai@gmail.com',
+        first_name: 'Thuthuong',
+        last_name: 'Nguyen',
+        phone: '1234567890',
+        ssn_last_4: '1234',
+      },
+      external_account: {
+        object: 'bank_account',
+        country: 'US',
+        currency: 'usd',
+        account_holder_name: 'Thuthuong Nguyen',
+        account_holder_type: 'individual',
+        routing_number: '110000000',
+        account_number: '000123456789',
       },
     });
     account
