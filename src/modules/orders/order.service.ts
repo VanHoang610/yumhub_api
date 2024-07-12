@@ -1183,4 +1183,20 @@ export class OrderService {
       return { result: false, listReview: error.message };
     }
   }
+
+  async updateDetailOrder(id: string, quantity: number) {
+    try {
+      const detailOrder = await this.detailOrderModel.findByIdAndUpdate(
+        id,
+        { quantity: quantity },
+        { new: true },
+      );
+      if (!detailOrder)
+        throw new HttpException('Not Found DetailOrder', HttpStatus.NOT_FOUND);
+
+      return { result: true, detailOrder: detailOrder };
+    } catch (error) {
+      return { result: false, detailOrder: error.message };
+    }
+  }
 }

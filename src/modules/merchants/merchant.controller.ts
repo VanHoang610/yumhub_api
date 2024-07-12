@@ -111,11 +111,11 @@ export class MerchantController {
     }
   }
 
-  // @Get()
-  // @UseGuards(AuthGuard)
-  // getMerchantByID(@Query('id') id: string) {
-  //   return this.merchantService.getMerchantById(id);
-  // }
+  @Get()
+  @UseGuards(AuthGuard)
+  getMerchantByID(@Query('id') id: string) {
+    return this.merchantService.getMerchantById(id);
+  }
 
   @Get('getAllMerchant')
   @UseGuards(AuthGuard)
