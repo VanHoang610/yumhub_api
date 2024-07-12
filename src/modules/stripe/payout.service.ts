@@ -84,7 +84,7 @@ export class StripeService {
         email: 'thuthuongxinhgai@gmail.com',
         first_name: 'Thuthuong',
         last_name: 'Nguyen',
-        phone: '1234567890',
+        phone: '+14155552671',
         ssn_last_4: '1234',
       },
       external_account: {
