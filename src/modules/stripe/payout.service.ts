@@ -14,24 +14,20 @@ export class StripeService {
     });
   }
 
-  async uploadFile(filePath: string): Promise<string> {
-    try {
-      const fileStream = await fs.readFile(filePath);
-      const file = await this.stripe.files.create({
-        purpose: 'identity_document',
-        file: {
-          data: fileStream,
-          name: 'document.jpg', // Tên tệp của bạn
-          type: 'application/octet-stream',
-        },
-      });
+  async uploadFile(base64Data: string, fileName: string): Promise<string> {
+    const buffer = Buffer.from(base64Data, 'base64');
 
-      this.logger.log(`File uploaded: ${file.id}`);
-      return file.id;
-    } catch (error) {
-      this.logger.error('Error uploading file:', error);
-      throw error;
-    }
+    const file = await this.stripe.files.create({
+      purpose: 'identity_document',
+      file: {
+        data: buffer,
+        name: fileName,
+        type: 'application/octet-stream',
+      },
+    });
+
+    console.log(`File uploaded: ${file.id}`);
+    return file.id;
   }
   
 
@@ -83,9 +79,11 @@ export class StripeService {
   }
   async updateCapability(
     accountId: string,
-    documentFrontId: string,
-    documentBackId: string,
+    documentFrontBase64: string,
+    documentBackBase64: string,
   ): Promise<Stripe.Account> {
+    const frontFileId = await this.uploadFile(documentFrontBase64, 'document_front.jpg');
+    const backFileId = await this.uploadFile(documentBackBase64, 'document_back.jpg');
     const account = await this.stripe.accounts.update(accountId, {
       business_profile: {
         mcc: '5734',
@@ -100,8 +98,8 @@ export class StripeService {
         id_number: '123456789',
           verification: {
             document: {
-              front: documentFrontId,
-              back: documentBackId, // Nếu tài liệu xác minh yêu cầu mặt trước và mặt sau
+              front: frontFileId,
+              back: backFileId, // Nếu tài liệu xác minh yêu cầu mặt trước và mặt sau
             },
           },
         address: {

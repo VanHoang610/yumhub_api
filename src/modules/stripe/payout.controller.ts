@@ -42,15 +42,13 @@ export class StripeController {
   @Post('update-stripe-capability')
   async updateCapability(
     @Body('accountId') accountId: string,
-    @Body('documentFrontPath') documentFrontPath: string,
-    @Body('documentBackPath') documentBackPath: string,
+    @Body('documentFrontBase64') documentFrontBase64: string,
+    @Body('documentBackBase64') documentBackBase64: string,
   ) {
-    const frontFileId = await this.stripeService.uploadFile(documentFrontPath);
-    const backFileId = await this.stripeService.uploadFile(documentBackPath);
     return this.stripeService.updateCapability(
       accountId,
-      frontFileId,
-      backFileId,
+      documentFrontBase64,
+      documentBackBase64,
     );
   }
 }
