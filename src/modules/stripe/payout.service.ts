@@ -32,11 +32,19 @@ export class StripeService {
   
 
   // payment done
-  async createPaymentIntent(amount: number, currency: string = 'usd'): Promise<Stripe.PaymentIntent> {
+  async createPaymentIntent(amount: number, currency: string = 'vnd'): Promise<Stripe.PaymentIntent> {
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: amount * 100, // Số tiền phải được tính bằng cents
       currency,
       payment_method_types: ['card'],
+    });
+    return paymentIntent;
+  }
+  async createPaymentIntentGGPay(amount: number, currency: string = 'vnd'): Promise<Stripe.PaymentIntent> {
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      amount: amount * 100, // Số tiền phải được tính bằng cents
+      currency,
+      payment_method_types: ['Google Pay'],
     });
     return paymentIntent;
   }

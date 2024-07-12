@@ -17,6 +17,13 @@ export class StripeController {
       clientSecret: paymentIntent.client_secret,
     };
   }
+  @Post('create-payment-intent-gp')
+  async createPaymentIntentGGP(@Body('amount') amount: number) {
+    const paymentIntent = await this.stripeService.createPaymentIntentGGPay(amount);
+    return {
+      clientSecret: paymentIntent.client_secret,
+    };
+  }
 
   @Post('create-transfer')
   async createTransfer(@Body() createTransferDto: { amount: number; currency: string; destination: string }) {
