@@ -1,16 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { promises as fs } from 'fs';
 
 @Injectable()
 export class StripeService {
   private stripe: Stripe;
-
+  private readonly logger = new Logger(StripeService.name);
+  
   constructor(private configService: ConfigService) {
     this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY'), {
       apiVersion: '2024-06-20',
     });
   }
+
+  async uploadFile(filePath: string): Promise<string> {
+    try {
+      const fileStream = await fs.readFile(filePath);
+      const file = await this.stripe.files.create({
+        purpose: 'identity_document',
+        file: {
+          data: fileStream,
+          name: 'document.jpg', // Tên tệp của bạn
+          type: 'application/octet-stream',
+        },
+      });
+
+      this.logger.log(`File uploaded: ${file.id}`);
+      return file.id;
+    } catch (error) {
+      this.logger.error('Error uploading file:', error);
+      throw error;
+    }
+  }
+  
 
   // payment done
   async createPaymentIntent(amount: number, currency: string = 'usd'): Promise<Stripe.PaymentIntent> {
@@ -58,8 +81,12 @@ export class StripeService {
     updateCapability
     return account;
   }
-  async updateCapability(id: string) {
-    const account = await this.stripe.accounts.update(id, {
+  async updateCapability(
+    accountId: string,
+    documentFrontId: string,
+    documentBackId: string,
+  ): Promise<Stripe.Account> {
+    const account = await this.stripe.accounts.update(accountId, {
       business_profile: {
         mcc: '5734',
         url: 'https://duantotnghiep-api-a32664265dc1.herokuapp.com', // URL của trang web của bạn
@@ -70,6 +97,13 @@ export class StripeService {
         ip: '192.168.0.1', // Địa chỉ IP của người chấp nhận TOS
       },
       individual: {
+        id_number: '123456789',
+          verification: {
+            document: {
+              front: documentFrontId,
+              back: documentBackId, // Nếu tài liệu xác minh yêu cầu mặt trước và mặt sau
+            },
+          },
         address: {
           city: 'San Francisco',
           line1: '123 Market St',
@@ -97,15 +131,15 @@ export class StripeService {
         account_number: '000123456789',
       },
     });
-    account
     const updateCapability = await this.stripe.accounts.updateCapability(
-      id,
+      accountId,
       'transfers',
       {
         requested: true,
       }
     )
-    return {account, updateCapability};
+    updateCapability
+    return account;
   }
   
   
@@ -116,4 +150,6 @@ export class StripeService {
       destination,
     });
   }
+
+
 }

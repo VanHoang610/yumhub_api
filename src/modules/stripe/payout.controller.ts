@@ -40,7 +40,17 @@ export class StripeController {
     return this.stripeService.createConnectedAccount(email);
   }
   @Post('update-stripe-capability')
-  async updateCapability(@Body('id') id: string) {
-    return this.stripeService.updateCapability(id);
+  async updateCapability(
+    @Body('accountId') accountId: string,
+    @Body('documentFrontPath') documentFrontPath: string,
+    @Body('documentBackPath') documentBackPath: string,
+  ) {
+    const frontFileId = await this.stripeService.uploadFile(documentFrontPath);
+    const backFileId = await this.stripeService.uploadFile(documentBackPath);
+    return this.stripeService.updateCapability(
+      accountId,
+      frontFileId,
+      backFileId,
+    );
   }
 }
