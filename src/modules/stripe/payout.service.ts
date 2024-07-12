@@ -141,13 +141,28 @@ export class StripeService {
   }
   
   
-  async createPayout(amount: number, currency: string, destination: string) {
-    return this.stripe.payouts.create({
+  async createPayout(stripeAccountId: string, amount: number, destination: string) {
+    return await this.stripe.payouts.create({
       amount,
-      currency,
+      currency: 'usd',
       destination,
+    }, {
+      stripeAccount: stripeAccountId,
     });
   }
 
+  async addBankAccount(stripeAccountId: string, accountHolderName: string, routingNumber: string, accountNumber: string) {
+    return await this.stripe.accounts.createExternalAccount(stripeAccountId, {
+      external_account: {
+        object: 'bank_account',
+        country: 'US',
+        currency: 'usd',
+        account_holder_name: accountHolderName,
+        account_holder_type: 'individual',
+        routing_number: routingNumber,
+        account_number: accountNumber,
+      },
+    });
+  }
 
 }

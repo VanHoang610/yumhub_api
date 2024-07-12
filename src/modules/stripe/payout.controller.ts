@@ -31,9 +31,12 @@ export class StripeController {
   }
 
   @Post('create-payout')
-  async createPayout(@Body() createPayoutDto: { amount: number; currency: string; destination: string }) {
-    const { amount, currency, destination } = createPayoutDto;
-    return this.stripeService.createPayout(amount, currency, destination);
+  async createPayout(
+    @Body('stripeAccountId') stripeAccountId: string,
+    @Body('amount') amount: number,
+    @Body('destination') destination: string,
+  ) {
+    return await this.stripeService.createPayout(stripeAccountId, amount, destination);
   }
   @Post('connect-stripe-customer')
   async connectStripeCustomer(@Body('email') email: string) {
@@ -50,5 +53,14 @@ export class StripeController {
       documentFrontBase64,
       documentBackBase64,
     );
+  }
+  @Post('add-bank-account')
+  async addBankAccount(
+    @Body('stripeAccountId') stripeAccountId: string,
+    @Body('account_holder_name') accountHolderName: string,
+    @Body('routing_number') routingNumber: string,
+    @Body('account_number') accountNumber: string,
+  ) {
+    return await this.stripeService.addBankAccount(stripeAccountId, accountHolderName, routingNumber, accountNumber);
   }
 }
