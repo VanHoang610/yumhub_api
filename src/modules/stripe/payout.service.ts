@@ -39,7 +39,7 @@ export class StripeService {
   }
   async createConnectedAccount(email: string) {
     const account = await this.stripe.accounts.create({
-      type: 'express',
+      type: 'custom',
       country: 'US',
       email: email,
       capabilities: {
