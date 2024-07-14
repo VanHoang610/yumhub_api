@@ -1135,6 +1135,12 @@ export class OrderService {
         case 7:
           statusOrder = '661761a5fc13ae3517ab89f5';
           break;
+        case 8:
+          statusOrder = '661760e3fc13ae3574ab8de3';
+          break;
+        case 9:
+          statusOrder = '6656a8738913d56206f64e01';
+          break;
         default:
           throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
       }
