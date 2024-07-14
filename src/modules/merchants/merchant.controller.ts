@@ -111,11 +111,11 @@ export class MerchantController {
     }
   }
 
-  // @Get()
-  // @UseGuards(AuthGuard)
-  // getMerchantByID(@Query('id') id: string) {
-  //   return this.merchantService.getMerchantById(id);
-  // }
+  @Get()
+  @UseGuards(AuthGuard)
+  getMerchantByID(@Query('id') id: string) {
+    return this.merchantService.getMerchantById(id);
+  }
 
   @Get('getAllMerchant')
   @UseGuards(AuthGuard)
@@ -294,10 +294,15 @@ export class MerchantController {
     return this.merchantService.getAllTypeOfMerchant();
   }
 
-  @Get('getNearMerchant')
+  @Post('getNearMerchant')
   @UseGuards(AuthGuard)
-  getNearMerchant(@Query('id') id: string) {
-    return this.merchantService.getNearMerchant(id);
+  getNearMerchant(@Query('id') id: string, @Body() body: { longitude?: number, latitude?: number }) {
+    const { longitude, latitude } = body;
+    if (!longitude && !latitude) {
+      return this.merchantService.getNearMerchant(id);
+    }
+  
+    return this.merchantService.getNearMerchant(id, longitude, latitude);
   }
 
   //tìm kiếm merchant
