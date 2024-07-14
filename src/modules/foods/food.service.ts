@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators/core';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { isValidObjectId, Model } from 'mongoose';
 import { FoodDto } from 'src/dto/dto.food';
 import { UpdateFoodDto } from 'src/dto/dto.updateFood';
 import { Food } from 'src/schemas/food.schema';
@@ -264,20 +264,28 @@ export class FoodService {
   //     }
   // }
 
-  async updateFood(foodId: string, updateFood: UpdateFoodDto) {
+  async updateFood(foodId: string, updateFood: UpdateFoodDto): Promise<{ result: boolean, message?: string, food?: any }> {
     try {
-      const Foods = await this.FoodModel.findByIdAndUpdate(
+      if (!isValidObjectId(foodId)) {
+        return { result: false, message: 'ID món ăn không hợp lệ' };
+      }
+      const food = await this.FoodModel.findByIdAndUpdate(
         foodId,
         updateFood,
         { new: true }
       );
-      if (!Foods) return { Message: 'Not found food' };
-      return { result: true, Foods: Foods };
+
+      if (!food) {
+        console.log(`Food not found with ID: ${foodId}`);
+        return { result: false, message: 'Không tìm thấy món ăn' };
+      }
+
+      return { result: true, food: food };
     } catch (error) {
-      return { result: false, Foods: error };
+      console.error(`Error updating food with ID: ${foodId}`, error);
+      return { result: false, message: error.message };
     }
   }
-
   async searchFoodByName(any: string) {
     return this.FoodModel.find({
       nameFood: { $regex: any, $options: 'i' },
