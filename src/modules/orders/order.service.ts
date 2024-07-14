@@ -879,22 +879,6 @@ export class OrderService {
             const pipeline = [
                 {
                     $lookup: {
-                        from: 'merchants',
-                        localField: 'merchantID',
-                        foreignField: '_id',
-                        as: 'merchant'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'shippers',
-                        localField: 'shipperID',
-                        foreignField: '_id',
-                        as: 'shipper'
-                    }
-                },
-                {
-                    $lookup: {
                         from: 'customers',
                         localField: 'customerID',
                         foreignField: '_id',
@@ -902,26 +886,8 @@ export class OrderService {
                     }
                 },
                 {
-                    $lookup: {
-                        from: 'vouchers',
-                        localField: 'voucherID',
-                        foreignField: '_id',
-                        as: 'voucher'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'orderstatuses',
-                        localField: 'status',
-                        foreignField: '_id',
-                        as: 'status'
-                    }
-                },
-                {
                     $addFields: {
                         _idStr: { $toString: "$_id" },
-                        nameMerchant: { $arrayElemAt: ["$merchant.name", 0] },
-                        nameShipper: { $arrayElemAt: ["$shipper.fullName", 0] },
                         nameCustomer: { $arrayElemAt: ["$customer.fullName", 0] }
                     }
                 },
@@ -929,8 +895,7 @@ export class OrderService {
                     $match: {
                         $or: [
                             { _idStr: regex },
-                            { nameMerchant: regex },
-                            { nameShipper: regex },
+                            { deliveryAddress: regex },
                             { nameCustomer: regex }
                         ]
                     }
@@ -939,9 +904,9 @@ export class OrderService {
                     $project: {
                         _id: 1,
                         customerID: { $arrayElemAt: ["$customer", 0] },
-                        merchantID: { $arrayElemAt: ["$merchant", 0] },
-                        shipperID: { $arrayElemAt: ["$shipper", 0] },
-                        voucherID: { $arrayElemAt: ["$voucher", 0] },
+                        merchantID: 1,
+                        shipperID: 1,
+                        voucherID: 1,
                         deliveryAddress: 1,
                         priceFood: 1,
                         deliveryCost: 1,
@@ -949,7 +914,7 @@ export class OrderService {
                         timeBook: 1,
                         timeGetFood: 1,
                         timeGiveFood: 1,
-                        status: { $arrayElemAt: ["$status", 0] },
+                        status: 1,
                         totalDistance: 1,
                         revenueDelivery: 1,
                         revenueMerchant: 1,
