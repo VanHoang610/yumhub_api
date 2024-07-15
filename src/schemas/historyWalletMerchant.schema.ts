@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { Shipper } from "./shipper.schema";
 import { Merchant } from "./merchant.schema";
 import { TransactionTypeMerchant } from "./transactionTypeMerchant.schema";
 
@@ -20,6 +19,18 @@ export class HistoryWalletMerchant {
 
     @Prop({required: false, default: Date.now})
     time: Date
+
+    @Prop({required: false, default: 2}) //2: thành công
+    status: number
+    
+    @Prop({required: false}) 
+    nameBank: string
+
+    @Prop({required: false})
+    numberBank: string
+
+    @Prop({required: false})
+    accountHolder: string
 }
 
 export const HistoryWalletMerchantSchemas = SchemaFactory.createForClass(HistoryWalletMerchant);

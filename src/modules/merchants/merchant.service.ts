@@ -62,7 +62,7 @@ export class MerchantService {
     @InjectModel(PaymentMethodMerchant.name)
     private paymentMethodMerchantModel: Model<PaymentMethodMerchant>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
-  ) {}
+  ) { }
 
   async addData() {
     try {
@@ -367,7 +367,7 @@ export class MerchantService {
           ) {
             const distance = Math.sqrt(
               Math.pow(merchant.longitude - longitude, 2) +
-                Math.pow(merchant.latitude - latitude, 2),
+              Math.pow(merchant.latitude - latitude, 2),
             );
             return { ...merchant.toObject(), distance };
           } else {
@@ -393,7 +393,7 @@ export class MerchantService {
       const sortShipper = shipper.map((shipper) => {
         const distance = Math.sqrt(
           Math.pow(shipper.longitude - merchant.longitude, 2) +
-            Math.pow(shipper.latitude - merchant.latitude, 2),
+          Math.pow(shipper.latitude - merchant.latitude, 2),
         );
         return { ...shipper.toObject(), distance };
       });
@@ -785,14 +785,15 @@ export class MerchantService {
         transantionType: typeMerchant._id,
         time: new Date(),
       });
+      const populatedHistory = (await this.historyMerchantModel.findById(createHistory._id).populate('merchantID').populate('transantionType'));
 
-      return { result: true, WalletMerchant: createHistory };
+      return { result: true, walletShipper: populatedHistory };
     } catch (error) {
-      return { result: false, error };
+      return { result: false, walletShipper: error.message };
     }
   }
 
-  async cashOutMerchant(id: string, topUp: HistoryMerchantDto) {
+  async cashOutMerchant(id: string, cashOut: HistoryMerchantDto) {
     try {
       const merchant = await this.merchants.findById(id);
       const idMerchant = merchant._id;
@@ -802,32 +803,43 @@ export class MerchantService {
         .exec();
 
       const currentBalance = merchant.balance;
-      const updateBalance = currentBalance - topUp.amountTransantion;
+      const updateBalance = currentBalance - cashOut.amountTransantion;
       merchant.balance = updateBalance;
       await merchant.save();
       const createHistory = await this.historyMerchantModel.create({
         merchantID: idMerchant,
-        amountTransantion: topUp.amountTransantion,
-        description: topUp.description,
+        amountTransantion: cashOut.amountTransantion,
+        description: cashOut.description,
         transantionType: typeMerchant._id,
         time: new Date(),
+        status: 1,
+        nameBank: cashOut.nameBank,
+        numberBank: cashOut.numberBank,
+        accountHolder: cashOut.accountHolder
       });
-      return { result: true, WalletMerchant: createHistory };
+
+      const populatedHistory = (await this.historyMerchantModel.findById(createHistory._id).populate('merchantID').populate('transantionType'));
+      return { result: true, walletMerchant: populatedHistory };
     } catch (error) {
-      return { result: false, error };
+      return { result: false, walletMerchant: error.message };
     }
   }
 
   async transactionHistory(id: string) {
     try {
       const merchant = await this.merchants.findById(id);
-      const idMerchant = merchant._id;
+
+      if (!merchant) {
+        return { result: false, walletMerchant: 'Merchant not found' };
+      }
       const history = await this.historyMerchantModel
-        .find({ merchantID: idMerchant })
+        .find({ merchantID: merchant._id })
+        .populate('merchantID')
+        .populate('transantionType')
         .exec();
-      return { result: true, TransactionHistory: history };
+      return { result: true, walletMerchant: history };
     } catch (error) {
-      return { result: false, error };
+      return { result: false, walletMerchant: error.message };
     }
   }
 
@@ -958,7 +970,7 @@ export class MerchantService {
         sortMerchant = merchants.map((merchant) => {
           const distance = Math.sqrt(
             Math.pow(merchant.longitude - longitude, 2) +
-              Math.pow(merchant.latitude - latitude, 2),
+            Math.pow(merchant.latitude - latitude, 2),
           );
           return { ...merchant.toObject(), distance };
         });
@@ -973,7 +985,7 @@ export class MerchantService {
         sortMerchant = merchants.map((merchant) => {
           const distance = Math.sqrt(
             Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
-              Math.pow(merchant.latitude - addressCustomer.latitude, 2),
+            Math.pow(merchant.latitude - addressCustomer.latitude, 2),
           );
           return { ...merchant.toObject(), distance };
         });
@@ -1122,6 +1134,30 @@ export class MerchantService {
       return { result: true, employee: employee };
     } catch (error) {
       return { result: false, employee: error };
+    }
+  }
+
+  async getListAwaitingApproval() {
+    try {
+      const history = (await this.historyMerchantModel.find({ status: 1 }).populate('merchantID').populate('transantionType'));
+      if (!history)
+        throw new HttpException('Not find History Merchant', HttpStatus.NOT_FOUND);
+
+      return { result: true, walletMerchant: history };
+    } catch (error) {
+      return { result: false, walletMerchant: error.message };
+    }
+  }
+
+  async approvalCashOut(id: string) {
+    try {
+      const history = (await this.historyMerchantModel.findByIdAndUpdate(id, { status: 2 }, { new: true }).populate('merchantID').populate('transantionType'));
+      if (!history)
+        throw new HttpException('Not find History Merchant', HttpStatus.NOT_FOUND);
+
+      return { result: true, walletMerchant: history };
+    } catch (error) {
+      return { result: false, walletMerchant: error.message };
     }
   }
 }

@@ -982,97 +982,97 @@ export class OrderService {
     }
   }
 
-  async searchOrder(search) {
-    try {
-      const regex = new RegExp(search, 'i');
-      const pipeline = [
-        {
-          $lookup: {
-            from: 'merchants',
-            localField: 'merchantID',
-            foreignField: '_id',
-            as: 'merchant',
-          },
-        },
-        {
-          $lookup: {
-            from: 'shippers',
-            localField: 'shipperID',
-            foreignField: '_id',
-            as: 'shipper',
-          },
-        },
-        {
-          $lookup: {
-            from: 'customers',
-            localField: 'customerID',
-            foreignField: '_id',
-            as: 'customer',
-          },
-        },
-        {
-          $lookup: {
-            from: 'vouchers',
-            localField: 'voucherID',
-            foreignField: '_id',
-            as: 'voucher',
-          },
-        },
-        {
-          $lookup: {
-            from: 'orderstatuses',
-            localField: 'status',
-            foreignField: '_id',
-            as: 'status',
-          },
-        },
-        {
-          $addFields: {
-            _idStr: { $toString: '$_id' },
-            nameMerchant: { $arrayElemAt: ['$merchant.name', 0] },
-            nameShipper: { $arrayElemAt: ['$shipper.fullName', 0] },
-            nameCustomer: { $arrayElemAt: ['$customer.fullName', 0] },
-          },
-        },
-        {
-          $match: {
-            $or: [
-              { _idStr: regex },
-              { nameMerchant: regex },
-              { nameShipper: regex },
-              { nameCustomer: regex },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            customerID: { $arrayElemAt: ['$customer', 0] },
-            merchantID: { $arrayElemAt: ['$merchant', 0] },
-            shipperID: { $arrayElemAt: ['$shipper', 0] },
-            voucherID: { $arrayElemAt: ['$voucher', 0] },
-            deliveryAddress: 1,
-            priceFood: 1,
-            deliveryCost: 1,
-            totalPaid: 1,
-            timeBook: 1,
-            timeGetFood: 1,
-            timeGiveFood: 1,
-            status: { $arrayElemAt: ['$status', 0] },
-            totalDistance: 1,
-            revenueDelivery: 1,
-            revenueMerchant: 1,
-            paymentMethod: 1,
-          },
-        },
-      ];
+  // async searchOrder(search) {
+  //   try {
+  //     const regex = new RegExp(search, 'i');
+  //     const pipeline = [
+  //       {
+  //         $lookup: {
+  //           from: 'merchants',
+  //           localField: 'merchantID',
+  //           foreignField: '_id',
+  //           as: 'merchant',
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'shippers',
+  //           localField: 'shipperID',
+  //           foreignField: '_id',
+  //           as: 'shipper',
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'customers',
+  //           localField: 'customerID',
+  //           foreignField: '_id',
+  //           as: 'customer',
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'vouchers',
+  //           localField: 'voucherID',
+  //           foreignField: '_id',
+  //           as: 'voucher',
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'orderstatuses',
+  //           localField: 'status',
+  //           foreignField: '_id',
+  //           as: 'status',
+  //         },
+  //       },
+  //       {
+  //         $addFields: {
+  //           _idStr: { $toString: '$_id' },
+  //           nameMerchant: { $arrayElemAt: ['$merchant.name', 0] },
+  //           nameShipper: { $arrayElemAt: ['$shipper.fullName', 0] },
+  //           nameCustomer: { $arrayElemAt: ['$customer.fullName', 0] },
+  //         },
+  //       },
+  //       {
+  //         $match: {
+  //           $or: [
+  //             { _idStr: regex },
+  //             { nameMerchant: regex },
+  //             { nameShipper: regex },
+  //             { nameCustomer: regex },
+  //           ],
+  //         },
+  //       },
+  //       {
+  //         $project: {
+  //           _id: 1,
+  //           customerID: { $arrayElemAt: ['$customer', 0] },
+  //           merchantID: { $arrayElemAt: ['$merchant', 0] },
+  //           shipperID: { $arrayElemAt: ['$shipper', 0] },
+  //           voucherID: { $arrayElemAt: ['$voucher', 0] },
+  //           deliveryAddress: 1,
+  //           priceFood: 1,
+  //           deliveryCost: 1,
+  //           totalPaid: 1,
+  //           timeBook: 1,
+  //           timeGetFood: 1,
+  //           timeGiveFood: 1,
+  //           status: { $arrayElemAt: ['$status', 0] },
+  //           totalDistance: 1,
+  //           revenueDelivery: 1,
+  //           revenueMerchant: 1,
+  //           paymentMethod: 1,
+  //         },
+  //       },
+  //     ];
 
-      const orders = await this.orderModel.aggregate(pipeline).exec();
-      return { result: true, orders: orders };
-    } catch (error) {
-      return { result: false, error: error.message };
-    }
-  }
+  //     const orders = await this.orderModel.aggregate(pipeline).exec();
+  //     return { result: true, orders: orders };
+  //   } catch (error) {
+  //     return { result: false, error: error.message };
+  //   }
+  // }
 
   async getReviewOfOrder(id: string) {
     try {
@@ -1144,6 +1144,7 @@ export class OrderService {
             return { result: true, orders: orders };
         } catch (error) {
             return { result: false, error: error.message };
+        }}
 
   async getListFoodByOrder(id: string, status: number) {
     try {
