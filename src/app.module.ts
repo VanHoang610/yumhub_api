@@ -41,8 +41,8 @@ import { WebhookTypeDto } from './webhookpayos/webhook-type.dto';
 import { UploadService } from './modules/upload/upload.service';
 import { UploadController } from './modules/upload/upload.controller';
 import { BraintreeModule } from './modules/braintree/braintree.module';
-import { PayoutService } from './modules/stripe/payout.service';
-import { PayoutController } from './modules/stripe/payout.controller';
+import { StripeService } from './modules/stripe/payout.service';
+import { StripeController } from './modules/stripe/payout.controller';
 
 @Module({
   imports: [
@@ -85,7 +85,7 @@ import { PayoutController } from './modules/stripe/payout.controller';
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController,
-    WebhookController,UploadController, PayoutController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, PayoutService],
+    WebhookController,UploadController, StripeController,],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, StripeService],
 })
 export class AppModule {}
