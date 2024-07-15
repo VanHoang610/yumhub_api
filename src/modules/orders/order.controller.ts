@@ -201,4 +201,13 @@ export class OrderController {
         const { status } = body;
         return this.orderServices.getListFoodByOrder(id, status);
     }
+
+
+      // update detailer
+      @Post('updateDetailOrder')
+      @UseGuards(AuthGuard)
+      updateDetailOrder(@Query('id') id: string, @Body() body: { quantity: number}) {
+          const { quantity } = body;
+          return this.orderServices.updateDetailOrder(id, quantity);
+      }
 }

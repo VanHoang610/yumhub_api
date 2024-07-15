@@ -110,10 +110,9 @@ export class FoodController {
 
   @Patch('updateFood')
   @UseGuards(AuthGuard)
-  updateFood(@Body() body: { ID: string; update: UpdateFoodDto}) {
+  updateFood(@Query('id') id: string ,@Body()  update: UpdateFoodDto) {
     try {
-      const { ID, update } = body;
-      return this.foodService.updateFood(ID, update);
+      return this.foodService.updateFood(id, update);
     } catch (error) {
       return error;
     }

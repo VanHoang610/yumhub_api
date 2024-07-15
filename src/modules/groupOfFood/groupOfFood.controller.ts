@@ -13,7 +13,7 @@ export class GroupOfFoodController {
         return await this.groupFoodServices.createGroupOfFood(merchantID, name);
     }
 
-    @Post('delete')
+    @Get('delete')
     @UseGuards(AuthGuard)
     async deleteGroupOfFood(@Query('id') id: string) {
         return await this.groupFoodServices.deleteGroupOfFood(id);

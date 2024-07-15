@@ -1089,6 +1089,62 @@ export class OrderService {
     }
   }
 
+
+    async searchOrder(search) {
+        try {
+            const regex = new RegExp(search, 'i');
+            const pipeline = [
+                {
+                    $lookup: {
+                        from: 'customers',
+                        localField: 'customerID',
+                        foreignField: '_id',
+                        as: 'customer'
+                    }
+                },
+                {
+                    $addFields: {
+                        _idStr: { $toString: "$_id" },
+                        nameCustomer: { $arrayElemAt: ["$customer.fullName", 0] }
+                    }
+                },
+                {
+                    $match: {
+                        $or: [
+                            { _idStr: regex },
+                            { deliveryAddress: regex },
+                            { nameCustomer: regex }
+                        ]
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        customerID: { $arrayElemAt: ["$customer", 0] },
+                        merchantID: 1,
+                        shipperID: 1,
+                        voucherID: 1,
+                        deliveryAddress: 1,
+                        priceFood: 1,
+                        deliveryCost: 1,
+                        totalPaid: 1,
+                        timeBook: 1,
+                        timeGetFood: 1,
+                        timeGiveFood: 1,
+                        status: 1,
+                        totalDistance: 1,
+                        revenueDelivery: 1,
+                        revenueMerchant: 1,
+                        paymentMethod: 1
+                    }
+                }
+            ];
+
+            const orders = await this.orderModel.aggregate(pipeline).exec();
+            return { result: true, orders: orders };
+        } catch (error) {
+            return { result: false, error: error.message };
+
   async getListFoodByOrder(id: string, status: number) {
     try {
       let user;
@@ -1105,6 +1161,7 @@ export class OrderService {
           if (user) {
             shipperID = user._id;
           }
+
         }
       }
 
@@ -1134,6 +1191,12 @@ export class OrderService {
           break;
         case 7:
           statusOrder = '661761a5fc13ae3517ab89f5';
+          break;
+        case 8:
+          statusOrder = '661760e3fc13ae3574ab8de3';
+          break;
+        case 9:
+          statusOrder = '6656a8738913d56206f64e01';
           break;
         default:
           throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
@@ -1181,6 +1244,22 @@ export class OrderService {
     } catch (error) {
       console.log('Error:', error);
       return { result: false, listReview: error.message };
+    }
+  }
+
+  async updateDetailOrder(id: string, quantity: number) {
+    try {
+      const detailOrder = await this.detailOrderModel.findByIdAndUpdate(
+        id,
+        { quantity: quantity },
+        { new: true },
+      );
+      if (!detailOrder)
+        throw new HttpException('Not Found DetailOrder', HttpStatus.NOT_FOUND);
+
+      return { result: true, detailOrder: detailOrder };
+    } catch (error) {
+      return { result: false, detailOrder: error.message };
     }
   }
 }
