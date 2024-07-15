@@ -351,4 +351,18 @@ export class MerchantController {
   listEmployeeMerchant(@Query('id') id: string) {
     return this.merchantService.listEmployeeMerchant(id);
   }
+
+  //lấy tất cả danh sách đang chờ duyệt rút tiền 
+  @Get('getListAwaitingApproval')
+  @UseGuards(AuthGuard)
+  getListAwaitingApproval() {
+    return this.merchantService.getListAwaitingApproval();
+  }
+
+ //duyệt tài khoản rút tiền  
+ @Get('approvalCashOut')
+ @UseGuards(AuthGuard)
+ approvalCashOut(@Query('id') id: string) {
+   return this.merchantService.approvalCashOut(id);
+ }
 }

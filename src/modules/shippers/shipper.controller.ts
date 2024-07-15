@@ -20,7 +20,7 @@ import { AuthGuard } from 'src/helper/auth.middleware';
 
 @Controller('shippers')
 export class ShipperController {
-  constructor(private readonly shipperService: ShipperService) {}
+  constructor(private readonly shipperService: ShipperService) { }
 
   @Get('newUser')
   @UseGuards(AuthGuard)
@@ -228,7 +228,7 @@ export class ShipperController {
   @Post('topUp')
   @UseGuards(AuthGuard)
   topUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
-    return this.shipperService.topUptopUpShipper(id, topUp);
+    return this.shipperService.topUpShipper(id, topUp);
   }
 
   // rút tiền shipper
@@ -297,5 +297,19 @@ export class ShipperController {
   @UseGuards(AuthGuard)
   listShipperIsDeleted() {
     return this.shipperService.getShipperIsDeleted();
+  }
+
+  //lấy tất cả danh sách đang chờ duyệt rút tiền 
+  @Get('getListAwaitingApproval')
+  @UseGuards(AuthGuard)
+  getListAwaitingApproval() {
+    return this.shipperService.getListAwaitingApproval();
+  }
+
+  //duyệt tài khoản rút tiền  
+  @Get('approvalCashOut')
+  @UseGuards(AuthGuard)
+  approvalCashOut(@Query('id') id: string) {
+    return this.shipperService.approvalCashOut(id);
   }
 }
