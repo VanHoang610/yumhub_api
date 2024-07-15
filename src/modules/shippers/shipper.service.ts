@@ -1439,6 +1439,7 @@ export class ShipperService {
         description: topUp.description,
         transantionType: typeShipper._id,
         time: new Date(),
+        status: topUp.status
       });
 
       const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('merchantID').populate('transantionType'));
@@ -1468,7 +1469,7 @@ export class ShipperService {
         description: cashOut.description,
         transantionType: typeShipper._id,
         time: new Date(),
-        status: 1,
+        status: cashOut.status,
         nameBank: cashOut.nameBank,
         numberBank: cashOut.numberBank,
         accountHolder: cashOut.accountHolder

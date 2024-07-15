@@ -784,6 +784,7 @@ export class MerchantService {
         description: topUp.description,
         transantionType: typeMerchant._id,
         time: new Date(),
+        status: topUp.status,
       });
       const populatedHistory = (await this.historyMerchantModel.findById(createHistory._id).populate('merchantID').populate('transantionType'));
 
@@ -812,7 +813,7 @@ export class MerchantService {
         description: cashOut.description,
         transantionType: typeMerchant._id,
         time: new Date(),
-        status: 1,
+        status: cashOut.status,
         nameBank: cashOut.nameBank,
         numberBank: cashOut.numberBank,
         accountHolder: cashOut.accountHolder
