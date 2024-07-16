@@ -24,7 +24,5 @@ export class HistoryMerchantDto {
     @IsOptional()
     @IsString()
     accountHolder: string
-
-
     
 }

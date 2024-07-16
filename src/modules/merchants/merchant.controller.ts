@@ -294,7 +294,7 @@ export class MerchantController {
     return this.merchantService.getAllTypeOfMerchant();
   }
 
-  @Post('getNearMerchant')
+  @Get('getNearMerchant')
   @UseGuards(AuthGuard)
   getNearMerchant(@Query('id') id: string, @Body() body: { longitude?: number, latitude?: number }) {
     const { longitude, latitude } = body;

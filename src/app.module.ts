@@ -86,6 +86,6 @@ import { StripeController } from './modules/stripe/payout.controller';
   ],
   controllers: [AppController,
     WebhookController,UploadController, StripeController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, StripeService],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, StripeService,],
 })
 export class AppModule {}
