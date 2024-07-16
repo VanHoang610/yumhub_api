@@ -1442,7 +1442,7 @@ export class ShipperService {
         status: topUp.status
       });
 
-      const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('merchantID').populate('transantionType'));
+      const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('shipperID').populate('transantionType'));
       return { result: true, walletShipper: populatedHistory };
     } catch (error) {
       console.log(error);
@@ -1474,7 +1474,7 @@ export class ShipperService {
         numberBank: cashOut.numberBank,
         accountHolder: cashOut.accountHolder
       });
-      const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('merchantID').populate('transantionType'));
+      const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('shipperID').populate('transantionType'));
       return { result: true, walletShipper: populatedHistory };
     } catch (error) {
       return { result: false, walletShipper: error.message };
