@@ -16,7 +16,7 @@ export class CreateVoucherDto {
     discountAmount: string
 
     @IsOptional()
-    typeOfVoucher?: TypeOfVoucher
+    typeOfVoucherID?: TypeOfVoucher
 
     @IsString()
     code: string
