@@ -43,8 +43,6 @@ import { UploadController } from './modules/upload/upload.controller';
 import { BraintreeModule } from './modules/braintree/braintree.module';
 import { StripeService } from './modules/stripe/payout.service';
 import { StripeController } from './modules/stripe/payout.controller';
-import { ZalopayController } from './modules/zalopay/zalopay.controller';
-import { ZalopayService } from './modules/zalopay/zalopay.service';
 
 @Module({
   imports: [
@@ -87,7 +85,7 @@ import { ZalopayService } from './modules/zalopay/zalopay.service';
     MongooseModule.forRoot('mongodb+srv://hoangkun610:Levanhoang000@yumhub.muqzonu.mongodb.net/API_YUMHUB'),
   ],
   controllers: [AppController,
-    WebhookController,UploadController, StripeController,ZalopayController,],
-  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, StripeService, ZalopayService],
+    WebhookController,UploadController, StripeController,],
+  providers: [AppService, WebhookDataDto, RealtimeGateway, WebhookTypeDto, UploadService, StripeService,],
 })
 export class AppModule {}
