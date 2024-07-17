@@ -127,8 +127,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     // shipper xác nhận nhận đơn hàng
     if (type_user === "shipper" && command === "accept") {
       this.realTimeTo2Object(type_user, command, order);
-      this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đã có tài xế nhận đơn")
-      this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotification, "Bạn có đơn hàng mới")
+      if (this.findClientById(order.customerID._id, "customer").tokenNotification !== undefined){
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đã có tài xế nhận đơn")
+      }
+      if (this.findClientById(order.merchantID._id, "merchant").tokenNotification !== undefined){
+        this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotification, "Bạn có đơn hàng mới")
+      }
+      
       this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
     }
     // shipper đã đến nhà hàng
