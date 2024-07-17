@@ -140,6 +140,8 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
     // shipper đã đến nhà hàng
     if (type_user === "shipper" && command === "waiting") {
+      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",command);
+      
       this.realTimeTo1Object(type_user, command, order);
     }
     // shipper đã lấy hàng
