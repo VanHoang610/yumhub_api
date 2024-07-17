@@ -130,8 +130,10 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       if (this.findClientById(order.customerID._id, "customer").tokenNotification !== undefined){
         this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đã có tài xế nhận đơn")
       }
-      if (this.findClientById(order.merchantID._id, "merchant").tokenNotification !== undefined){
-        this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotification, "Bạn có đơn hàng mới")
+      const merchantClients = this.findAllClientMerchantById(order.merchantID._id);
+      if (merchantClients.length > 0){
+        merchantClients.forEach(client => {
+        this.sendNotication(client.tokenNotification, "Bạn có đơn hàng mới")})
       }
       
       this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
@@ -148,7 +150,11 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     if (type_user === "shipper" && command === "cancelled_from_shipper") {
       this.realTimeTo2Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy từ tài xế")
-      this.sendNotication(this.findClientById(order.merchantID._id, "merchant").tokenNotification, "Đơn hàng đã bị hủy từ tài xế")
+      const merchantClients = this.findAllClientMerchantById(order.merchantID._id);
+      if (merchantClients.length > 0){
+        merchantClients.forEach(client => {
+        this.sendNotication(client.tokenNotification, "Đơn hàng đã bị hủy từ tài xế")})
+      }
       this.deleteChatRoom(order._id);
     }
     // shipper đã đến nơi giao
