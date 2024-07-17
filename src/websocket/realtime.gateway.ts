@@ -96,8 +96,12 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
   private realTimeTo1Object(type_user_send: string, command: string, order: any) {
     if (type_user_send === "customer") {
+      console.log("xxxxxxxxxxxxxxxxxxxxxxxx1", order.shipperID._id);
+      
       if (this.findClientById(order.shipperID._id, "shipper") !== undefined) {
+        console.log("xxxxxxxxxxxxxxxxxxxxxxxx2", order.shipperID._id);
         this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, command, order);
+        console.log("xxxxxxxxxxxxxxxxxxxxxxxx3", order.shipperID._id);
       } else if (this.findClientById(order.customerID._id, "customer") !== undefined) {
         this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, command, "shipper không hoạt động");
       }
