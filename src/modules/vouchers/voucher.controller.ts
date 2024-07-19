@@ -16,6 +16,7 @@ import { CreateVoucherDto } from 'src/dto/dto.createVoucher';
 import mongoose from 'mongoose';
 import { AuthGuard } from 'src/helper/auth.middleware';
 import { UpdateVoucherDto } from 'src/dto/dto.updateVoucher';
+import { RolesGuard } from 'src/helper/checkRole.middleware';
 
 @Controller('vouchers')
 export class VoucherController {
