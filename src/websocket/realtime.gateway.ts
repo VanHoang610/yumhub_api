@@ -167,7 +167,9 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     if (type_user === "shipper" && command === "cancelled_from_shipper") {
       this.realTimeTo2Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy từ tài xế")
+      
       const merchantClients = this.findAllClientMerchantById(order.merchantID._id);
+      console.log(merchantClients.length);
       if (merchantClients.length > 0){
         merchantClients.forEach(client => {
         this.sendNotication(client.tokenNotification, "Đơn hàng đã bị hủy từ tài xế")})

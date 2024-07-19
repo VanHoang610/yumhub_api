@@ -706,9 +706,10 @@ export class OrderService {
         },
         { new: true },
       );
+      const populate =(await (await (await update.populate("shipperID")).populate("customerID")).populate("merchantID")).populate('voucherID')
       if (!update)
         throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
-      return { result: true, updateOrder: update };
+      return { result: true, updateOrder: populate };
     } catch (error) {
       return { result: false, updateOrder: error };
     }
