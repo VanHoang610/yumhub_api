@@ -55,6 +55,10 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     console.log(`${type_user} connected:`, id_user, tokenNotification);
+    console.log('list customer: ', this.customers);
+    console.log('list shippers: ', this.shippers);
+    console.log('list merchants: ', this.merchants);
+    
   }
 
   handleDisconnect(client: Socket) {
