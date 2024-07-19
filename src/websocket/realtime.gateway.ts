@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UploadService } from '../modules/upload/upload.service';
+import { log } from 'console';
 
 interface ConnectedClient {
   socket: Socket;
@@ -75,6 +76,8 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         // có thể xử lý bắn notification trên app customer nếu khách hàng không hoạt động app
       }
       const merchantClients = this.findAllClientMerchantById(order.merchantID._id);
+      console.log("list merchant: ", merchantClients);
+      
       if (this.findAllClientMerchantById(order.merchantID._id).length > 0) {
         merchantClients.forEach(client => {
           this.sendMessageToClient(client.socket, command, order);
@@ -135,9 +138,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đã có tài xế nhận đơn")
       }
       const merchantClients = this.findAllClientMerchantById(order.merchantID._id);
+      console.log("listmerchant : ", merchantClients);
+      
       if (merchantClients.length > 0){
         merchantClients.forEach(client => {
         this.sendNotication(client.tokenNotification, "Bạn có đơn hàng mới")})
+        console.log("sended");
+        
       }
       
       this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
@@ -242,6 +249,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   // Function để gửi tin nhắn từ server tới client cụ thể
   sendMessageToClient(client: Socket, command: string, order: any): void {
+    
     client.emit('message', { command: command, order: order });
   }
   //gửi tin nhắn từ sever tới client về chat
