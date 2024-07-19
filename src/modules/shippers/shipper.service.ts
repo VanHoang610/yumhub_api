@@ -32,6 +32,8 @@ export class ShipperService {
   constructor(
     private jwtService: JwtService,
     @InjectModel(Shipper.name) private shipperModel: Model<Shipper>,
+    @InjectModel(HistoryWalletShipper.name)
+    private walletShipper: Model<HistoryWalletShipper>,
     @InjectModel(DocumentShipper.name)
     private documentShipperModal: Model<DocumentShipper>,
     @InjectModel(Order.name) private orderModel: Model<Order>,
@@ -43,7 +45,7 @@ export class ShipperService {
     private typeShipperModel: Model<TransactionTypeShipper>,
     @InjectModel(OrderStatus.name) private statusModel: Model<OrderStatus>,
     @InjectModel(Review.name) private reviewModel: Model<Review>,
-  ) { }
+  ) {}
 
   async addData() {
     try {
@@ -1439,10 +1441,13 @@ export class ShipperService {
         description: topUp.description,
         transantionType: typeShipper._id,
         time: new Date(),
-        status: topUp.status
+        status: topUp.status,
       });
 
-      const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('shipperID').populate('transantionType'));
+      const populatedHistory = await this.historyShipperModel
+        .findById(createHistory._id)
+        .populate('shipperID')
+        .populate('transantionType');
       return { result: true, walletShipper: populatedHistory };
     } catch (error) {
       console.log(error);
@@ -1472,9 +1477,12 @@ export class ShipperService {
         status: cashOut.status,
         nameBank: cashOut.nameBank,
         numberBank: cashOut.numberBank,
-        accountHolder: cashOut.accountHolder
+        accountHolder: cashOut.accountHolder,
       });
-      const populatedHistory = (await this.historyShipperModel.findById(createHistory._id).populate('shipperID').populate('transantionType'));
+      const populatedHistory = await this.historyShipperModel
+        .findById(createHistory._id)
+        .populate('shipperID')
+        .populate('transantionType');
       return { result: true, walletShipper: populatedHistory };
     } catch (error) {
       return { result: false, walletShipper: error.message };
@@ -1483,13 +1491,13 @@ export class ShipperService {
 
   async transactionHistory(id: string) {
     try {
-      const shipper = (await this.shipperModel.findById(id));
+      const shipper = await this.shipperModel.findById(id);
 
       if (!shipper) {
         return { result: false, walletMerchant: 'Merchant not found' };
       }
       const history = await this.historyShipperModel
-        .find({ shipperID: shipper._id })
+        .find({ shipperID: shipper._id, status: { $nin: [4] } })
         .populate('shipperID')
         .populate('transantionType')
         .exec();
@@ -1679,9 +1687,15 @@ export class ShipperService {
 
   async getListAwaitingApproval() {
     try {
-      const history = (await this.historyShipperModel.find({ status: 1 }).populate('merchantID').populate('transantionType'));
+      const history = await this.historyShipperModel
+        .find({ status: 1 })
+        .populate('merchantID')
+        .populate('transantionType');
       if (!history)
-        throw new HttpException('Not find History Shipper', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Not find History Shipper',
+          HttpStatus.NOT_FOUND,
+        );
 
       return { result: true, walletShipper: history };
     } catch (error) {
@@ -1691,13 +1705,84 @@ export class ShipperService {
 
   async approvalCashOut(id: string) {
     try {
-      const history = (await this.historyShipperModel.findByIdAndUpdate(id, { status: 2 }, { new: true }).populate('merchantID').populate('transantionType'));
+      const history = await this.historyShipperModel
+        .findByIdAndUpdate(id, { status: 2 }, { new: true })
+        .populate('merchantID')
+        .populate('transantionType');
       if (!history)
-        throw new HttpException('Not find History Merchant', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Not find History Merchant',
+          HttpStatus.NOT_FOUND,
+        );
 
       return { result: true, walletShipper: history };
     } catch (error) {
       return { result: false, walletShipper: error.message };
+    }
+  }
+
+  async withdrawalApproval(id: string) {
+    try {
+      const walletShipper = await this.walletShipper.findByIdAndUpdate(
+        id,
+        { status: 2 },
+        { new: true },
+      );
+      if (!walletShipper) {
+        throw new HttpException(
+          'Not Found Shipper In Wallet',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return { result: true, walletShipper: walletShipper };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
+  }
+
+  async listWithdrawalApproval() {
+    try {
+      const walletShipper = await this.walletShipper
+        .find({ status: 1 })
+        .populate('shipperID');
+
+      if (!walletShipper) {
+        throw new HttpException(
+          'Not Found Shipper In Wallet',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return { result: true, walletShipper: walletShipper };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
+  }
+
+  async findWithdrawalShipper(keyword: string) {
+    try {
+      const walletShipper = await this.historyShipperModel
+        .find({
+          $and: [
+            {
+              $or: [
+                { accountHolder: new RegExp(keyword, 'i') },
+                { numberBank: keyword },
+              ],
+            },
+            { status: 1 },
+          ],
+        })
+        .populate('shipperID');
+      if (walletShipper.length === 0) {
+        return {
+          result: false,
+          message: 'Not Found Shippers',
+          walletShipper: [],
+        };
+      }
+      return { result: true, walletShipper: walletShipper };
+    } catch (error) {
+      return { result: false, walletShipper: error };
     }
   }
 }

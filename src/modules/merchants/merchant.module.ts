@@ -87,6 +87,10 @@ import { Address, AddressSchema } from 'src/schemas/address.schema';
             name: Address.name,
             schema: AddressSchema,
            },
+           {
+            name: HistoryWalletMerchant.name,
+            schema: HistoryWalletMerchantSchemas,
+           },
         ]),
         JwtModule.register({
             global: true,
