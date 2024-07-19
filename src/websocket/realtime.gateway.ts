@@ -58,7 +58,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     console.log('list customer: ', this.customers);
     console.log('list shippers: ', this.shippers);
     console.log('list merchants: ', this.merchants);
-    
+    console.log(this.findAllClientMerchantById(id_merchant as string).length)
   }
 
   handleDisconnect(client: Socket) {
