@@ -251,7 +251,7 @@ export class MerchantService {
     try {
       const merchants = await this.merchants.find({
         deleted: false,
-        status: 3,
+       
       });
       await this.merchants.populate(merchants, { path: 'type' });
       if (!merchants)
