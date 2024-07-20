@@ -42,6 +42,8 @@ export class MerchantService {
     private jwtService: JwtService,
     @InjectModel(Food.name) private foodModel: Model<Food>,
     @InjectModel(Merchant.name) private merchants: Model<Merchant>,
+    @InjectModel(HistoryWalletMerchant.name)
+    private walletMerchant: Model<HistoryWalletMerchant>,
     @InjectModel(Customer.name) private customerModol: Model<Customer>,
     @InjectModel(Address.name) private addressModol: Model<Address>,
     @InjectModel(UserMerchant.name)
@@ -158,7 +160,7 @@ export class MerchantService {
     try {
       const existingUserMerchant = await this.userMerchantModel.findOne({
         email: merchant.email,
-        phoneNumber: merchant.phoneNumber
+        phoneNumber: merchant.phoneNumber,
       });
 
       if (existingUserMerchant) {
@@ -318,12 +320,13 @@ export class MerchantService {
   async getHistoryMerchant(id: string) {
     try {
       const orders = await this.orderModel
-        .find({ merchantID: id })
-        .sort({ timeBook: 1 })
+        .find({ merchantID: id, status: { $ne: '661760e3fc13ae3574ab8ddd' } }) // ne: not equal=>không bằng })
         .populate('customerID')
         .populate('merchantID')
         .populate('shipperID')
-        .populate('voucherID');
+        .populate('voucherID')
+        .populate('status')
+        .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };
     } catch (error) {
@@ -489,7 +492,7 @@ export class MerchantService {
 
   async resetPass(email: string, password: string) {
     try {
-      const user = await this.userMerchantModel.findOne({email: email});
+      const user = await this.userMerchantModel.findOne({ email: email });
       if (!user)
         throw new HttpException('Not Find Account', HttpStatus.NOT_FOUND);
       const passwordNew = await bcrypt.hash(password, 10);
@@ -753,7 +756,10 @@ export class MerchantService {
       const userMerchant = await this.userMerchantModel.findById(id);
       userMerchant.password = undefined;
       if (!userMerchant)
-        throw new HttpException('Not Found User Merchant', HttpStatus.NOT_FOUND)
+        throw new HttpException(
+          'Not Found User Merchant',
+          HttpStatus.NOT_FOUND,
+        );
 
       return { result: true, userMerchant: userMerchant };
     } catch (error) {
@@ -780,15 +786,20 @@ export class MerchantService {
         description: topUp.description,
         transantionType: typeMerchant._id,
         time: new Date(),
+        status: topUp.status,
       });
+      const populatedHistory = await this.historyMerchantModel
+        .findById(createHistory._id)
+        .populate('merchantID')
+        .populate('transantionType');
 
-      return { result: true, WalletMerchant: createHistory };
+      return { result: true, walletShipper: populatedHistory };
     } catch (error) {
-      return { result: false, error };
+      return { result: false, walletShipper: error.message };
     }
   }
 
-  async cashOutMerchant(id: string, topUp: HistoryMerchantDto) {
+  async cashOutMerchant(id: string, cashOut: HistoryMerchantDto) {
     try {
       const merchant = await this.merchants.findById(id);
       const idMerchant = merchant._id;
@@ -798,32 +809,46 @@ export class MerchantService {
         .exec();
 
       const currentBalance = merchant.balance;
-      const updateBalance = currentBalance - topUp.amountTransantion;
+      const updateBalance = currentBalance - cashOut.amountTransantion;
       merchant.balance = updateBalance;
       await merchant.save();
       const createHistory = await this.historyMerchantModel.create({
         merchantID: idMerchant,
-        amountTransantion: topUp.amountTransantion,
-        description: topUp.description,
+        amountTransantion: cashOut.amountTransantion,
+        description: cashOut.description,
         transantionType: typeMerchant._id,
         time: new Date(),
+        status: cashOut.status,
+        nameBank: cashOut.nameBank,
+        numberBank: cashOut.numberBank,
+        accountHolder: cashOut.accountHolder,
       });
-      return { result: true, WalletMerchant: createHistory };
+
+      const populatedHistory = await this.historyMerchantModel
+        .findById(createHistory._id)
+        .populate('merchantID')
+        .populate('transantionType');
+      return { result: true, walletMerchant: populatedHistory };
     } catch (error) {
-      return { result: false, error };
+      return { result: false, walletMerchant: error.message };
     }
   }
 
   async transactionHistory(id: string) {
     try {
       const merchant = await this.merchants.findById(id);
-      const idMerchant = merchant._id;
+
+      if (!merchant) {
+        return { result: false, walletMerchant: 'Merchant not found' };
+      }
       const history = await this.historyMerchantModel
-        .find({ merchantID: idMerchant })
+        .find({ merchantID: merchant._id, status: { $nin: [4] } })
+        .populate('merchantID')
+        .populate('transantionType')
         .exec();
-      return { result: true, TransactionHistory: history };
+      return { result: true, walletMerchant: history };
     } catch (error) {
-      return { result: false, error };
+      return { result: false, walletMerchant: error.message };
     }
   }
 
@@ -883,9 +908,13 @@ export class MerchantService {
       if (!merchant)
         throw new HttpException('Not Find Merchant', HttpStatus.NOT_FOUND);
       const idMerchant = merchant._id;
-      const allFood = await this.foodModel.find({
-        merchantID: idMerchant,
-      }).populate('status').populate('groupOfFood').exec();
+      const allFood = await this.foodModel
+        .find({
+          merchantID: idMerchant,
+        })
+        .populate('status')
+        .populate('groupOfFood')
+        .exec();
       if (!allFood)
         throw new HttpException('Not Find Food', HttpStatus.NOT_FOUND);
 
@@ -927,27 +956,62 @@ export class MerchantService {
     }
   }
 
-  async getNearMerchant(id: string) {
+  async getNearMerchant(id: string, longitude?: number, latitude?: number) {
     try {
+      let sortMerchant;
+
       const addressCustomer = await this.addressModol.findOne({
         customerID: id,
       });
       if (!addressCustomer)
-        throw new HttpException('Not Found Address', HttpStatus.NOT_FOUND);
-      const merchants = await this.merchants.find({ status: 3 }).exec();
-      if (!merchants)
-        throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+        throw new HttpException('Not Found CustomerID', HttpStatus.NOT_FOUND);
 
-      //tính quãng đường
-      const sortMerchant = merchants.map((merchant) => {
-        const distance = Math.sqrt(
-          Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
-            Math.pow(merchant.latitude - addressCustomer.latitude, 2),
-        );
-        return { ...merchant.toObject(), distance };
-      });
+      if (!addressCustomer && !longitude && !latitude) {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
 
-      sortMerchant.sort((a, b) => a.distance - b.distance);
+        return { result: true, nearestCustomer: merchants };
+      }
+
+      if (longitude && latitude) {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+
+        // tính quãng đường
+        sortMerchant = merchants.map((merchant) => {
+          const distance = Math.sqrt(
+            Math.pow(merchant.longitude - longitude, 2) +
+              Math.pow(merchant.latitude - latitude, 2),
+          );
+          return { ...merchant.toObject(), distance };
+        });
+
+        sortMerchant.sort((a, b) => a.distance - b.distance);
+      } else if (addressCustomer?.longitude && addressCustomer?.latitude) {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+
+        // tính quãng đường từ địa chỉ khách hàng
+        sortMerchant = merchants.map((merchant) => {
+          const distance = Math.sqrt(
+            Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
+              Math.pow(merchant.latitude - addressCustomer.latitude, 2),
+          );
+          return { ...merchant.toObject(), distance };
+        });
+
+        sortMerchant.sort((a, b) => a.distance - b.distance);
+      } else {
+        const merchants = await this.merchants.find({ status: 3 }).exec();
+        if (!merchants)
+          throw new HttpException('Not Found Merchants', HttpStatus.NOT_FOUND);
+
+        sortMerchant = merchants;
+      }
+
       // const nearestCustomer = sortMerchant.slice(0, 5);
       return { result: true, nearestCustomer: sortMerchant };
     } catch (error) {
@@ -996,7 +1060,7 @@ export class MerchantService {
 
   async getAllDeletedMerchant() {
     try {
-      const merchants = await this.merchants.find({ status: 4 });
+      const merchants = await this.merchants.find({ deleted: true });
       if (!merchants)
         throw new HttpException(
           'Not Found Deleted Merchants',
@@ -1022,7 +1086,7 @@ export class MerchantService {
         ],
       });
       if (merchants.length === 0) {
-        return { result: false, message: 'Not Found Customers', merchants: [] };
+        return { result: false, message: 'Not Found Merchants', merchants: [] };
       }
       return { result: true, merchants: merchants };
     } catch (error) {
@@ -1083,6 +1147,107 @@ export class MerchantService {
       return { result: true, employee: employee };
     } catch (error) {
       return { result: false, employee: error };
+    }
+  }
+
+  async getListAwaitingApproval() {
+    try {
+      const history = await this.historyMerchantModel
+        .find({ status: 1 })
+        .populate('merchantID')
+        .populate('transantionType');
+      if (!history)
+        throw new HttpException(
+          'Not find History Merchant',
+          HttpStatus.NOT_FOUND,
+        );
+
+      return { result: true, walletMerchant: history };
+    } catch (error) {
+      return { result: false, walletMerchant: error.message };
+    }
+  }
+
+  async approvalCashOut(id: string) {
+    try {
+      const history = await this.historyMerchantModel
+        .findByIdAndUpdate(id, { status: 2 }, { new: true })
+        .populate('merchantID')
+        .populate('transantionType');
+      if (!history)
+        throw new HttpException(
+          'Not find History Merchant',
+          HttpStatus.NOT_FOUND,
+        );
+
+      return { result: true, walletMerchant: history };
+    } catch (error) {
+      return { result: false, walletMerchant: error.message };
+    }
+  }
+
+  async withdrawalApproval(id: string) {
+    try {
+      const walletMerchant = await this.walletMerchant.findByIdAndUpdate(
+        id,
+        { status: 2 },
+        { new: true },
+      );
+      if (!walletMerchant) {
+        throw new HttpException(
+          'Not Found Merchant In Wallet',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return { result: true, walletMerchant: walletMerchant };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
+  }
+
+  async listWithdrawalApproval() {
+    try {
+      const walletMerchant = await this.walletMerchant
+        .find({ status: 1 })
+        .populate('merchantID');
+
+      if (!walletMerchant) {
+        throw new HttpException(
+          'Not Found Merchant In Wallet',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return { result: true, walletMerchant: walletMerchant };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
+  }
+
+  async findWithdrawalMerchant(keyword: string) {
+    try {
+      const walletMerchant = await this.historyMerchantModel
+        .find({
+          $and: [
+            {
+              $or: [
+                { accountHolder: new RegExp(keyword, 'i') },
+                { numberBank: keyword },
+              ],
+            },
+            { status: 1 },
+          ],
+        })
+        .populate('merchantID');
+      if (walletMerchant.length === 0) {
+        return {
+          result: false,
+          message: 'Not Found Merchants',
+          walletMerchant: [],
+        };
+      }
+      return { result: true, walletMerchant: walletMerchant };
+    } catch (error) {
+      return { result: false, walletMerchant: error };
     }
   }
 }

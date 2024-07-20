@@ -19,6 +19,7 @@ import { UpdateUserMerchantDto } from 'src/dto/dto.updateUserMerchant';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { AuthGuard } from 'src/helper/auth.middleware';
 import { MerchantDto } from 'src/dto/dto.merchant';
+import { RolesGuard } from 'src/helper/checkRole.middleware';
 
 @Controller('merchants')
 export class MerchantController {
@@ -111,11 +112,11 @@ export class MerchantController {
     }
   }
 
-  // @Get()
-  // @UseGuards(AuthGuard)
-  // getMerchantByID(@Query('id') id: string) {
-  //   return this.merchantService.getMerchantById(id);
-  // }
+  @Get()
+  @UseGuards(AuthGuard)
+  getMerchantByID(@Query('id') id: string) {
+    return this.merchantService.getMerchantById(id);
+  }
 
   @Get('getAllMerchant')
   @UseGuards(AuthGuard)
@@ -184,8 +185,8 @@ export class MerchantController {
 
   //cập nhật mật khẩu
   @Post('resetPass')
-  resetPass(@Body() body: { email: string, password: string }) {
-    const { password, email} = body;
+  resetPass(@Body() body: { email: string; password: string }) {
+    const { password, email } = body;
     return this.merchantService.resetPass(email, password);
   }
 
@@ -216,7 +217,10 @@ export class MerchantController {
   // sửa tài khoản userMerchant
   @Patch('updateUserMerchant')
   @UseGuards(AuthGuard)
-  updateUserMerchant(@Query('id') id: string, @Body() update: UpdateUserMerchantDto) {
+  updateUserMerchant(
+    @Query('id') id: string,
+    @Body() update: UpdateUserMerchantDto,
+  ) {
     return this.merchantService.updateUserMerchant(id, update);
   }
 
@@ -241,12 +245,12 @@ export class MerchantController {
     return this.merchantService.getMerchantById(id);
   }
 
-   // chi tiết tài khoản user merchant
-   @Get('getUserMerchantById')
-   @UseGuards(AuthGuard)
-   getUserMerchantById(@Query('id') id: string) {
-     return this.merchantService.getUserMerchantById(id);
-   }
+  // chi tiết tài khoản user merchant
+  @Get('getUserMerchantById')
+  @UseGuards(AuthGuard)
+  getUserMerchantById(@Query('id') id: string) {
+    return this.merchantService.getUserMerchantById(id);
+  }
 
   // nạp tiền merchant
   @Post('topUp')
@@ -296,8 +300,16 @@ export class MerchantController {
 
   @Get('getNearMerchant')
   @UseGuards(AuthGuard)
-  getNearMerchant(@Query('id') id: string) {
-    return this.merchantService.getNearMerchant(id);
+  getNearMerchant(
+    @Query('id') id: string,
+    @Body() body: { longitude?: number; latitude?: number },
+  ) {
+    const { longitude, latitude } = body;
+    if (!longitude && !latitude) {
+      return this.merchantService.getNearMerchant(id);
+    }
+
+    return this.merchantService.getNearMerchant(id, longitude, latitude);
   }
 
   //tìm kiếm merchant
@@ -339,11 +351,46 @@ export class MerchantController {
     return this.merchantService.checkIDCardDocument(image);
   }
 
-
   //lấy ra tất cả nhân viên của merchant
   @Get('listEmployeeMerchant')
   @UseGuards(AuthGuard)
   listEmployeeMerchant(@Query('id') id: string) {
     return this.merchantService.listEmployeeMerchant(id);
+  }
+
+  //lấy tất cả danh sách đang chờ duyệt rút tiền
+  @Get('getListAwaitingApproval')
+  @UseGuards(AuthGuard)
+  getListAwaitingApproval() {
+    return this.merchantService.getListAwaitingApproval();
+  }
+
+  //duyệt tài khoản rút tiền
+  @Get('approvalCashOut')
+  @UseGuards(AuthGuard)
+  approvalCashOut(@Query('id') id: string) {
+    return this.merchantService.approvalCashOut(id);
+  }
+
+  // kiểm duyệt rút tiền
+  @Get('withdrawalApproval')
+  @UseGuards(AuthGuard, RolesGuard)
+  withdrawalApproval(@Query('id') id: string) {
+    return this.merchantService.withdrawalApproval(id);
+  }
+
+  // list rút tiền của merchant
+  @Get('listWithdrawalApproval')
+  @UseGuards(AuthGuard, RolesGuard)
+  listWithdrawalApproval() {
+    return this.merchantService.listWithdrawalApproval();
+  }
+
+  // tìm kiếm rút tiền merchant
+  @Post('findWithdrawalMerchant')
+  @UseGuards(AuthGuard)
+  findWithdrawalMerchant(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.merchantService.findWithdrawalMerchant(keyword);
   }
 }

@@ -53,6 +53,10 @@ import { DocumentShipper, DocumentShipperSchema } from "src/schemas/documentShip
             {
                 name: DocumentShipper.name,
                 schema: DocumentShipperSchema
+            },
+            {
+                name: HistoryWalletShipper.name,
+                schema: HistoryWalletShipperSchemas
             }
         ]),
         JwtModule.register({

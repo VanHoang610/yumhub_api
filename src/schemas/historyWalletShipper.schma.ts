@@ -19,6 +19,18 @@ export class HistoryWalletShipper {
 
     @Prop({required: false, default: Date.now})
     time: Date
+
+    @Prop({required: false, default: 2}) //2: thành công
+    status: number
+    
+    @Prop({required: false}) 
+    nameBank: string
+
+    @Prop({required: false})
+    numberBank: string
+
+    @Prop({required: false})
+    accountHolder: string
 }
 
 export const HistoryWalletShipperSchemas = SchemaFactory.createForClass(HistoryWalletShipper);

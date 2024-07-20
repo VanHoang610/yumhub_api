@@ -216,11 +216,12 @@ export class CustomerServices {
   async getHistoryById(id: string) {
     try {
       const orders = await this.orderModel
-        .find({ customerID: id })
+      .find({ customerID: id, status: { $ne: '661760e3fc13ae3574ab8ddd' } }) // ne: not equal=>không bằng })
         .populate('customerID')
         .populate('merchantID')
         .populate('shipperID')
         .populate('voucherID')
+        .populate('status')
         .sort({ timeBook: 1 });
       if (!orders) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       return { result: true, history: orders };

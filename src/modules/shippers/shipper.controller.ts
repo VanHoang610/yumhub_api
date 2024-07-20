@@ -17,6 +17,7 @@ import { RegisterShipperDto } from 'src/dto/dto.registerShipper';
 import { LoginDto } from 'src/dto/dto.login';
 import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { AuthGuard } from 'src/helper/auth.middleware';
+import { RolesGuard } from 'src/helper/checkRole.middleware';
 
 @Controller('shippers')
 export class ShipperController {
@@ -228,7 +229,7 @@ export class ShipperController {
   @Post('topUp')
   @UseGuards(AuthGuard)
   topUpShipper(@Query('id') id: string, @Body() topUp: HistoryMerchantDto) {
-    return this.shipperService.topUptopUpShipper(id, topUp);
+    return this.shipperService.topUpShipper(id, topUp);
   }
 
   // rút tiền shipper
@@ -297,5 +298,41 @@ export class ShipperController {
   @UseGuards(AuthGuard)
   listShipperIsDeleted() {
     return this.shipperService.getShipperIsDeleted();
+  }
+
+  //lấy tất cả danh sách đang chờ duyệt rút tiền
+  @Get('getListAwaitingApproval')
+  @UseGuards(AuthGuard)
+  getListAwaitingApproval() {
+    return this.shipperService.getListAwaitingApproval();
+  }
+
+  //duyệt tài khoản rút tiền
+  @Get('approvalCashOut')
+  @UseGuards(AuthGuard)
+  approvalCashOut(@Query('id') id: string) {
+    return this.shipperService.approvalCashOut(id);
+  }
+
+  // kiểm duyệt rút tiền
+  @Get('withdrawalApproval')
+  @UseGuards(AuthGuard, RolesGuard)
+  withdrawalApproval(@Query('id') id: string) {
+    return this.shipperService.withdrawalApproval(id);
+  }
+
+  // list rút tiền của shipper
+  @Get('listWithdrawalApproval')
+  @UseGuards(AuthGuard, RolesGuard)
+  listWithdrawalApproval() {
+    return this.shipperService.listWithdrawalApproval();
+  }
+
+  // tìm kiếm rút tiền shipper
+  @Post('findWithdrawalShipper')
+  @UseGuards(AuthGuard)
+  findWithdrawalShipper(@Body() body: { keyword: string }) {
+    const { keyword } = body;
+    return this.shipperService.findWithdrawalShipper(keyword);
   }
 }

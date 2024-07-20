@@ -6,6 +6,8 @@ import { AdminService } from "./admin.service";
 import { ResetPassword, ResetPasswordSchema } from "src/schemas/resetPass.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "../auth/constants";
+import { AuthGuard } from "src/helper/auth.middleware";
+import { RolesGuard } from "src/helper/checkRole.middleware";
 
 @Module({
     imports: [
@@ -26,7 +28,7 @@ import { jwtConstants } from "../auth/constants";
           }),
     ],
     controllers: [AdminController],
-    providers: [AdminService]
+    providers: [AdminService, AuthGuard, RolesGuard],
 })
 
 export class AdminModule { };

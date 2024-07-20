@@ -9,5 +9,20 @@ export class HistoryMerchantDto {
     @IsOptional()
     @IsString()
     description: string
+
+    @IsOptional()
+    status: number
+
+    @IsOptional()
+    @IsString()
+    nameBank: string
+
+    @IsOptional()
+    @IsString()
+    numberBank: string
+
+    @IsOptional()
+    @IsString()
+    accountHolder: string
     
 }
