@@ -118,10 +118,17 @@ export class MerchantController {
     return this.merchantService.getMerchantById(id);
   }
 
+  
+  @Get('getAllMerchantAdmin')
+  @UseGuards(AuthGuard)
+  getMerchantAdmin() {
+    return this.merchantService.getMerchant();
+  }
+
   @Get('getAllMerchant')
   @UseGuards(AuthGuard)
   getMerchant() {
-    return this.merchantService.getMerchant();
+    return this.merchantService.getMerchantInApp();
   }
 
   @Post('deleteMerchant')
