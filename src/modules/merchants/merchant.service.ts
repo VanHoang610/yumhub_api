@@ -262,6 +262,53 @@ export class MerchantService {
     }
   }
 
+  async getMerchantInApp() {
+    try {
+      // Lấy danh sách merchants từ cơ sở dữ liệu
+      const merchants = await this.merchants.find({
+        deleted: false,
+        status: 3,
+      });
+  
+      // Điền dữ liệu vào field 'type' cho mỗi merchant
+      await this.merchants.populate(merchants, { path: 'type' });
+  
+      // Kiểm tra nếu không có merchants nào
+      if (!merchants)
+        throw new HttpException('Không tìm thấy merchant', HttpStatus.UNAUTHORIZED);
+  
+      // Lấy thời gian hiện tại
+      const currentTime = new Date();
+  
+      // Hàm chuyển đổi thời gian từ chuỗi sang đối tượng Date
+      const convertToDate = (timeString) => {
+        const [time, modifier] = timeString.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (hours === '12') {
+          hours = '00';
+        }
+        if (modifier === 'PM') {
+          hours = parseInt(hours, 10) + 12;
+        }
+        return new Date(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate(), hours, minutes);
+      };
+  
+      // Lọc merchants dựa trên closetime và opentime
+      const validMerchants = merchants.filter(merchant => {
+        const openTime = convertToDate(merchant.openTime);
+        const closeTime = convertToDate(merchant.closeTime);
+  
+        // So sánh thời gian hiện tại với opentime và closetime
+        return currentTime >= openTime && currentTime <= closeTime;
+      });
+  
+      return { result: true, merchants: validMerchants };
+    } catch (error) {
+      return { result: false, merchants: error };
+    }
+  }
+  
+
   async deleteMerchant(id: string) {
     try {
       const merchantById = await this.merchants.findById(id);
