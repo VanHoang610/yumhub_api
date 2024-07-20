@@ -1494,7 +1494,7 @@ export class ShipperService {
       const shipper = await this.shipperModel.findById(id);
 
       if (!shipper) {
-        return { result: false, walletMerchant: 'Merchant not found' };
+        return { result: false, walletShipper: 'Shipper not found' };
       }
       const history = await this.historyShipperModel
         .find({ shipperID: shipper._id, status: { $nin: [4] } })

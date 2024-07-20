@@ -655,7 +655,7 @@ export class OrderService {
       const order = await this.orderModel.findById(id);
       const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
       const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
-      // Mapping số nguyên sang tên trạng thái
+  
       const statusMap = {
         1: 'cart',
         2: 'processing',
@@ -667,36 +667,27 @@ export class OrderService {
         8: 'goToMerchant',
         9: 'fakeOrder',
       };
-
-      // Kiểm tra nếu updateOrder.status là số
+  
       if (updateOrder.status) {
         if (typeof updateOrder.status === 'number') {
           const statusName = statusMap[updateOrder.status];
           if (statusName) {
-            // Tìm kiếm trạng thái theo tên
-            const statusDoc = await this.statusModel
-              .findOne({ name: statusName })
-              .exec();
+            const statusDoc = await this.statusModel.findOne({ name: statusName }).exec();
             if (!statusDoc) {
-              return {
-                result: false,
-                message: `Status name '${statusName}' not found`,
-              };
+              return { result: false, message: `Status name '${statusName}' not found` };
             }
             updateOrder.status = statusDoc._id;
           } else {
             return { result: false, message: 'Nhập giá trị status từ 1-8' };
           }
         } else {
-          // Kiểm tra nếu updateOrder.status là _id hợp lệ
           const status = await this.statusModel.findById(updateOrder.status);
           if (!status) {
             return { result: false, message: 'Invalid status ID' };
           }
         }
       }
-
-      // Cập nhật đơn hàng
+  
       const update = await this.orderModel.findByIdAndUpdate(
         id,
         {
@@ -704,15 +695,26 @@ export class OrderService {
           revenueMerchant,
           revenueDelivery,
         },
-        { new: true },
+        { new: true }
       );
-      if (!update)
+  
+      if (!update) {
         throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
-      return { result: true, updateOrder: update };
+      }
+  
+      const populatedUpdate = await (await (await (await update
+        .populate('shipperID'))
+        .populate('customerID'))
+        .populate('merchantID'))
+        .populate('voucherID');
+  
+      return { result: true, updateOrder: populatedUpdate };
     } catch (error) {
-      return { result: false, updateOrder: error };
+      console.error(error);  // Consider logging the error
+      return { result: false, message: 'An error occurred while updating the order', error };
     }
   }
+  
 
   async getOrderByShipperAndStatus(orderDto: OrderDto) {
     try {
