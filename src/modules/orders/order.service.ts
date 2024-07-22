@@ -1091,62 +1091,62 @@ export class OrderService {
     }
   }
 
+  async searchOrder(search) {
+    try {
+      const regex = new RegExp(search, 'i');
+      const pipeline = [
+        {
+          $lookup: {
+            from: 'customers',
+            localField: 'customerID',
+            foreignField: '_id',
+            as: 'customer',
+          },
+        },
+        {
+          $addFields: {
+            _idStr: { $toString: '$_id' },
+            nameCustomer: { $arrayElemAt: ['$customer.fullName', 0] },
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { _idStr: regex },
+              { deliveryAddress: regex },
+              { nameCustomer: regex },
+            ],
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            customerID: { $arrayElemAt: ['$customer', 0] },
+            merchantID: 1,
+            shipperID: 1,
+            voucherID: 1,
+            deliveryAddress: 1,
+            priceFood: 1,
+            deliveryCost: 1,
+            totalPaid: 1,
+            timeBook: 1,
+            timeGetFood: 1,
+            timeGiveFood: 1,
+            status: 1,
+            totalDistance: 1,
+            revenueDelivery: 1,
+            revenueMerchant: 1,
+            paymentMethod: 1,
+          },
+        },
+      ];
 
-    async searchOrder(search) {
-        try {
-            const regex = new RegExp(search, 'i');
-            const pipeline = [
-                {
-                    $lookup: {
-                        from: 'customers',
-                        localField: 'customerID',
-                        foreignField: '_id',
-                        as: 'customer'
-                    }
-                },
-                {
-                    $addFields: {
-                        _idStr: { $toString: "$_id" },
-                        nameCustomer: { $arrayElemAt: ["$customer.fullName", 0] }
-                    }
-                },
-                {
-                    $match: {
-                        $or: [
-                            { _idStr: regex },
-                            { deliveryAddress: regex },
-                            { nameCustomer: regex }
-                        ]
-                    }
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        customerID: { $arrayElemAt: ["$customer", 0] },
-                        merchantID: 1,
-                        shipperID: 1,
-                        voucherID: 1,
-                        deliveryAddress: 1,
-                        priceFood: 1,
-                        deliveryCost: 1,
-                        totalPaid: 1,
-                        timeBook: 1,
-                        timeGetFood: 1,
-                        timeGiveFood: 1,
-                        status: 1,
-                        totalDistance: 1,
-                        revenueDelivery: 1,
-                        revenueMerchant: 1,
-                        paymentMethod: 1
-                    }
-                }
-            ];
-
-            const orders = await this.orderModel.aggregate(pipeline).exec();
-            return { result: true, orders: orders };
-        } catch (error) {
-            return { result: false, error: error.message };
-        }}
+      const orders = await this.orderModel.aggregate(pipeline).exec();
+      return { result: true, orders: orders };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
+  }
 
   async getListFoodByOrder(id: string, status: number) {
     try {
@@ -1164,7 +1164,6 @@ export class OrderService {
           if (user) {
             shipperID = user._id;
           }
-
         }
       }
 
@@ -1261,6 +1260,50 @@ export class OrderService {
         throw new HttpException('Not Found DetailOrder', HttpStatus.NOT_FOUND);
 
       return { result: true, detailOrder: detailOrder };
+    } catch (error) {
+      return { result: false, detailOrder: error.message };
+    }
+  }
+
+  async listReviewByOrder(id: string) {
+    try {
+      const reviewModel = [];
+      const reviews = await this.reviewModel
+        .find({ orderID: id })
+        .populate('typeOfReview');
+  
+      if (!reviews || reviews.length === 0) {
+        throw new HttpException('Not Found Review', HttpStatus.NOT_FOUND);
+      }
+  
+      for (const review of reviews) {
+        const imageReviews = await this.ImgReviewModel.find({ reviewID: review._id });
+        const images = []; 
+  
+        const order = await this.orderModel.findOne({ _id: review.orderID });
+        if (order && order.customerID) {
+          const customer = await this.customerModel.findOne({ _id: order.customerID });
+          for (const image of imageReviews) {
+            if (image.reviewID.toString() === review._id.toString()) {
+              images.push(image.image);
+            }
+          }
+  
+          reviewModel.push({
+            review: review,
+            customer: customer,
+            images: images,
+          });
+        } else {
+          console.log('Order not found or no customerID in order.');
+          reviewModel.push({
+            review: review,
+            customer: [],
+            images: images,
+          });
+        }
+      }
+      return { result: true, listReview: reviewModel };
     } catch (error) {
       return { result: false, detailOrder: error.message };
     }
