@@ -161,7 +161,7 @@ export class OrderService {
       const orders = new this.orderModel({
         customerID: customers._id,
         merchantID: merchants._id,
-        status: '661760e3fc13ae3574ab8ddd', //pending
+        status: '661760e3fc13ae3574ab8ddd', //cart
         ...orderDto,
       });
 
