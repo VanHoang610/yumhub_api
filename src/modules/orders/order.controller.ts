@@ -230,4 +230,13 @@ export class OrderController {
     const { quantity } = body;
     return this.orderServices.updateDetailOrder(id, quantity);
   }
+
+  // lấy ra tất của review của một order
+  @Get('listReviewByOrder')
+  @UseGuards(AuthGuard)
+  listReviewByOrder(
+    @Query('id') id: string,
+  ) {
+    return this.orderServices.listReviewByOrder(id);
+  }
 }
