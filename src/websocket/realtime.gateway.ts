@@ -204,8 +204,8 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
     if (command === "chat") {
       const { message, type_mess } = payload;
+      const roomName = `room_${order._id}`;
       if (type_mess != "loading") {
-        const roomName = `room_${order._id}`;
         const chatMessage: MessageRow = {
           typeUser: type_user,
           message: message,
@@ -218,16 +218,15 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
           this.chatRooms.set(roomName, [chatMessage]);
         }
         console.log(this.chatRooms.get(roomName));
-
-        this.server.to(roomName).emit('chatMessage', chatMessage);
-        if (type_user === 'shipper') {
-          this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tin nhắn mới")
-        } else {
-          this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Tin nhắn mới")
-        }
-        this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, "chat", { orderID: order._id, fullChat: this.chatRooms.get(roomName) });
-        this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, "chat", { orderID: order._id, fullChat: this.chatRooms.get(roomName) });
       }
+      // this.server.to(roomName).emit('chatMessage', chatMessage);
+      if (type_user === 'shipper') {
+        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tin nhắn mới")
+      } else {
+        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Tin nhắn mới")
+      }
+      this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, "chat", { orderID: order._id, fullChat: this.chatRooms.get(roomName) });
+      this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, "chat", { orderID: order._id, fullChat: this.chatRooms.get(roomName) });
     }
   }
   // @SubscribeMessage('chatMessage')
