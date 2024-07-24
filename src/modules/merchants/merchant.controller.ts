@@ -305,7 +305,7 @@ export class MerchantController {
     return this.merchantService.getAllTypeOfMerchant();
   }
 
-  @Get('getNearMerchant')
+  @Post('getNearMerchant')
   @UseGuards(AuthGuard)
   getNearMerchant(
     @Query('id') id: string,
