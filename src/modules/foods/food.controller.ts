@@ -117,4 +117,15 @@ export class FoodController {
       return error;
     }
   }
+
+  @Get('getAllFoods')
+  @UseGuards(AuthGuard)
+  getAllFoods() {
+    try {
+      return this.foodService.getAllFoods();
+    } catch (error) {
+      return error;
+    }
+  }
+
 }

@@ -17,7 +17,7 @@ export class FoodService {
     @InjectModel(Merchant.name) private merchantModel: Model<Merchant>,
     @InjectModel(GroupOfFood.name) private GroupOfFoodModel: Model<GroupOfFood>,
     @InjectModel(FoodStatus.name) private foodStatusModel: Model<FoodStatus>,
-  ) {}
+  ) { }
 
   async createFood(createFood: FoodDto) {
     try {
@@ -238,7 +238,7 @@ export class FoodService {
                 { nameMerchant: regex }, // Thêm điều kiện tìm kiếm theo tên merchant
               ],
             },
-            { status: statusObjectId }, 
+            { status: statusObjectId },
           ],
         },
       },
@@ -292,7 +292,7 @@ export class FoodService {
     }).exec();
   }
 
-  
+
   async searchFoods(price: number, name: string) {
     // Tạo một object để chứa các điều kiện lọc
     const query: any = { status: '661fb317ee3a326f69b55386' }; // status onSale
@@ -309,5 +309,27 @@ export class FoodService {
     // Thực hiện truy vấn MongoDB với các điều kiện lọc
     const foods = await this.FoodModel.find(query).exec();
     return { result: true, food: foods };
+  }
+
+  async getAllFoods() {
+    try {
+      const foods = await this.FoodModel.find()
+        .populate('merchantID')
+        .populate('status')
+        .populate({
+          path: 'typeOfFood',
+          strictPopulate: false,
+        })
+        .exec();
+
+      // Trả về mảng rỗng nếu không có foods nào được tìm thấy
+      if (!foods || foods.length === 0) {
+        return { result: true, foods: [] };
+      }
+
+      return { result: true, foods: foods };
+    } catch (error) {
+      return { result: false, message: error.message };
+    }
   }
 }
