@@ -10,6 +10,7 @@ import { Server, Socket } from 'socket.io';
 import { UploadService } from '../modules/upload/upload.service';
 import { log } from 'console';
 
+
 interface ConnectedClient {
   socket: Socket;
   id_user: string;
@@ -296,13 +297,19 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   private createChatRoom(orderId: string, customerId: string, shipperId: string) {
     const roomName = `room_${orderId}`;
     this.server.to([customerId, shipperId]).socketsJoin(roomName);
+    const timeStart: MessageRow = {
+      typeUser: "timeStart",
+      message: "timeStart",
+      timestamp: new Date(),
+      type_mess: "timeStart"
+    }
     const chatMessage: MessageRow = {
       typeUser: "shipper",
       message: "ban vui long cho chut nhe",
       timestamp: new Date(),
       type_mess: "text"
     };
-    this.chatRooms.set(roomName, [chatMessage]);
+    this.chatRooms.set(roomName, [timeStart, chatMessage]);
   }
 
   private deleteChatRoom(orderId: string) {
