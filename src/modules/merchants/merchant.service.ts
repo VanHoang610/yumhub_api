@@ -534,19 +534,37 @@ export class MerchantService {
       const hashPassword = await bcrypt.hash(password, 10);
       user.password = hashPassword;
       await user.save();
-      console.log(user.password);
 
       const merchant = await this.merchants.findOne({ _id: user.merchantID });
       if (!merchant)
         throw new HttpException('Merchant không tồn tại', HttpStatus.NOT_FOUND);
-      merchant.status = 2;
+      merchant.status = 3;
+      await merchant.save();
+
+      //tạo tài khoản nhân viên
+      const phoneNumber = 0 + Math.floor(980000000 + Math.random() * 900000000).toString();
+      const passwordEmployee = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashPasswordEmployee = await bcrypt.hash(passwordEmployee, 10);
+      const userMerchant = new this.userMerchantModel({
+        merchantID: merchant._id,
+        phoneNumber: phoneNumber,
+        role: 2,
+        password: hashPasswordEmployee
+      });
+      
+      await userMerchant.save();
+      if (!merchant)
+        throw new HttpException('Merchant không tồn tại', HttpStatus.NOT_FOUND);
+      merchant.status = 3;
       await merchant.save();
 
       await Mailer.sendMail({
         email: user.email,
         subject: 'Chúc mừng bạn đã trở thành đối tác của YumHub',
         content: `Email của bạn là: ${email}
-                            Password của bạn là: ${password}`,
+                  Password của bạn là: ${password},
+                  SDT của nhân viên là: ${phoneNumber}
+                  Password của nhân viên là: ${passwordEmployee}`,
       });
 
       return { result: true, message: 'Hãy kiểm tra email của bạn!' };
