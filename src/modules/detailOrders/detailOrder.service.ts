@@ -40,8 +40,10 @@ export class DetailOrderService {
 
             // Lưu đối tượng vào cơ sở dữ liệu
             const createdDetailProduct = await newDetailProduct.save();
+            console.log(createdDetailProduct);
+            
             // Trả về thông tin chi tiết sản phẩm đã tạo
-            return { result: true, detailProduct: createdDetailProduct, imgFood:imgFood };
+            return { result: true, detailProduct: createdDetailProduct, imgFood:imgFood, detailOrder : createdDetailProduct };
         } catch (error) {
             return { result: false, error: error.message };
         }
