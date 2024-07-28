@@ -153,7 +153,7 @@ export class OrderController {
       return error;
     }
   }
-  @Post('deleteOrder')
+  @Delete('deleteOrder')
   @UseGuards(AuthGuard)
   deleteOrder(@Query('id') id: string) {
     try {
