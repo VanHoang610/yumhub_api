@@ -75,12 +75,12 @@ export class DetailOrderService {
         const details = await this.detailOrderModel.find({ orderID: orderId }).exec();
     
         const foodDetails = await Promise.all(details.map(async detail => {
-            const food = await this.foodModel.findById(detail.foodID).select('nameFood image');
+            const food = await this.foodModel.findById(detail.foodID)
             if (!food) {
                 // Handle the case where the food item is not found
                 return { food: detail, image: null, name: 'Unknown' };
             }
-            return { food: detail, image: food.image, name: food.nameFood };
+            return { food: detail, image: food.image, name: food.nameFood, other: food };
         }));
     
         order.push(...foodDetails);
