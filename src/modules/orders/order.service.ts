@@ -34,7 +34,7 @@ export class OrderService {
     @InjectModel(ImageReview.name) private ImgReviewModel: Model<ImageReview>,
     @InjectModel(TypeOfVoucher.name)
     private typeOfVoucherModel: Model<TypeOfVoucher>,
-  ) {}
+  ) { }
 
   async addData() {
     try {
@@ -655,7 +655,7 @@ export class OrderService {
       const order = await this.orderModel.findById(id);
       const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
       const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
-  
+
       const statusMap = {
         1: 'cart',
         2: 'processing',
@@ -667,7 +667,7 @@ export class OrderService {
         8: 'goToMerchant',
         9: 'fakeOrder',
       };
-  
+
       if (updateOrder.status) {
         if (typeof updateOrder.status === 'number') {
           const statusName = statusMap[updateOrder.status];
@@ -687,7 +687,7 @@ export class OrderService {
           }
         }
       }
-  
+
       const update = await this.orderModel.findByIdAndUpdate(
         id,
         {
@@ -697,24 +697,24 @@ export class OrderService {
         },
         { new: true }
       );
-  
+
       if (!update) {
         throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
       }
-  
+
       const populatedUpdate = await (await (await (await update
         .populate('shipperID'))
         .populate('customerID'))
         .populate('merchantID'))
         .populate('voucherID');
-  
+
       return { result: true, updateOrder: populatedUpdate };
     } catch (error) {
       console.error(error);  // Consider logging the error
       return { result: false, message: 'An error occurred while updating the order', error };
     }
   }
-  
+
 
   async getOrderByShipperAndStatus(orderDto: OrderDto) {
     try {
@@ -1249,12 +1249,12 @@ export class OrderService {
     }
   }
 
-  async updateDetailOrder(id: string, quantity: number) {
+  async updateDetailOrder(id: string, quantity: number, description: string) {
     try {
       const detailOrder = await this.detailOrderModel.findByIdAndUpdate(
         id,
-        { quantity: quantity },
-        { new: true },
+        { quantity, description },
+        { new: true }
       );
       if (!detailOrder)
         throw new HttpException('Not Found DetailOrder', HttpStatus.NOT_FOUND);
@@ -1271,15 +1271,15 @@ export class OrderService {
       const reviews = await this.reviewModel
         .find({ orderID: id })
         .populate('typeOfReview');
-  
+
       if (!reviews || reviews.length === 0) {
         throw new HttpException('Not Found Review', HttpStatus.NOT_FOUND);
       }
-  
+
       for (const review of reviews) {
         const imageReviews = await this.ImgReviewModel.find({ reviewID: review._id });
-        const images = []; 
-  
+        const images = [];
+
         const order = await this.orderModel.findOne({ _id: review.orderID });
         if (order && order.customerID) {
           const customer = await this.customerModel.findOne({ _id: order.customerID });
@@ -1288,7 +1288,7 @@ export class OrderService {
               images.push(image.image);
             }
           }
-  
+
           reviewModel.push({
             review: review,
             customer: customer,
