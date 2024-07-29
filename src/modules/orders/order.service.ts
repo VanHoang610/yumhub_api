@@ -651,10 +651,6 @@ export class OrderService {
 
   async updateOrder(id: string, updateOrder: UpdateOrderDto) {
     try {
-      const fee = await this.feeModel.findOne();
-      const order = await this.orderModel.findById(id);
-      const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
-      const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
 
       const statusMap = {
         1: 'cart',
@@ -691,9 +687,7 @@ export class OrderService {
       const update = await this.orderModel.findByIdAndUpdate(
         id,
         {
-          ...updateOrder,
-          revenueMerchant,
-          revenueDelivery,
+          ...updateOrder
         },
         { new: true }
       );
