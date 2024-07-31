@@ -258,6 +258,12 @@ export class MerchantController {
   getUserMerchantById(@Query('id') id: string) {
     return this.merchantService.getUserMerchantById(id);
   }
+  // reActive merchant
+  @Post('data-recovery-Merchant')
+  @UseGuards(AuthGuard)
+  reActiveMerchant(@Query('id') id: string) {
+    return this.merchantService.dataRecoveryMerchant(id);
+  }
 
   // nạp tiền merchant
   @Post('topUp')

@@ -26,7 +26,7 @@ export class UserMerchant {
     @Prop({required: false})
     password: string
 
-    @Prop({ unique: true, required: true }) 
+    @Prop({ unique: true }) 
     email: string
 
     @Prop({ required: false, default: false }) 

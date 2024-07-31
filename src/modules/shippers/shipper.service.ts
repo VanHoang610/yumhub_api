@@ -1191,13 +1191,14 @@ export class ShipperService {
   async verifileShipper(email: string) {
     try {
       const user = await this.shipperModel.findOne({ email: email });
+
       if (!user)
         throw new HttpException('Email chưa đăng ký', HttpStatus.NOT_FOUND);
 
       const password = Math.floor(100000 + Math.random() * 900000).toString();
       const hashPassword = await bcrypt.hash(password, 10);
       user.password = hashPassword;
-      user.status = 2;
+      user.status = 3;
       await user.save();
 
       const passwordRest = new this.resetPasswordModel({
@@ -1783,6 +1784,20 @@ export class ShipperService {
       return { result: true, walletShipper: walletShipper };
     } catch (error) {
       return { result: false, walletShipper: error };
+    }
+  }
+  async dataRecoveryShipper(id: string) {
+    try {
+      const updateMerchantID = await this.shipperModel.findByIdAndUpdate(
+        id,
+        { deleted: false },
+        { new: true },
+      );
+      return { result: true, message: 'Khoi phuc thanh cong' } 
+      
+    } catch (error) {
+      
+      return { result: false, message: 'Khoi phuc Merchant that bai' }
     }
   }
 }

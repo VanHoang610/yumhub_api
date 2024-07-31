@@ -75,7 +75,7 @@ export class MerchantService {
           type: '6604e35881084710d45efe8c',
           openTime: '6:40 AM',
           closeTime: '4:43 PM',
-          rating: '4780644259',
+          rating: 4,
           address: '3 Mesta Parkway',
           businessLicense: 4,
           deleted: false,
@@ -91,7 +91,7 @@ export class MerchantService {
           type: '6604e35881084710d45efe8c',
           openTime: '10:00 AM',
           closeTime: '8:11 PM',
-          rating: '5999573513',
+          rating: 5,
           address: '00 Algoma Trail',
           businessLicense: 2,
           deleted: false,
@@ -107,7 +107,7 @@ export class MerchantService {
           type: '6604e35881084710d45efe8d',
           openTime: '1:05 PM',
           closeTime: '4:05 PM',
-          rating: '0797479198',
+          rating: 4,
           address: '57084 Onsgard Junction',
           businessLicense: 2,
           deleted: false,
@@ -123,7 +123,7 @@ export class MerchantService {
           type: '6604e35881084710d45efe8f',
           openTime: '12:23 AM',
           closeTime: '9:06 PM',
-          rating: '2935049756',
+          rating: 2,
           address: '586 Roth Street',
           businessLicense: 4,
           deleted: true,
@@ -139,7 +139,7 @@ export class MerchantService {
           type: '6604e35881084710d45efe8e',
           openTime: '9:23 AM',
           closeTime: '4:25 PM',
-          rating: '1965644376',
+          rating: 1,
           address: '863 Summerview Way',
           businessLicense: 3,
           deleted: false,
@@ -250,8 +250,7 @@ export class MerchantService {
   async getMerchant() {
     try {
       const merchants = await this.merchants.find({
-        deleted: false,
-       
+        deleted: false, 
       });
       await this.merchants.populate(merchants, { path: 'type' });
       if (!merchants)
@@ -279,7 +278,6 @@ export class MerchantService {
   
       // Lấy thời gian hiện tại
       const currentTime = new Date();
-  
       // Hàm chuyển đổi thời gian từ chuỗi sang đối tượng Date
       const convertToDate = (timeString) => {
         const [time, modifier] = timeString.split(' ');
@@ -328,6 +326,22 @@ export class MerchantService {
     }
   }
 
+  async dataRecoveryMerchant(id: string) {
+    try {
+      const updateMerchantID = await this.merchants.findByIdAndUpdate(
+        id,
+        { deleted: false },
+        { new: true },
+      );
+      
+      return { result: true, message: 'Khoi phuc thanh cong' } 
+      
+    } catch (error) {
+      
+      return { result: false, message: 'Khoi phuc Merchant that bai' }
+    }
+  }
+
   async updateMerchant(id: string, updateMerchant: MerchantDto) {
     try {
       const merchantNew = await this.merchants.findByIdAndUpdate(
@@ -338,7 +352,7 @@ export class MerchantService {
       if (!merchantNew) {
         throw new Error(`Không tìm thấy merchantID: ${id}`);
       }
-
+      const rating = (await this.getRating(id)).rating;
       const userMerchant = await this.userMerchantModel.findOne({
         merchantID: id,
       });
@@ -347,6 +361,7 @@ export class MerchantService {
       }
       const idUserMerchant = userMerchant._id;
       const userMerchantUpdate = {
+        rating: rating,
         email: updateMerchant.email,
         phoneNumber: updateMerchant.phoneNumber,
         fullName: updateMerchant.fullName,
@@ -581,19 +596,37 @@ export class MerchantService {
       const hashPassword = await bcrypt.hash(password, 10);
       user.password = hashPassword;
       await user.save();
-      console.log(user.password);
 
       const merchant = await this.merchants.findOne({ _id: user.merchantID });
       if (!merchant)
         throw new HttpException('Merchant không tồn tại', HttpStatus.NOT_FOUND);
-      merchant.status = 2;
+      merchant.status = 3;
+      await merchant.save();
+
+      //tạo tài khoản nhân viên
+      const phoneNumber = 0 + Math.floor(980000000 + Math.random() * 900000000).toString();
+      const passwordEmployee = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashPasswordEmployee = await bcrypt.hash(passwordEmployee, 10);
+      const userMerchant = new this.userMerchantModel({
+        merchantID: merchant._id,
+        phoneNumber: phoneNumber,
+        role: 2,
+        password: hashPasswordEmployee
+      });
+      
+      await userMerchant.save();
+      if (!merchant)
+        throw new HttpException('Merchant không tồn tại', HttpStatus.NOT_FOUND);
+      merchant.status = 3;
       await merchant.save();
 
       await Mailer.sendMail({
         email: user.email,
         subject: 'Chúc mừng bạn đã trở thành đối tác của YumHub',
         content: `Email của bạn là: ${email}
-                            Password của bạn là: ${password}`,
+                  Password của bạn là: ${password},
+                  SDT của nhân viên là: ${phoneNumber}
+                  Password của nhân viên là: ${passwordEmployee}`,
       });
 
       return { result: true, message: 'Hãy kiểm tra email của bạn!' };
@@ -989,7 +1022,8 @@ export class MerchantService {
       }
     }
     const rating = numberOfReview > 0 ? totalPointReview / numberOfReview : 0;
-    return { result: true, rating: rating };
+
+    return { result: true, rating: Math.round(rating * 100) / 100 };
   }
 
   async getAllTypeOfMerchant() {
