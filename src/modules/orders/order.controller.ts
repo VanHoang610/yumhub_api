@@ -153,7 +153,7 @@ export class OrderController {
       return error;
     }
   }
-  @Post('deleteOrder')
+  @Delete('deleteOrder')
   @UseGuards(AuthGuard)
   deleteOrder(@Query('id') id: string) {
     try {
@@ -225,10 +225,10 @@ export class OrderController {
   @UseGuards(AuthGuard)
   updateDetailOrder(
     @Query('id') id: string,
-    @Body() body: { quantity: number },
+    @Body() body: { quantity: number, description: string },
   ) {
-    const { quantity } = body;
-    return this.orderServices.updateDetailOrder(id, quantity);
+    const { quantity, description } = body;
+    return this.orderServices.updateDetailOrder(id, quantity, description);
   }
 
   // lấy ra tất của review của một order
