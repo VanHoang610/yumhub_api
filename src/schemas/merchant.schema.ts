@@ -47,6 +47,9 @@ export class Merchant {
     @Prop({required: false})
     hotline?: string
 
+    @Prop({required: false})
+    decription?: string
+
 }
 
 export const MerchantSchema = SchemaFactory.createForClass(Merchant)

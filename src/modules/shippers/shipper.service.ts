@@ -1785,4 +1785,18 @@ export class ShipperService {
       return { result: false, walletShipper: error };
     }
   }
+  async dataRecoveryShipper(id: string) {
+    try {
+      const updateMerchantID = await this.shipperModel.findByIdAndUpdate(
+        id,
+        { deleted: false },
+        { new: true },
+      );
+      return { result: true, message: 'Khoi phuc thanh cong' } 
+      
+    } catch (error) {
+      
+      return { result: false, message: 'Khoi phuc Merchant that bai' }
+    }
+  }
 }
