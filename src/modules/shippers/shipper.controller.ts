@@ -156,6 +156,13 @@ export class ShipperController {
     return this.shipperService.deleteShipper(id);
   }
 
+  @Post('data-recovery-Shipper')
+  @UseGuards(AuthGuard)
+  reActiveMerchant(@Query('id') id: string) {
+    return this.shipperService.dataRecoveryShipper(id);
+  }
+
+
   @Patch('updateShipper')
   @UseGuards(AuthGuard)
   async updateShipper(

@@ -9,6 +9,7 @@ import { FoodStatus } from 'src/schemas/foodStatus.schema';
 import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
 import { Merchant } from 'src/schemas/merchant.schema';
 const { ObjectId } = require('mongodb');
+const removeAccents = require('remove-accents');
 
 @Injectable()
 export class FoodService {
@@ -286,12 +287,21 @@ export class FoodService {
       return { result: false, message: error.message };
     }
   }
-  async searchFoodByName(any: string) {
-    return this.FoodModel.find({
-      nameFood: { $regex: any, $options: 'i' },
-    }).exec();
-  }
+  async searchFoodByName(any) {
+    // Loại bỏ dấu từ chuỗi tìm kiếm
+    const searchQuery = removeAccents(any);
 
+    // Lấy tất cả các món ăn từ cơ sở dữ liệu
+    const foods = await this.FoodModel.find().exec();
+
+    // Lọc các món ăn dựa trên chuỗi tìm kiếm không dấu
+    const filteredFoods = foods.filter(food => {
+      const nameFoodNoAccent = removeAccents(food.nameFood);
+      return nameFoodNoAccent.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
+    return filteredFoods;
+  }
   
   async searchFoods(price: number, name: string) {
     // Tạo một object để chứa các điều kiện lọc
