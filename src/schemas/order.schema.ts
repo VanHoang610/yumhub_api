@@ -29,6 +29,9 @@ export class Order {
     @Prop({required: true}) 
     deliveryAddress: string
 
+    @Prop() 
+    deliveryPhonenumber: string
+
     @Prop({required: true, default: 0}) 
     priceFood: number
 
