@@ -22,6 +22,9 @@ export class UpdateOrderDto {
   deliveryAddress: string;
 
   @IsOptional()
+  deliveryPhonenumber: string;
+
+  @IsOptional()
   priceFood: number;
 
   @IsOptional()
