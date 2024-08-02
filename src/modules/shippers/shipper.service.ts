@@ -26,6 +26,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { DocumentShipper } from 'src/schemas/documentShipper.schema';
+import { RejectShipperDto } from 'src/dto/dto.rejectShipper';
 
 @Injectable()
 export class ShipperService {
@@ -1800,4 +1801,29 @@ export class ShipperService {
       return { result: false, message: 'Khoi phuc Merchant that bai' }
     }
   }
+  async rejectShipper(id: string, shipper: RejectShipperDto) {
+    try {
+        // Find the shipper by ID
+        const user = await this.shipperModel.findByIdAndUpdate(
+            id
+        );
+        const content = `
+            Xin lỗi quý khách hàng: ${user.fullName}<br/>
+            Thông tin đăng ký bạn chưa hợp lệ: ${shipper.notes}<br/>
+            Vui lòng kiểm tra và cập nhật lại những thông tin sai.<br/>
+            <a href="https://your-link-here.com">Click vào đây để cập nhật thông tin</a>
+        `;
+        await Mailer.sendMail({
+          email: user.email,
+          subject: 'Đăng ký đối tác tài xế',
+          content: content,
+        });
+
+        return { result: true, message: 'Từ chối thành công' };
+    } catch (error) {
+        return { result: false, message: 'Từ chối shipper thất bại', error: error.message };
+    }
+}
+
+
 }

@@ -32,6 +32,9 @@ export class Order {
     @Prop() 
     deliveryPhonenumber: string
 
+    @Prop() 
+    deliveryFullName: string
+
     @Prop({required: true, default: 0}) 
     priceFood: number
 

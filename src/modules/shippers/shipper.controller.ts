@@ -150,6 +150,12 @@ export class ShipperController {
   //     return this.shipperService.getPhoneNumberShipper(id);
   // }
 
+  @Patch("reject")
+  @UseGuards(AuthGuard)
+  getRejectShipper(@Query('id') id: string, @Body() body) {
+    return this.shipperService.rejectShipper(id, body);
+  }
+
   @Post('deleteShipper')
   @UseGuards(AuthGuard)
   deleteShipper(@Query('id') id: string) {
