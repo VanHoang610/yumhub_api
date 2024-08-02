@@ -23,6 +23,9 @@ export class OrderDto {
 
     @IsString()
     deliveryPhonenumber: string
+
+    @IsString()
+    deliveryFullName: string
     
     @IsNumber()
     priceFood: number
