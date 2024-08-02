@@ -596,19 +596,37 @@ export class MerchantService {
       const hashPassword = await bcrypt.hash(password, 10);
       user.password = hashPassword;
       await user.save();
-      console.log(user.password);
 
       const merchant = await this.merchants.findOne({ _id: user.merchantID });
       if (!merchant)
         throw new HttpException('Merchant không tồn tại', HttpStatus.NOT_FOUND);
-      merchant.status = 2;
+      merchant.status = 3;
+      await merchant.save();
+
+      //tạo tài khoản nhân viên
+      const phoneNumber = 0 + Math.floor(980000000 + Math.random() * 900000000).toString();
+      const passwordEmployee = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashPasswordEmployee = await bcrypt.hash(passwordEmployee, 10);
+      const userMerchant = new this.userMerchantModel({
+        merchantID: merchant._id,
+        phoneNumber: phoneNumber,
+        role: 2,
+        password: hashPasswordEmployee
+      });
+      
+      await userMerchant.save();
+      if (!merchant)
+        throw new HttpException('Merchant không tồn tại', HttpStatus.NOT_FOUND);
+      merchant.status = 3;
       await merchant.save();
 
       await Mailer.sendMail({
         email: user.email,
         subject: 'Chúc mừng bạn đã trở thành đối tác của YumHub',
         content: `Email của bạn là: ${email}
-                            Password của bạn là: ${password}`,
+                  Password của bạn là: ${password},
+                  SDT của nhân viên là: ${phoneNumber}
+                  Password của nhân viên là: ${passwordEmployee}`,
       });
 
       return { result: true, message: 'Hãy kiểm tra email của bạn!' };
@@ -1018,8 +1036,37 @@ export class MerchantService {
       return { result: false, types: error };
     }
   }
+/**
+ * Tính khoảng cách giữa hai vị trí trên Trái đất
+ * @param {number} lat1 - Vĩ độ của vị trí thứ nhất
+ * @param {number} lon1 - Kinh độ của vị trí thứ nhất
+ * @param {number} lat2 - Vĩ độ của vị trí thứ hai
+ * @param {number} lon2 - Kinh độ của vị trí thứ hai
+ * @returns {number} Khoảng cách giữa hai vị trí theo km
+ */
 
   async getNearMerchant(id: string, longitude?: number, latitude?: number) {
+    /**
+     * Chuyển đổi độ sang radians
+     * @param {number} degrees - Giá trị độ
+     * @returns {number} Giá trị radians
+     */
+    const degreesToRadians = (degrees) => {
+      return degrees * (Math.PI / 180);
+    }
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+      const R = 6371; // Bán kính Trái đất theo km
+      const dLat = degreesToRadians(lat2 - lat1);
+      const dLon = degreesToRadians(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c; // Khoảng cách theo km
+      return distance;
+    }
+    
+    
     try {
       let sortMerchant;
 
@@ -1044,10 +1091,11 @@ export class MerchantService {
 
         // tính quãng đường
         sortMerchant = merchants.map((merchant) => {
-          const distance = Math.sqrt(
-            Math.pow(merchant.longitude - longitude, 2) +
-              Math.pow(merchant.latitude - latitude, 2),
-          );
+          // const distance = Math.sqrt(
+          //   Math.pow(merchant.longitude - longitude, 2) +
+          //     Math.pow(merchant.latitude - latitude, 2),
+          // );
+          const distance = calculateDistance(merchant.latitude, merchant.longitude, latitude, longitude);
           return { ...merchant.toObject(), distance };
         });
 
@@ -1059,10 +1107,11 @@ export class MerchantService {
 
         // tính quãng đường từ địa chỉ khách hàng
         sortMerchant = merchants.map((merchant) => {
-          const distance = Math.sqrt(
-            Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
-              Math.pow(merchant.latitude - addressCustomer.latitude, 2),
-          );
+          // const distance = Math.sqrt(
+          //   Math.pow(merchant.longitude - addressCustomer.longitude, 2) +
+          //     Math.pow(merchant.latitude - addressCustomer.latitude, 2),
+          // );
+          const distance = calculateDistance(merchant.latitude, merchant.longitude, latitude, longitude);
           return { ...merchant.toObject(), distance };
         });
 

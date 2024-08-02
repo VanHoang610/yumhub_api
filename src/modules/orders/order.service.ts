@@ -34,7 +34,7 @@ export class OrderService {
     @InjectModel(ImageReview.name) private ImgReviewModel: Model<ImageReview>,
     @InjectModel(TypeOfVoucher.name)
     private typeOfVoucherModel: Model<TypeOfVoucher>,
-  ) {}
+  ) { }
 
   async addData() {
     try {
@@ -161,7 +161,7 @@ export class OrderService {
       const orders = new this.orderModel({
         customerID: customers._id,
         merchantID: merchants._id,
-        status: '661760e3fc13ae3574ab8ddd', //pending
+        status: '661760e3fc13ae3574ab8ddd', //cart
         ...orderDto,
       });
 
@@ -651,11 +651,7 @@ export class OrderService {
 
   async updateOrder(id: string, updateOrder: UpdateOrderDto) {
     try {
-      const fee = await this.feeModel.findOne();
-      const order = await this.orderModel.findById(id);
-      const revenueMerchant = order.priceFood * ((100 - fee.merchant) / 100);
-      const revenueDelivery = order.deliveryCost * ((100 - fee.shipper) / 100);
-      // Mapping số nguyên sang tên trạng thái
+
       const statusMap = {
         1: 'cart',
         2: 'processing',
@@ -668,27 +664,19 @@ export class OrderService {
         9: 'fakeOrder',
       };
 
-      // Kiểm tra nếu updateOrder.status là số
       if (updateOrder.status) {
         if (typeof updateOrder.status === 'number') {
           const statusName = statusMap[updateOrder.status];
           if (statusName) {
-            // Tìm kiếm trạng thái theo tên
-            const statusDoc = await this.statusModel
-              .findOne({ name: statusName })
-              .exec();
+            const statusDoc = await this.statusModel.findOne({ name: statusName }).exec();
             if (!statusDoc) {
-              return {
-                result: false,
-                message: `Status name '${statusName}' not found`,
-              };
+              return { result: false, message: `Status name '${statusName}' not found` };
             }
             updateOrder.status = statusDoc._id;
           } else {
             return { result: false, message: 'Nhập giá trị status từ 1-8' };
           }
         } else {
-          // Kiểm tra nếu updateOrder.status là _id hợp lệ
           const status = await this.statusModel.findById(updateOrder.status);
           if (!status) {
             return { result: false, message: 'Invalid status ID' };
@@ -696,23 +684,31 @@ export class OrderService {
         }
       }
 
-      // Cập nhật đơn hàng
       const update = await this.orderModel.findByIdAndUpdate(
         id,
         {
-          ...updateOrder,
-          revenueMerchant,
-          revenueDelivery,
+          ...updateOrder
         },
-        { new: true },
+        { new: true }
       );
-      if (!update)
+
+      if (!update) {
         throw new HttpException('Update Order Fail', HttpStatus.NOT_FOUND);
-      return { result: true, updateOrder: update };
+      }
+
+      const populatedUpdate = await (await (await (await update
+        .populate('shipperID'))
+        .populate('customerID'))
+        .populate('merchantID'))
+        .populate('voucherID');
+
+      return { result: true, updateOrder: populatedUpdate };
     } catch (error) {
-      return { result: false, updateOrder: error };
+      console.error(error);  // Consider logging the error
+      return { result: false, message: 'An error occurred while updating the order', error };
     }
   }
+
 
   async getOrderByShipperAndStatus(orderDto: OrderDto) {
     try {
@@ -1089,62 +1085,62 @@ export class OrderService {
     }
   }
 
+  async searchOrder(search) {
+    try {
+      const regex = new RegExp(search, 'i');
+      const pipeline = [
+        {
+          $lookup: {
+            from: 'customers',
+            localField: 'customerID',
+            foreignField: '_id',
+            as: 'customer',
+          },
+        },
+        {
+          $addFields: {
+            _idStr: { $toString: '$_id' },
+            nameCustomer: { $arrayElemAt: ['$customer.fullName', 0] },
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { _idStr: regex },
+              { deliveryAddress: regex },
+              { nameCustomer: regex },
+            ],
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            customerID: { $arrayElemAt: ['$customer', 0] },
+            merchantID: 1,
+            shipperID: 1,
+            voucherID: 1,
+            deliveryAddress: 1,
+            priceFood: 1,
+            deliveryCost: 1,
+            totalPaid: 1,
+            timeBook: 1,
+            timeGetFood: 1,
+            timeGiveFood: 1,
+            status: 1,
+            totalDistance: 1,
+            revenueDelivery: 1,
+            revenueMerchant: 1,
+            paymentMethod: 1,
+          },
+        },
+      ];
 
-    async searchOrder(search) {
-        try {
-            const regex = new RegExp(search, 'i');
-            const pipeline = [
-                {
-                    $lookup: {
-                        from: 'customers',
-                        localField: 'customerID',
-                        foreignField: '_id',
-                        as: 'customer'
-                    }
-                },
-                {
-                    $addFields: {
-                        _idStr: { $toString: "$_id" },
-                        nameCustomer: { $arrayElemAt: ["$customer.fullName", 0] }
-                    }
-                },
-                {
-                    $match: {
-                        $or: [
-                            { _idStr: regex },
-                            { deliveryAddress: regex },
-                            { nameCustomer: regex }
-                        ]
-                    }
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        customerID: { $arrayElemAt: ["$customer", 0] },
-                        merchantID: 1,
-                        shipperID: 1,
-                        voucherID: 1,
-                        deliveryAddress: 1,
-                        priceFood: 1,
-                        deliveryCost: 1,
-                        totalPaid: 1,
-                        timeBook: 1,
-                        timeGetFood: 1,
-                        timeGiveFood: 1,
-                        status: 1,
-                        totalDistance: 1,
-                        revenueDelivery: 1,
-                        revenueMerchant: 1,
-                        paymentMethod: 1
-                    }
-                }
-            ];
-
-            const orders = await this.orderModel.aggregate(pipeline).exec();
-            return { result: true, orders: orders };
-        } catch (error) {
-            return { result: false, error: error.message };
-        }}
+      const orders = await this.orderModel.aggregate(pipeline).exec();
+      return { result: true, orders: orders };
+    } catch (error) {
+      return { result: false, error: error.message };
+    }
+  }
 
   async getListFoodByOrder(id: string, status: number) {
     try {
@@ -1162,7 +1158,6 @@ export class OrderService {
           if (user) {
             shipperID = user._id;
           }
-
         }
       }
 
@@ -1248,17 +1243,61 @@ export class OrderService {
     }
   }
 
-  async updateDetailOrder(id: string, quantity: number) {
+  async updateDetailOrder(id: string, quantity: number, description: string) {
     try {
       const detailOrder = await this.detailOrderModel.findByIdAndUpdate(
         id,
-        { quantity: quantity },
-        { new: true },
+        { quantity, description },
+        { new: true }
       );
       if (!detailOrder)
         throw new HttpException('Not Found DetailOrder', HttpStatus.NOT_FOUND);
 
       return { result: true, detailOrder: detailOrder };
+    } catch (error) {
+      return { result: false, detailOrder: error.message };
+    }
+  }
+
+  async listReviewByOrder(id: string) {
+    try {
+      const reviewModel = [];
+      const reviews = await this.reviewModel
+        .find({ orderID: id })
+        .populate('typeOfReview');
+
+      if (!reviews || reviews.length === 0) {
+        throw new HttpException('Not Found Review', HttpStatus.NOT_FOUND);
+      }
+
+      for (const review of reviews) {
+        const imageReviews = await this.ImgReviewModel.find({ reviewID: review._id });
+        const images = [];
+
+        const order = await this.orderModel.findOne({ _id: review.orderID });
+        if (order && order.customerID) {
+          const customer = await this.customerModel.findOne({ _id: order.customerID });
+          for (const image of imageReviews) {
+            if (image.reviewID.toString() === review._id.toString()) {
+              images.push(image.image);
+            }
+          }
+
+          reviewModel.push({
+            review: review,
+            customer: customer,
+            images: images,
+          });
+        } else {
+          console.log('Order not found or no customerID in order.');
+          reviewModel.push({
+            review: review,
+            customer: [],
+            images: images,
+          });
+        }
+      }
+      return { result: true, listReview: reviewModel };
     } catch (error) {
       return { result: false, detailOrder: error.message };
     }
