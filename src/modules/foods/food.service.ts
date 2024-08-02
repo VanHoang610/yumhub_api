@@ -267,9 +267,6 @@ export class FoodService {
 
   async updateFood(foodId: string, updateFood: UpdateFoodDto): Promise<{ result: boolean, message?: string, food?: any }> {
     try {
-      if (!isValidObjectId(foodId)) {
-        return { result: false, message: 'ID món ăn không hợp lệ' };
-      }
       const food = await this.FoodModel.findByIdAndUpdate(
         foodId,
         updateFood,
