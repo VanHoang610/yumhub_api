@@ -344,6 +344,8 @@ export class MerchantService {
 
   async updateMerchant(id: string, updateMerchant: MerchantDto) {
     try {
+      // const rating = (await this.getRating(id)).rating;
+    
       const merchantNew = await this.merchants.findByIdAndUpdate(
         id,
         updateMerchant,
@@ -352,27 +354,29 @@ export class MerchantService {
       if (!merchantNew) {
         throw new Error(`Không tìm thấy merchantID: ${id}`);
       }
-      const rating = (await this.getRating(id)).rating;
-      const userMerchant = await this.userMerchantModel.findOne({
-        merchantID: id,
-      });
-      if (!userMerchant) {
-        throw new Error(`Không tìm thấy userMerchant ${id}`);
-      }
-      const idUserMerchant = userMerchant._id;
-      const userMerchantUpdate = {
-        rating: rating,
-        email: updateMerchant.email,
-        phoneNumber: updateMerchant.phoneNumber,
-        fullName: updateMerchant.fullName,
-      };
-
-      const userMerchantNew = await this.userMerchantModel.findByIdAndUpdate(
-        idUserMerchant,
-        userMerchantUpdate,
-        { new: true },
-      );
-      return { result: true, merchantNew: merchantNew, userMerchantNew };
+    
+      
+      // const userMerchant = await this.userMerchantModel.findOne({
+      //   merchantID: id,
+      // });
+      // if (!userMerchant) {
+      //   throw new Error(`Không tìm thấy userMerchant ${id}`);
+      // }
+      // const idUserMerchant = userMerchant._id;
+      // const userMerchantUpdate = {
+        
+      //   email: updateMerchant.email,
+      //   phoneNumber: updateMerchant.phoneNumber,
+      //   fullName: updateMerchant.fullName,
+      // };
+      // console.log(userMerchantUpdate);
+      
+      // const userMerchantNew = await this.userMerchantModel.findByIdAndUpdate(
+      //   idUserMerchant,
+      //   userMerchantUpdate,
+      //   { new: true },
+      // );
+      return { result: true, merchantNew: merchantNew };
     } catch (error) {
       console.error('Error updating merchant:', error);
       throw error;
