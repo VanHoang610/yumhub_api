@@ -197,7 +197,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         })
       }
       this.deleteChatRoom(order._id);
-      this.activeOrders.delete(order.shipperID._id); // Xóa trạng thái đơn hàng
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // shipper đã đến nơi giao
     if (type_user === "shipper" && command === "arrived") {
@@ -211,13 +211,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       setTimeout(() => {
         this.deleteChatRoom(order._id);
       }, 3 * 60 * 60 * 1000); // 3 giờ
-      this.activeOrders.delete(order.shipperID._id); // Xóa trạng thái đơn hàng
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // shipper hủy đơn hàng (khách boom hàng)
     if (type_user === "shipper" && command === "fake_order") {
       this.realTimeTo1Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy vì không liên lạc được cho bạn")
-      this.activeOrders.delete(order.shipperID._id); // Xóa trạng thái đơn hàng
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // merchant hủy đơn hàng
     if (type_user === "merchant" && command === "cancelled_from_merchant") {
@@ -225,7 +225,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy từ nhà hàng")
       this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Đơn hàng đã bị hủy từ nhà hàng")
       this.deleteChatRoom(order._id);
-      this.activeOrders.delete(order.shipperID._id); // Xóa trạng thái đơn hàng
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     if (command === "chat") {
       const { message, type_mess } = payload;
