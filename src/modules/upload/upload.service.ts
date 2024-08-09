@@ -35,6 +35,7 @@ export class UploadService {
   }
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
+    console.log(file);
     if (!file) {
       throw new Error('No file uploaded');
     }

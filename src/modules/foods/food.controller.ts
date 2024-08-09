@@ -77,6 +77,17 @@ export class FoodController {
     return this.foodService.findApproveFood(keyword);
   }
 
+  @Post('deleteFood')
+  @UseGuards(AuthGuard)
+  deleteFood(@Query('id') id: string, @Body() body:{note:string} ) {
+    try {
+      const { note } = body;
+      return this.foodService.deleteFood(id, note);
+    } catch (error) {
+      return error;
+    }
+  }
+
   // @Patch("updateImg/:id")
   // async updateImg(@Param('id') id: string, @Body() body: { img: string }) {
   //     try {

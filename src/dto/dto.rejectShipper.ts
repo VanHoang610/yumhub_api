@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsOptional } from "class-validator";
 export class RejectShipperDto {
 
     image: boolean
-    name: boolean
+    fullName: boolean
     address: boolean
     email: boolean
     phoneNumber: boolean
@@ -14,5 +14,5 @@ export class RejectShipperDto {
     idCard: boolean
     driverLicense: boolean
     vehicleCertificate: boolean
-    notes:string
+    note:string
 }

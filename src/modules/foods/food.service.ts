@@ -4,10 +4,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { isValidObjectId, Model } from 'mongoose';
 import { FoodDto } from 'src/dto/dto.food';
 import { UpdateFoodDto } from 'src/dto/dto.updateFood';
+import { Mailer } from 'src/helper/mailer';
 import { Food } from 'src/schemas/food.schema';
 import { FoodStatus } from 'src/schemas/foodStatus.schema';
 import { GroupOfFood } from 'src/schemas/groupOfFood.schema';
 import { Merchant } from 'src/schemas/merchant.schema';
+import { UserMerchant } from 'src/schemas/userMerchant.schema';
 const { ObjectId } = require('mongodb');
 const removeAccents = require('remove-accents');
 
@@ -18,6 +20,7 @@ export class FoodService {
     @InjectModel(Merchant.name) private merchantModel: Model<Merchant>,
     @InjectModel(GroupOfFood.name) private GroupOfFoodModel: Model<GroupOfFood>,
     @InjectModel(FoodStatus.name) private foodStatusModel: Model<FoodStatus>,
+    @InjectModel(UserMerchant.name) private userMerchantModel: Model<FoodStatus>,
   ) { }
 
   async createFood(createFood: FoodDto) {
@@ -335,6 +338,40 @@ export class FoodService {
       }
 
       return { result: true, foods: foods };
+    } catch (error) {
+      return { result: false, message: error.message };
+    }
+  }
+  async deleteFood(id: string, note: string) {
+    try {
+      const food = await this.FoodModel.findById(id);
+      if (!food) {
+        return { result: false, message: 'Không tìm thấy món ăn' };
+      }
+
+      const user = await this.userMerchantModel.findOne({merchantID: food.merchantID, role: 1}) as UserMerchant;
+
+      if (!user) {
+        return { result: false, message: 'Không tìm thấy người dùng' };
+      }
+      const merchant = await this.merchantModel.findById(food.merchantID);
+      if (!merchant) {
+        return { result: false, message: 'Không tìm thấy người dùng' };
+      }
+
+      const content = `
+            Xin lỗi: <strong>${user.fullName}</strong><br/>
+            Thông tin đăng ký món ăn <strong>${food.nameFood}</strong> của <strong>${merchant.name} </strong>chưa hợp lệ: <strong>${note}</strong><br/>
+            Vui lòng kiểm tra và cập nhật lại những thông tin sai.<br/>
+            
+        `;
+        const mail = await Mailer.sendMail({
+          email: user.email,
+          subject: 'Thông báo từ chối đăng ký Món ăn',
+          content: content,
+        });
+        await this.FoodModel.findByIdAndDelete(id);
+      return { result: true, message: "Đã xóa món ăn thành công" };
     } catch (error) {
       return { result: false, message: error.message };
     }

@@ -177,6 +177,16 @@ export class ShipperController {
   ) {
     return await this.shipperService.updateShipper(id, updateShipper);
   }
+  @Patch('updateShipper-web')
+  async updateShipperfromWeb(
+    @Query('id') id: string,
+    @Body(new ValidationPipe()) updateShipper: any
+  ) {
+    console.log(updateShipper);
+    const result = await this.shipperService.updateShipperFromWeb(id, updateShipper);
+    console.log(result);
+    return result;
+  }
 
   //login
   @Post('login')

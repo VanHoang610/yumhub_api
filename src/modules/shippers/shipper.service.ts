@@ -1068,6 +1068,23 @@ export class ShipperService {
       return { result: false, error };
     }
   }
+
+  async updateShipperFromWeb(id: string, updateShipper: ShipperDto) {
+    try {
+      const shipperNew = await this.shipperModel.findByIdAndUpdate(
+        id,
+
+        {...updateShipper,
+          status:1
+        },
+        { new: true },
+      );
+      return { result: true, data: shipperNew };
+    } catch (error) {
+      console.error('Error updating shipper:', error);
+      return { result: false, error };
+    }
+  }
   async updateAvatar(id: string, avatar: string) {
     return await this.shipperModel.findByIdAndUpdate(id, { avatar });
   }
@@ -1675,11 +1692,11 @@ export class ShipperService {
               { idBike: new RegExp(keyword, 'i') },
             ],
           },
-          { status: { $in: [1, 2] } },
+          { status: 1},
         ],
       });
       if (shippers.length === 0) {
-        return { result: false, message: 'Not Found Shipper', shippers: [] };
+        return { result: true, message: 'Not Found Shipper', shippers: [] };
       }
       return { result: true, shippers: shippers };
     } catch (error) {
@@ -1804,21 +1821,46 @@ export class ShipperService {
   async rejectShipper(id: string, shipper: RejectShipperDto) {
     try {
         // Find the shipper by ID
-        const user = await this.shipperModel.findByIdAndUpdate(
-            id
-        );
+        const user = await this.shipperModel.findByIdAndUpdate(id,{status:9},{new:true});
+        if (!user) {
+          return { result: false, message: 'Từ chối shipper thất bại' };
+        }
+        const sttMap = {
+          image: '1',
+          fullName: '2',
+          address: '3',
+          email: '4',
+          phoneNumber: '5',
+          birthDay: '6',
+          brandBike: '7',
+          modeCode: '8',
+          idBike: '9',
+          idCard: 'a',
+          driverLicense: 'b',
+          vehicleCertificate: 'c',
+        };
+        let invalidFields = '';
+        for (const key in shipper) {
+            if (!shipper[key]) {
+                invalidFields += sttMap[key]; // Thêm số thứ tự vào chuỗi
+            }
+            if (key === 'vehicleCertificate') {
+              break;
+            }
+        }
+        
+        const url =`http://localhost:3003/updateInfoShipper/${id}/${invalidFields}`;
         const content = `
             Xin lỗi quý khách hàng: ${user.fullName}<br/>
-            Thông tin đăng ký bạn chưa hợp lệ: ${shipper.notes}<br/>
+            Thông tin đăng ký bạn chưa hợp lệ: ${shipper.note}<br/>
             Vui lòng kiểm tra và cập nhật lại những thông tin sai.<br/>
-            <a href="https://your-link-here.com">Click vào đây để cập nhật thông tin</a>
+            <a href="${url}">Click vào đây để cập nhật thông tin</a>
         `;
-        await Mailer.sendMail({
+        const mail = await Mailer.sendMail({
           email: user.email,
           subject: 'Đăng ký đối tác tài xế',
           content: content,
         });
-
         return { result: true, message: 'Từ chối thành công' };
     } catch (error) {
         return { result: false, message: 'Từ chối shipper thất bại', error: error.message };
