@@ -25,6 +25,11 @@ interface MessageRow {
   type_mess: string;
 }
 
+interface OrderCurrentProcessing {
+  order: string;
+  status: string;
+}
+
 @WebSocketGateway()
 export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly uploadService: UploadService) { }
@@ -35,6 +40,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   private shippers: ConnectedClient[] = [];
   private merchants: ConnectedClient[] = [];
   private chatRooms: Map<string, MessageRow[]> = new Map();
+  private activeOrders: Map<string, OrderCurrentProcessing> = new Map();
 
   handleConnection(client: Socket) {
     const { id_user, type_user, id_merchant, tokenNotification } = client.handshake.query;
@@ -60,6 +66,14 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     console.log('list shippers: ', this.shippers);
     console.log('list merchants: ', this.merchants);
     console.log(this.findAllClientMerchantById(id_merchant as string).length)
+
+    // Kiểm tra xem người dùng này có đơn hàng nào đang trong tiến trình hay không
+    const activeOrder = this.activeOrders.get(id_user as string);
+    if (activeOrder) {
+      // Gửi lại thông tin đơn hàng cho người dùng
+      this.sendMessageToClient(client, 'orderUpdate', activeOrder);
+    }
+
   }
 
   handleDisconnect(client: Socket) {
@@ -131,10 +145,12 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     if (type_user === "customer" && command === "placeOrder") {
       this.realTimeTo1Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Bạn có đơn hàng mới")
+      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command }); 
     }
     // shipper từ chối nhận đơn hàng
     if (type_user === "shipper" && command === "refuse") {
       this.realTimeTo1Object(type_user, command, order);
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // shipper xác nhận nhận đơn hàng
     if (type_user === "shipper" && command === "accept") {
@@ -154,16 +170,19 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       }
 
       this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
+      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
     }
     // shipper đã đến nhà hàng
     if (type_user === "shipper" && command === "waiting") {
       console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", command);
 
       this.realTimeTo1Object(type_user, command, order);
+      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
     }
     // shipper đã lấy hàng
     if (type_user === "shipper" && command === "delivering") {
       this.realTimeTo2Object(type_user, command, order);
+      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
     }
     // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
     if (type_user === "shipper" && command === "cancelled_from_shipper") {
@@ -178,11 +197,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         })
       }
       this.deleteChatRoom(order._id);
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // shipper đã đến nơi giao
     if (type_user === "shipper" && command === "arrived") {
       this.realTimeTo1Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tài xế đã đến nơi giao")
+      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
     }
     // shipper giao hàng thành công
     if (type_user === "shipper" && command === "success") {
@@ -190,11 +211,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       setTimeout(() => {
         this.deleteChatRoom(order._id);
       }, 3 * 60 * 60 * 1000); // 3 giờ
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // shipper hủy đơn hàng (khách boom hàng)
     if (type_user === "shipper" && command === "fake_order") {
       this.realTimeTo1Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy vì không liên lạc được cho bạn")
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     // merchant hủy đơn hàng
     if (type_user === "merchant" && command === "cancelled_from_merchant") {
@@ -202,6 +225,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Đơn hàng đã bị hủy từ nhà hàng")
       this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Đơn hàng đã bị hủy từ nhà hàng")
       this.deleteChatRoom(order._id);
+      this.activeOrders.delete(order.customerID._id); // Xóa trạng thái đơn hàng
     }
     if (command === "chat") {
       const { message, type_mess } = payload;
