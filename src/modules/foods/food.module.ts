@@ -7,6 +7,7 @@ import { FoodService } from './food.service';
 import { Merchant, MerchantSchema } from 'src/schemas/merchant.schema';
 import { FoodStatus, FoodStatusSchemas } from 'src/schemas/foodStatus.schema';
 import { GroupOfFood, groupOfFoodSchema } from 'src/schemas/groupOfFood.schema';
+import { UserMerchant, UserMerchantSchema } from 'src/schemas/userMerchant.schema';
 
 @Module({
     imports: [
@@ -26,6 +27,10 @@ import { GroupOfFood, groupOfFoodSchema } from 'src/schemas/groupOfFood.schema';
             {
                 name: FoodStatus.name,
                 schema: FoodStatusSchemas
+            },
+            {
+                name: UserMerchant.name,
+                schema: UserMerchantSchema
             },
         ])
     ],

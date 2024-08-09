@@ -20,6 +20,7 @@ import { HistoryMerchantDto } from 'src/dto/dto.historyMerchant';
 import { AuthGuard } from 'src/helper/auth.middleware';
 import { MerchantDto } from 'src/dto/dto.merchant';
 import { RolesGuard } from 'src/helper/checkRole.middleware';
+import { RejectMerchantDto } from 'src/dto/dto.rejectMerchant';
 
 @Controller('merchants')
 export class MerchantController {
@@ -208,6 +209,12 @@ export class MerchantController {
     return this.merchantService.changePass(id, passOld, passNew);
   }
 
+  //sửa tài khoản merchant
+  @Patch('rejectMerchant')
+  @UseGuards(AuthGuard)
+  rejectMerchant(@Query('id') id: string, @Body() body) {
+    return this.merchantService.rejectMerchant(id, body);
+  }
   //gửi email xác thực
   @Post('verifileMerchant')
   verifileMerchant(@Body() body: { email: string }) {

@@ -36,6 +36,7 @@ import * as FormData from 'form-data';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { RejectMerchantDto } from 'src/dto/dto.rejectMerchant';
 @Injectable()
 export class MerchantService {
   constructor(
@@ -1366,4 +1367,54 @@ export class MerchantService {
       return { result: false, walletMerchant: error };
     }
   }
+  async rejectMerchant(id: string, information: RejectMerchantDto) {
+    try {
+      
+        // Find the shipper by ID
+        const merchant = await this.merchants.findByIdAndUpdate(id,{status:5},{new:true});
+        if (!merchant) {
+          return { result: false, message: 'không tìm thấy thông tin merchant' };
+        }
+        const user = await this.userMerchantModel.findOne({merchantID:id});
+        if (!user) {
+          return { result: false, message: 'không tìm thấy user' };
+        }
+
+        const sttMap = {
+          image: '1',
+          name: '2',
+          address: '3',
+          email: '4',
+          phoneNumber: '5',
+          nameOwner: '6',
+          IDCard: '7',
+          businessLicense: '8',
+        };
+        let invalidFields = '';
+        for (const key in information) {
+            if (!information[key]) {
+                invalidFields += sttMap[key]; // Thêm số thứ tự vào chuỗi
+            }
+            if (key === 'businessLicense') {
+              break;
+            }
+        }
+        
+        const url =`http://localhost:3003/updateInfoShipper/${id}/${invalidFields}`;
+        const content = `
+            Xin lỗi quý khách hàng: ${user.fullName}<br/>
+            Thông tin đăng ký bạn chưa hợp lệ: ${information.note}<br/>
+            Vui lòng kiểm tra và cập nhật lại những thông tin sai.<br/>
+            <a href="${url}">Click vào đây để cập nhật thông tin</a>
+        `;
+        const mail = await Mailer.sendMail({
+          email: user.email,
+          subject: 'Đăng ký đối tác cửa hàng',
+          content: content,
+        });
+        return { result: true, message: 'Từ chối thành công' };
+    } catch (error) {
+        return { result: false, message: 'Từ chối shipper thất bại', error: error.message };
+    }
+}
 }
