@@ -1163,7 +1163,7 @@ export class MerchantService {
               { address: new RegExp(keyword, 'i') },
             ],
           },
-          { status: { $in: [1, 2] } },
+          { status: { $in: [1, 2] }, deleted: false },
         ],
       });
       if (merchants.length === 0) {
