@@ -1270,7 +1270,7 @@ export class MerchantService {
   async getListAwaitingApproval() {
     try {
       const history = await this.historyMerchantModel
-        .find({ status: 1 })
+        .find({ status: 1, deleted: false })
         .populate('merchantID')
         .populate('transantionType');
       if (!history)
