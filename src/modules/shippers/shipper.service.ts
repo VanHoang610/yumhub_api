@@ -1707,7 +1707,7 @@ export class ShipperService {
   async getListAwaitingApproval() {
     try {
       const history = await this.historyShipperModel
-        .find({ status: 1 })
+        .find({ status: 1, deleted: false })
         .populate('merchantID')
         .populate('transantionType');
       if (!history)
