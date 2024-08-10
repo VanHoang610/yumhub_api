@@ -1692,7 +1692,7 @@ export class ShipperService {
               { idBike: new RegExp(keyword, 'i') },
             ],
           },
-          { status: 1},
+          { status: 1, deleted: false },
         ],
       });
       if (shippers.length === 0) {
