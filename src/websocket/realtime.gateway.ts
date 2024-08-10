@@ -145,7 +145,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     if (type_user === "customer" && command === "placeOrder") {
       this.realTimeTo1Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Bạn có đơn hàng mới")
-      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command }); 
+      this.activeOrders.set(order.customerID._id, { order: JSON.stringify(order), status: command });
     }
     // shipper từ chối nhận đơn hàng
     if (type_user === "shipper" && command === "refuse") {
@@ -170,19 +170,19 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       }
 
       this.createChatRoom(order._id, order.customerID._id, order.shipperID._id);
-      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
+      this.activeOrders.set(order.customerID._id, { order: JSON.stringify(order), status: command }); // Lưu trạng thái đơn hàng
     }
     // shipper đã đến nhà hàng
     if (type_user === "shipper" && command === "waiting") {
       console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", command);
 
       this.realTimeTo1Object(type_user, command, order);
-      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
+      this.activeOrders.set(order.customerID._id, { order: JSON.stringify(order), status: command }); // Lưu trạng thái đơn hàng
     }
     // shipper đã lấy hàng
     if (type_user === "shipper" && command === "delivering") {
       this.realTimeTo2Object(type_user, command, order);
-      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
+      this.activeOrders.set(order.customerID._id, { order: JSON.stringify(order), status: command }); // Lưu trạng thái đơn hàng
     }
     // shipper hủy đơn hàng vì nhà hàng không hoạt động hoặc hết món
     if (type_user === "shipper" && command === "cancelled_from_shipper") {
@@ -203,7 +203,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     if (type_user === "shipper" && command === "arrived") {
       this.realTimeTo1Object(type_user, command, order);
       this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tài xế đã đến nơi giao")
-      this.activeOrders.set(order.customerID._id, { order : JSON.stringify(order), status : command}); // Lưu trạng thái đơn hàng
+      this.activeOrders.set(order.customerID._id, { order: JSON.stringify(order), status: command }); // Lưu trạng thái đơn hàng
     }
     // shipper giao hàng thành công
     if (type_user === "shipper" && command === "success") {
@@ -243,14 +243,14 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
           this.chatRooms.set(roomName, [chatMessage]);
         }
         console.log(this.chatRooms.get(roomName));
-      
-      // this.server.to(roomName).emit('chatMessage', chatMessage);
-      if (type_user === 'shipper') {
-        this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tin nhắn mới")
-      } else {
-        this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Tin nhắn mới")
+
+        // this.server.to(roomName).emit('chatMessage', chatMessage);
+        if (type_user === 'shipper') {
+          this.sendNotication(this.findClientById(order.customerID._id, "customer").tokenNotification, "Tin nhắn mới")
+        } else {
+          this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Tin nhắn mới")
+        }
       }
-    }
       this.sendMessageToClient(this.findClientById(order.customerID._id, "customer").socket, "chat", { orderID: order._id, fullChat: this.chatRooms.get(roomName) });
       this.sendMessageToClient(this.findClientById(order.shipperID._id, "shipper").socket, "chat", { orderID: order._id, fullChat: this.chatRooms.get(roomName) });
     }
