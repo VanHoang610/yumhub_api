@@ -147,6 +147,12 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Bạn có đơn hàng mới")
       this.activeOrders.set(order.customerID._id, { order: JSON.stringify(order), status: command });
     }
+    // khách hàng hủy đặt đơn khi chưa có shipper nào nhận
+    if (type_user === "customer" && command === "cancelled_from_customer") {
+      this.realTimeTo1Object(type_user, command, order);
+      this.sendNotication(this.findClientById(order.shipperID._id, "shipper").tokenNotification, "Đơn hàng đã bị hủy từ khách hàng")
+      this.activeOrders.delete(order.customerID._id);
+    }
     // shipper từ chối nhận đơn hàng
     if (type_user === "shipper" && command === "refuse") {
       this.realTimeTo1Object(type_user, command, order);

@@ -1078,8 +1078,6 @@ export class MerchantService {
       const addressCustomer = await this.addressModol.findOne({
         customerID: id,
       });
-      if (!addressCustomer)
-        throw new HttpException('Not Found CustomerID', HttpStatus.NOT_FOUND);
 
       if (!addressCustomer && !longitude && !latitude) {
         const merchants = await this.merchants.find({ status: 3 }).exec();
