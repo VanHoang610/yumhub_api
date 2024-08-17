@@ -277,7 +277,7 @@ export class FoodService {
         console.log(`Food not found with ID: ${foodId}`);
         return { result: false, message: 'Không tìm thấy món ăn' };
       }
-      if (updateFood.priceForSale === food.price) {
+      if (updateFood.priceForSale >= food.price) {
         updateFood.priceForSale = null;
       }
       const updatefood = await this.FoodModel.findByIdAndUpdate(
