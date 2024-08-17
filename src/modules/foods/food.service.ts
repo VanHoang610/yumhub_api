@@ -270,18 +270,22 @@ export class FoodService {
 
   async updateFood(foodId: string, updateFood: UpdateFoodDto): Promise<{ result: boolean, message?: string, food?: any }> {
     try {
-      const food = await this.FoodModel.findByIdAndUpdate(
-        foodId,
-        updateFood,
-        { new: true }
-      );
-
+      const food = await this.FoodModel.findById(
+        foodId
+      )
       if (!food) {
         console.log(`Food not found with ID: ${foodId}`);
         return { result: false, message: 'Không tìm thấy món ăn' };
       }
-
-      return { result: true, food: food };
+      if (updateFood.priceForSale === food.price) {
+        updateFood.priceForSale = null;
+      }
+      const updatefood = await this.FoodModel.findByIdAndUpdate(
+        foodId,
+        updateFood,
+        { new: true }
+      );
+      return { result: true, food: updatefood };
     } catch (error) {
       console.error(`Error updating food with ID: ${foodId}`, error);
       return { result: false, message: error.message };
