@@ -1444,7 +1444,7 @@ export class MerchantService {
               break;
             }
         }
-        const url =`https://thanhhoa-dev.github.io/yumhub_homepage/updateInfoMerchant/${id}/${invalidFields}`;
+        const url =`https://thanhhoa-dev.github.io/yumhub_homepage/#/updateInfoMerchant/${id}/${invalidFields}`;
         const content = `
             Xin lỗi quý khách hàng: ${user.fullName}<br/>
             Thông tin đăng ký bạn chưa hợp lệ: ${information.note}<br/>
@@ -1458,7 +1458,7 @@ export class MerchantService {
         });
         return { result: true, message: 'Từ chối thành công' };
     } catch (error) {
-        return { result: false, message: 'Từ chối shipper thất bại', error: error.message };
+        return { result: false, message: 'Từ chối merchant thất bại', error: error.message };
     }
 }
 }
