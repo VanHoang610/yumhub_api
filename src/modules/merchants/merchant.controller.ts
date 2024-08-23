@@ -33,6 +33,17 @@ export class MerchantController {
     return this.merchantService.updateMerchant(id, update);
   }
 
+  @Patch('updateMerchant-web')
+  async updateMerchantfromWeb(
+    @Query('id') id: string,
+    @Body(new ValidationPipe()) updateMerchant: any
+  ) {
+    console.log(updateMerchant);
+    const result = await this.merchantService.updateMerchantFromWeb(id, updateMerchant);
+    console.log(result);
+    return result;
+  }
+
   @Post('RevenueWeek')
   @UseGuards(AuthGuard)
   getRevenueWeek(@Body() body: { ID: string }) {
