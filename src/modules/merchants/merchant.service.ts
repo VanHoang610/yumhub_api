@@ -1365,6 +1365,53 @@ export class MerchantService {
       return { result: false, walletMerchant: error };
     }
   }
+
+  async updateMerchantFromWeb(id: string, updateMerchant: MerchantDto) {
+    // Bắt đầu một phiên giao dịch
+    const session = await this.merchants.startSession();
+    session.startTransaction();
+
+    try {
+      // Cập nhật tài liệu merchant
+      const merchantNew = await this.merchants.findByIdAndUpdate(
+        id,
+        {
+          ...updateMerchant,
+          status: 1,
+        },
+        { new: true, session }
+      );
+
+      if (!merchantNew) {
+        throw new Error('Không tìm thấy merchant');
+      }
+
+      // Cập nhật tài liệu userMerchant
+      const userMerchantNew = await this.userMerchantModel.findOneAndUpdate(
+        { merchantID: id },
+        { ...updateMerchant, status: 1 },
+        { new: true, session }
+      );
+
+      if (!userMerchantNew) {
+        throw new Error('Không tìm thấy userMerchant');
+      }
+
+      // Nếu tất cả thành công, commit giao dịch
+      await session.commitTransaction();
+      session.endSession();
+
+      return { result: true, data: { merchantNew, userMerchantNew } };
+    } catch (error) {
+      // Nếu có lỗi, rollback giao dịch
+      await session.abortTransaction();
+      session.endSession();
+
+      console.error('Lỗi khi cập nhật merchant và userMerchant:', error);
+      return { result: false, error };
+    }
+  }
+
   async rejectMerchant(id: string, information: RejectMerchantDto) {
     try {
       
@@ -1398,7 +1445,7 @@ export class MerchantService {
             }
         }
         
-        const url =`http://localhost:3003/updateInfoShipper/${id}/${invalidFields}`;
+        const url =`https://thanhhoa-dev.github.io/yumhub_homepage/updateInfoMerchant/${id}/${invalidFields}`;
         const content = `
             Xin lỗi quý khách hàng: ${user.fullName}<br/>
             Thông tin đăng ký bạn chưa hợp lệ: ${information.note}<br/>
