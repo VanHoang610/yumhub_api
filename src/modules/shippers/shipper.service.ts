@@ -1849,7 +1849,7 @@ export class ShipperService {
             }
         }
         
-        const url =`http://localhost:3003/updateInfoShipper/${id}/${invalidFields}`;
+        const url =`https://thanhhoa-dev.github.io/yumhub_homepage/#/updateInfoShipper/${id}/${invalidFields}`;
         const content = `
             Xin lỗi quý khách hàng: ${user.fullName}<br/>
             Thông tin đăng ký bạn chưa hợp lệ: ${shipper.note}<br/>
