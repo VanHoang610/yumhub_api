@@ -101,7 +101,8 @@ export class VoucherService {
     return this.voucherModel.find().populate('typeOfVoucherID').exec();
   }
   async findValidVoucher() {
-    return this.voucherModel.find({ endDate: { $gte: new Date() } }).exec(); // $gte viết tắt của "greater than or equal"
+    const validVoucher = this.voucherModel.find({startDate: { $lte: new Date()}, endDate: { $gte: new Date() } }).exec(); // $gte viết tắt của "greater than or equal"
+    return (await validVoucher).reverse();
   }
   async updateVoucher(id: string, updateVoucher: UpdateVoucherDto) {
     try {
