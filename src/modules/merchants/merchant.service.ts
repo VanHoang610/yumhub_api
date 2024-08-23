@@ -1444,7 +1444,6 @@ export class MerchantService {
               break;
             }
         }
-        
         const url =`https://thanhhoa-dev.github.io/yumhub_homepage/updateInfoMerchant/${id}/${invalidFields}`;
         const content = `
             Xin lỗi quý khách hàng: ${user.fullName}<br/>
