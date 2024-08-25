@@ -26,14 +26,25 @@ export class WebhookController {
         }else if(data.description.slice(0,1)=="2"){
           type="shipper"
         }else type="merchant"
-        const client = this.realtimeGateway.findClientById(data.description.slice(-24), type);
 
-        if (client) {
-          this.realtimeGateway.sendMessageToClient(client.socket, "paymentQRCode", desc);
-          console.log(`Đơn hàng ${data.orderCode} nhận được với số tiền ${data.amount}.`);
-        } else {
-          console.log(`Không tìm thấy client nào đang hoạt động với ID: ${data.description.slice(-24)} và loại: ${type}`);
+        if(type != "merchant"){
+          const client = this.realtimeGateway.findClientById(data.description.slice(-24), type);
+
+          if (client) {
+            this.realtimeGateway.sendMessageToClient(client.socket, "paymentQRCode", desc);
+            console.log(`Đơn hàng ${data.orderCode} nhận được với số tiền ${data.amount}.`);
+          } else {
+            console.log(`Không tìm thấy client nào đang hoạt động với ID: ${data.description.slice(-24)} và loại: ${type}`);
+          }
+        }else{
+          const clients = this.realtimeGateway.findAllClientMerchantById(data.description.slice(-24));
+          if (this.realtimeGateway.findAllClientMerchantById(data.description.slice(-24)).length > 0) {
+            clients.forEach(client => {
+              this.realtimeGateway.sendMessageToClient(client.socket, "paymentQRCode", desc);
+            })
+          }
         }
+        
       } catch (error) {
         console.error('Lỗi khi phân tích dữ liệu:', error);
       }

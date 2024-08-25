@@ -1069,22 +1069,103 @@ export class ShipperService {
     }
   }
 
+  // async updateShipperFromWeb(id: string, updateShipper: ShipperDto) {
+  //   try {
+  //     const shipperNew = await this.shipperModel.findByIdAndUpdate(
+  //       id,
+
+  //       {...updateShipper,
+  //         status:1
+  //       },
+  //       { new: true },
+  //     );
+  //     return { result: true, data: shipperNew };
+  //   } catch (error) {
+  //     console.error('Error updating shipper:', error);
+  //     return { result: false, error };
+  //   }
+  // }
+
   async updateShipperFromWeb(id: string, updateShipper: ShipperDto) {
+    // Bắt đầu một phiên giao dịch
+    const session = await this.shipperModel.startSession();
+    session.startTransaction();
+
     try {
+      // Cập nhật shipper
       const shipperNew = await this.shipperModel.findByIdAndUpdate(
         id,
-
-        {...updateShipper,
-          status:1
+        {
+          ...updateShipper,
+          status: 1,
         },
-        { new: true },
+        { new: true, session }
       );
-      return { result: true, data: shipperNew };
+
+      if (!shipperNew) {
+        throw new Error('Không tìm thấy shipper');
+      }
+
+      if (updateShipper.idCardBack){
+        const temp = {imageFontSide : updateShipper.idCardFront,
+          imageBackSide : updateShipper.idCardBack
+        }
+
+        const documentIDCard = await this.documentShipperModal.findOneAndUpdate(
+          { shipperID: id , documentTypeID : "66642316fc13ae0853b09bb7"},
+          { ...temp, status : 1},
+          { new: true, session }
+        )
+        if (!documentIDCard){
+          throw new Error('Không tìm thấy tài liệu CMND/CCCD');
+        }
+      }
+
+      if (updateShipper.driverLicenseFront){
+        const temp = {imageFontSide : updateShipper.driverLicenseFront,
+          imageBackSide : updateShipper.driverLicenseBack
+        }
+
+        const documentIDCard = await this.documentShipperModal.findOneAndUpdate(
+          { shipperID: id , documentTypeID : "66642316fc13ae0853b09bb8"},
+          { ...temp, status : 1},
+          { new: true, session }
+        )
+        if (!documentIDCard){
+          throw new Error('Không tìm thấy tài liệu GPLX');
+        }
+      }
+
+      if (updateShipper.vehicleCertificateFront){
+        const temp = {imageFontSide : updateShipper.vehicleCertificateFront,
+          imageBackSide : updateShipper.vehicleCertificateBack
+        }
+
+        const documentIDCard = await this.documentShipperModal.findOneAndUpdate(
+          { shipperID: id , documentTypeID : "6667dc72a588bba5a76a9ec4"},
+          { ...temp, status : 1},
+          { new: true, session }
+        )
+        if (!documentIDCard){
+          throw new Error('Không tìm thấy tài liệu Giấy DK xe');
+        }
+      }
+
+      // Nếu tất cả thành công, commit giao dịch
+      await session.commitTransaction();
+      session.endSession();
+
+      return { result: true, data: { shipperNew } };
     } catch (error) {
-      console.error('Error updating shipper:', error);
+      // Nếu có lỗi, rollback giao dịch
+      await session.abortTransaction();
+      session.endSession();
+
+      console.error('Lỗi khi cập nhật merchant và userMerchant:', error);
       return { result: false, error };
     }
   }
+
   async updateAvatar(id: string, avatar: string) {
     return await this.shipperModel.findByIdAndUpdate(id, { avatar });
   }

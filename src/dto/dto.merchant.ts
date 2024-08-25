@@ -53,4 +53,20 @@ export class MerchantDto {
 
     @IsString()
     fullName: string
+
+    @IsOptional()
+    @IsString()
+    IDCardBack?: string
+
+    @IsOptional()
+    @IsString()
+    IDCardFont?: string
+
+    @IsOptional()
+    @IsString()
+    businessLicenseBack?: string
+
+    @IsOptional()
+    @IsString()
+    businessLicenseFont?: string
 }

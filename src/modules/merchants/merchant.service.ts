@@ -1397,6 +1397,36 @@ export class MerchantService {
         throw new Error('Không tìm thấy userMerchant');
       }
 
+      if (updateMerchant.IDCardBack){
+        const temp = {imageFontSide : updateMerchant.IDCardFont,
+          imageBackSide : updateMerchant.IDCardBack
+        }
+
+        const documentIDCard = await this.documentMerchantModel.findOneAndUpdate(
+          { merchantID: id , documentTypeID : "66642316fc13ae0853b09bb7"},
+          { ...temp, status : 1},
+          { new: true, session }
+        )
+        if (!documentIDCard){
+          throw new Error('Không tìm thấy tài liệu CMND/CCCD');
+        }
+      }
+
+      if (updateMerchant.businessLicenseBack){
+        const temp = {imageFontSide : updateMerchant.businessLicenseFont,
+          imageBackSide : updateMerchant.businessLicenseBack
+        }
+
+        const documentIDCard = await this.documentMerchantModel.findOneAndUpdate(
+          { merchantID: id , documentTypeID : "6667e63ea588bba5a76a9f02"},
+          { ...temp, status : 1},
+          { new: true, session }
+        )
+        if (!documentIDCard){
+          throw new Error('Không tìm thấy tài liệu GPKD');
+        }
+      }
+
       // Nếu tất cả thành công, commit giao dịch
       await session.commitTransaction();
       session.endSession();
