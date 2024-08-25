@@ -289,7 +289,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 
   // Function để gửi tin nhắn từ server tới client cụ thể
-  sendMessageToClient(client: Socket, command: string, order: any): void {
+  public sendMessageToClient(client: Socket, command: string, order: any): void {
 
     client.emit('message', { command: command, order: order });
   }
@@ -300,7 +300,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   // }
 
   // Function để tìm kiếm client
-  findClientById(id_user: string, type_user: string): ConnectedClient | undefined {
+  public findClientById(id_user: string, type_user: string): ConnectedClient | undefined {
     switch (type_user) {
       case "customer":
         return this.customers.find(client => client.id_user === id_user)
@@ -310,7 +310,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         return undefined
     }
   }
-  findAllClientMerchantById(id_merchant: string): ConnectedClient[] | undefined {
+  public findAllClientMerchantById(id_merchant: string): ConnectedClient[] | undefined {
     return this.merchants.filter(client => client.id_merchant === id_merchant);
   }
   sendNotication(tokenNotification: string, messageBody: string) {

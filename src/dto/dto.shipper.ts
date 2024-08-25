@@ -53,4 +53,28 @@ export class ShipperDto {
     @IsOptional()
     status: number
 
+    @IsOptional()
+    @IsString()
+    idCardBack?: string
+
+    @IsOptional()
+    @IsString()
+    idCardFront?: string
+
+    @IsOptional()
+    @IsString()
+    driverLicenseFront?: string
+
+    @IsOptional()
+    @IsString()
+    driverLicenseBack?: string
+
+    @IsOptional()
+    @IsString()
+    vehicleCertificateFront?: string
+
+    @IsOptional()
+    @IsString()
+    vehicleCertificateBack?: string
+
 }
