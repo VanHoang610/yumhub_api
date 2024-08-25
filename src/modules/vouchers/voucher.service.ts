@@ -98,7 +98,8 @@ export class VoucherService {
   }
 
   async getAllVoucher() {
-    return this.voucherModel.find().populate('typeOfVoucherID').exec();
+    const allVoucher=this.voucherModel.find().populate('typeOfVoucherID').exec();
+    return (await allVoucher).reverse();
   }
   async findValidVoucher() {
     const validVoucher = this.voucherModel.find({startDate: { $lte: new Date()}, endDate: { $gte: new Date() } }).exec(); // $gte viết tắt của "greater than or equal"
