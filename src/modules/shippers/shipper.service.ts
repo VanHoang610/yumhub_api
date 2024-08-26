@@ -1348,6 +1348,7 @@ export class ShipperService {
         timeBook: { $gte: start, $lte: end },
         status: DeliveredID?._id, // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
       });
+
       const orderCancel = await this.orderModel.find({
         shipperID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
         timeBook: { $gte: start, $lte: end },
