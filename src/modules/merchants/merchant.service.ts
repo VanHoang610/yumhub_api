@@ -670,7 +670,6 @@ export class MerchantService {
       const end = new Date(dateEnd).setHours(23, 59, 59, 999);
       const DeliveredID = await this.statusModel.findOne({ name: 'success' });
       const CancelID = await this.statusModel.findOne({ name: 'cancel' });
-
       var totalRevenue = 0;
       const merchant = await this.merchants.findById(id);
       if (!merchant) {
@@ -680,9 +679,10 @@ export class MerchantService {
       // Lấy tất cả các hóa đơn của merchant thành công trong khoảng thời gian đã cho
       const orders = await this.orderModel.find({
         merchantID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
-        timeBook: { $gte: dateStart, $lte: dateEnd },
+        timeBook: { $gte: start, $lte: end },
         status: DeliveredID?._id, // Sử dụng DeliveredID?._id để tránh lỗi nếu không tìm thấy
       });
+
       // Lấy tất cả các hóa đơn của merchant huỷ trong khoảng thời gian đã cho
       const orderCancel = await this.orderModel.find({
         merchantID: Object(id), // Chuyển đổi ID thành ObjectId ở đây
