@@ -671,6 +671,9 @@ export class MerchantService {
       const DeliveredID = await this.statusModel.findOne({ name: 'success' });
       const CancelID = await this.statusModel.findOne({ name: 'cancel' });
       var totalRevenue = 0;
+      var payByBanking = 0;
+      var payByZalo = 0;
+      var payByCash = 0;
       const merchant = await this.merchants.findById(id);
       if (!merchant) {
         return { result: 'nhập sai ID Merchant', revenue: 0, cancel: 0 };
@@ -692,18 +695,29 @@ export class MerchantService {
       var numberOfOrders = 0;
       for (const order of orders) {
         numberOfOrders += 1;
-        totalRevenue += order.priceFood; // Giả sử totalAmount là trường lưu số tiền của hóa đơn
+        totalRevenue += order.revenueMerchant;
+        if (order.paymentMethod == 1) {
+          payByBanking += order.revenueMerchant;
+        } else if (order.paymentMethod == 2) {
+          payByZalo += order.revenueMerchant;
+        } else if (order.paymentMethod == 3) {
+          payByCash += order.revenueMerchant;
+        } // Giả sử totalAmount là trường lưu số tiền của hóa đơn
       }
       var numberOfOrderCancel = 0;
       for (const order of orderCancel) {
         numberOfOrderCancel += 1;
       }
 
+
       return {
         result: true,
         revenue: totalRevenue,
         success: numberOfOrders,
         cancel: numberOfOrderCancel,
+        payByBanking: payByBanking,
+        payByZalo: payByZalo,
+        payByCash: payByCash,
       };
     } catch (error) {
       return { result: false, revenue: error, cancel: error };
