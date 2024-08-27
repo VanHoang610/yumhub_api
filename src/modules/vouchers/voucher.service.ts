@@ -85,8 +85,12 @@ export class VoucherService {
       const objectIDTypeVoucher = new ObjectId(voucherDto.typeOfVoucherID);
 
       if (code) throw new HttpException("Code already exists ", HttpStatus.NOT_ACCEPTABLE);
+      const startDate = new Date(voucherDto.startDate).setHours(0, 0, 0, 0);
+      const endDate = new Date(voucherDto.endDate).setHours(23, 59, 59, 999);
       const newVoucher = new this.voucherModel({
         ...voucherDto,
+        startDate: startDate,
+        endDate: endDate,
         typeOfVoucherID: objectIDTypeVoucher
       });
       await newVoucher.save();
@@ -107,6 +111,8 @@ export class VoucherService {
   }
   async updateVoucher(id: string, updateVoucher: UpdateVoucherDto) {
     try {
+      updateVoucher.startDate = new Date(updateVoucher.startDate).setHours(0, 0, 0, 0);
+      updateVoucher.endDate = new Date(updateVoucher.endDate).setHours(23, 59, 59, 999);
       const voucherNew = await this.voucherModel.findByIdAndUpdate(
         id,
         updateVoucher,
