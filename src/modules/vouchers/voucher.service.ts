@@ -112,7 +112,9 @@ export class VoucherService {
         updateVoucher,
         { new: true },
       );
-      return { result: true, voucher: voucherNew };
+      const voucherResult = await voucherNew.populate('typeOfVoucherID');
+      console.log(voucherResult);
+      return { result: true, voucher: voucherResult};
     } catch (error) {
       console.error('Error updating voucher:', error);
       throw error;
