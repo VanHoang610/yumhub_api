@@ -80,7 +80,6 @@ export class VoucherController {
     @Query('id') id: string,
     @Body(new ValidationPipe()) updateVoucher: UpdateVoucherDto,
   ) {
-    console.log(updateVoucher);
     return await this.voucherService.updateVoucher(id, updateVoucher);
   }
 
