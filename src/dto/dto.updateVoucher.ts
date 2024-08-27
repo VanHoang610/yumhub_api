@@ -1,5 +1,5 @@
 export class UpdateVoucherDto {
     conditionsApply: Number;
-    startTime: string;
-    endTime: string;
+    startDate: any;
+    endDate: any;
 }
