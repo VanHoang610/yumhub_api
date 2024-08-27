@@ -1142,6 +1142,107 @@ export class OrderService {
     }
   }
 
+  // async getListFoodByOrder(id: string, status: number) {
+  //   try {
+  //     let user;
+  //     let customerID, merchantID, shipperID;
+  //     user = await this.customerModel.findById(id);
+  //     if (user) {
+  //       customerID = user._id;
+  //     } else {
+  //       user = await this.merchantModel.findById(id);
+  //       if (user) {
+  //         merchantID = user._id;
+  //       } else {
+  //         user = await this.shipperModel.findById(id);
+  //         if (user) {
+  //           shipperID = user._id;
+  //         }
+  //       }
+  //     }
+
+  //     if (!user) {
+  //       throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
+  //     }
+
+  //     let statusOrder;
+  //     switch (status) {
+  //       case 1:
+  //         statusOrder = '661760e3fc13ae3574ab8ddd';
+  //         break;
+  //       case 2:
+  //         statusOrder = '661760e3fc13ae3574ab8dde';
+  //         break;
+  //       case 3:
+  //         statusOrder = '661760e3fc13ae3574ab8ddf';
+  //         break;
+  //       case 4:
+  //         statusOrder = '661760e3fc13ae3574ab8de0';
+  //         break;
+  //       case 5:
+  //         statusOrder = '661760e3fc13ae3574ab8de1';
+  //         break;
+  //       case 6:
+  //         statusOrder = '661760e3fc13ae3574ab8de2';
+  //         break;
+  //       case 7:
+  //         statusOrder = '661761a5fc13ae3517ab89f5';
+  //         break;
+  //       case 8:
+  //         statusOrder = '661760e3fc13ae3574ab8de3';
+  //         break;
+  //       case 9:
+  //         statusOrder = '6656a8738913d56206f64e01';
+  //         break;
+  //       default:
+  //         throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
+  //     }
+
+  //     let orders;
+  //     if (customerID) {
+  //       orders = await this.orderModel
+  //         .find({ customerID, status: statusOrder })
+  //         .populate('merchantID')
+  //         .populate('shipperID');
+  //     } else if (merchantID) {
+  //       orders = await this.orderModel
+  //         .find({ merchantID, status: statusOrder })
+  //         .populate('customerID')
+  //         .populate('shipperID');
+  //     } else if (shipperID) {
+  //       orders = await this.orderModel
+  //         .find({ shipperID, status: statusOrder })
+  //         .populate('customerID')
+  //         .populate('merchantID');
+  //     }
+
+  //     if (!orders || orders.length === 0) {
+  //       throw new HttpException('No orders found', HttpStatus.NOT_FOUND);
+  //     }
+
+  //     const orderIDs = orders.map((order) => order._id);
+
+  //     const detailOrders = await this.detailOrderModel
+  //       .find({ orderID: { $in: orderIDs } })
+  //       .populate('foodID');
+
+  //     const ordersWithDetails = orders.map((order) => {
+  //       const orderDetail = detailOrders.filter(
+  //         (detail) => detail.orderID.toString() === order._id.toString(),
+  //       );
+  //       return {
+  //         ...order.toObject(),
+  //         detailOrder: orderDetail,
+  //       };
+  //     });
+
+  //     return { result: true, listOrder: ordersWithDetails };
+  //   } catch (error) {
+  //     console.log('Error:', error);
+  //     return { result: false, listReview: error.message };
+  //   }
+  // }
+
   async getListFoodByOrder(id: string, status: number) {
     try {
       let user;
@@ -1160,11 +1261,11 @@ export class OrderService {
           }
         }
       }
-
+  
       if (!user) {
         throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
       }
-
+  
       let statusOrder;
       switch (status) {
         case 1:
@@ -1197,51 +1298,54 @@ export class OrderService {
         default:
           throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
       }
-
+  
       let orders;
       if (customerID) {
         orders = await this.orderModel
           .find({ customerID, status: statusOrder })
           .populate('merchantID')
-          .populate('shipperID');
+          .populate('shipperID')
+          .populate('voucherID'); // Thêm populate voucherID
       } else if (merchantID) {
         orders = await this.orderModel
           .find({ merchantID, status: statusOrder })
           .populate('customerID')
-          .populate('shipperID');
+          .populate('shipperID')
+          .populate('voucherID'); // Thêm populate voucherID
       } else if (shipperID) {
         orders = await this.orderModel
           .find({ shipperID, status: statusOrder })
           .populate('customerID')
-          .populate('merchantID');
+          .populate('merchantID')
+          .populate('voucherID'); // Thêm populate voucherID
       }
-
+  
       if (!orders || orders.length === 0) {
         throw new HttpException('No orders found', HttpStatus.NOT_FOUND);
       }
-
+  
       const orderIDs = orders.map((order) => order._id);
-
       const detailOrders = await this.detailOrderModel
-        .find({ orderID: { $in: orderIDs } })
-        .populate('foodID');
-
-      const ordersWithDetails = orders.map((order) => {
-        const orderDetail = detailOrders.filter(
-          (detail) => detail.orderID.toString() === order._id.toString(),
-        );
-        return {
-          ...order.toObject(),
-          detailOrder: orderDetail,
-        };
-      });
-
-      return { result: true, listOrder: ordersWithDetails };
-    } catch (error) {
-      console.log('Error:', error);
-      return { result: false, listReview: error.message };
-    }
-  }
+              .find({ orderID: { $in: orderIDs } })
+              .populate('foodID');
+        
+            const ordersWithDetails = orders.map((order) => {
+              const orderDetail = detailOrders.filter(
+                (detail) => detail.orderID.toString() === order._id.toString(),
+              );
+              return {
+                ...order.toObject(),
+                detailOrder: orderDetail,
+                voucher: order.voucherID ? order.voucherID : null, // Lấy dữ liệu từ voucherID
+              };
+            });
+        
+            return { result: true, listOrder: ordersWithDetails };
+          } catch (error) {
+            console.log('Error:', error);
+            return { result: false, listReview: error.message };
+          }
+        }
 
   async updateDetailOrder(id: string, quantity: number, description: string) {
     try {
