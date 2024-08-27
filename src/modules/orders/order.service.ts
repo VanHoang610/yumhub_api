@@ -232,7 +232,8 @@ export class OrderService {
         .populate('customerID')
         .populate('merchantID')
         .populate('shipperID')
-        .populate('voucherID');
+        .populate('voucherID')
+        .populate('status');
       if (!orders) return { Message: 'Not found Order' };
       return { result: true, order: orders };
     } catch (error) {
